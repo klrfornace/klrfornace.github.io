@@ -57,7 +57,6 @@ const mapboxSatelliteStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id
 // var Google_Satellite = L.gridLayer.googleMutant( { type: 'satellite', maxZoom: 20, basemap: true, basemapName: 'Google_Satellite' } );
 
 // Esri basemaps
-// const ak = "AAPK276bdd9fabf844118406ccb5dcd673f1UDIgaNCtaUkLIyK5oo9muJoeZone99tRVSU5LHa43zc7bLXZ6LqSiCfwFGwzJq-9";
 
 // map.createPane('base');
 // map.getPane('base').style.zIndex = 0;
