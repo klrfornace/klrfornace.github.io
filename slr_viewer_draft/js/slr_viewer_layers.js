@@ -99,74 +99,76 @@ const defaultWMSoptions = {
   attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
   bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
   maxZoom: 19,
-  queryable: false,
+  queryable: true,
+  nullValue: 127,
+  popupMinZoom: 15,
 };
 
-const passiveSCI_0 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_0 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_00ft_SCI_v2', name: 'Passive SCI 00ft'})
 );
-const passiveSCI_1 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_1 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_01ft_SCI_v2', name: 'Passive SCI 1ft'})
 );
-const passiveSCI_2 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_2 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_02ft_SCI_v2', name: 'Passive SCI 2ft'})
 );
-const passiveSCI_3 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_3 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_03ft_SCI_v2', name: 'Passive SCI 3ft'})
 );
-const passiveSCI_4 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_4 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_04ft_SCI_v2', name: 'Passive SCI 4ft'})
 );
-const passiveSCI_5 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_5 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_05ft_SCI_v2', name: 'Passive SCI 5ft'})
 );
-const passiveSCI_6 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_6 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_06ft_SCI_v2', name: 'Passive SCI 6ft'})
 );
-const passiveSCI_7 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_7 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_07ft_SCI_v2', name: 'Passive SCI 7ft'})
 );
-const passiveSCI_8 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_8 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_08ft_SCI_v2', name: 'Passive SCI 8ft'})
 );
-const passiveSCI_9 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_9 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_09ft_SCI_v2', name: 'Passive SCI 9ft'})
 );
-const passiveSCI_10 = L.tileLayer.wms(crcgeoURL,
+const passiveSCI_10 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_10ft_SCI_v2', name: 'Passive SCI 10ft'})
 );
 
-const passiveGWI_0 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_0 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_00ft_GWI_v2', name: 'Passive GWI 00ft'})
 );
-const passiveGWI_1 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_1 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_01ft_GWI_v2', name: 'Passive GWI 1ft'})
 );
-const passiveGWI_2 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_2 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_02ft_GWI_v2', name: 'Passive GWI 2ft'})
 );
-const passiveGWI_3 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_3 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_03ft_GWI_v2', name: 'Passive GWI 3ft'})
 );
-const passiveGWI_4 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_4 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_04ft_GWI_v2', name: 'Passive GWI 4ft'})
 );
-const passiveGWI_5 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_5 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_05ft_GWI_v2', name: 'Passive GWI 5ft'})
 );
-const passiveGWI_6 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_6 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_06ft_GWI_v2', name: 'Passive GWI 6ft'})
 );
-const passiveGWI_7 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_7 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_07ft_GWI_v2', name: 'Passive GWI 7ft'})
 );
-const passiveGWI_8 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_8 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_08ft_GWI_v2', name: 'Passive GWI 8ft'})
 );
-const passiveGWI_9 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_9 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_09ft_GWI_v2', name: 'Passive GWI 9ft'})
 );
-const passiveGWI_10 = L.tileLayer.wms(crcgeoURL,
+const passiveGWI_10 = L.tileLayer.betterWms(crcgeoURL,
   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_10ft_GWI_v2', name: 'Passive GWI 10ft'})
 );
 
@@ -265,12 +267,16 @@ const boundary_highlight_style = {
     fillOpacity: 0.0
   };
 
+
+const zoomThreshold = 15; // Click and pan behavior will only be active below this zoom level.
+
 function highlightBoundaries ( e ) {
+  if (map.getZoom() < zoomThreshold) {
     let layer = e.target;
     layer.setStyle( boundary_highlight_style );
     if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
   }
-  
+  }
 
 const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?where=&text=&objectIds=&time=&geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&f=geojson';
 
@@ -279,12 +285,21 @@ const devplan = new L.GeoJSON.AJAX(
     {
       style: boundary_style,
       onEachFeature: function ( feature, layer ) {
-        layer.bindPopup( '<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } );
+        // layer.bindPopup( '<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } );
         layer.on(
           {
             mouseover: highlightBoundaries,
             mouseout: function(){devplan.resetStyle(this)},
-            click: function(){map.fitBounds( layer.getBounds())}
+            click: function(e){
+              if (map.getZoom() < zoomThreshold) {
+                map.fitBounds( layer.getBounds())
+
+                // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+                L.popup({ maxWidth: 200})
+                .setLatLng(e.latlng)
+                .setContent('<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } )
+                .openOn(map);
+              }}
 
             // Zoom to clicked polygon if no other clickable overlays are
             // expecting a pop-up window:
@@ -315,12 +330,21 @@ const ahupuaa = new L.GeoJSON.AJAX(
     onEachFeature: function ( feature, layer ) {
       var ahupuaa_name = feature.properties.ahupuaa;
       ahupuaa_name = ahupuaa_name.replace( /�/g, '&#299;' );
-      layer.bindPopup( '<strong>' + ahupuaa_name + '</strong>');
+      // layer.bindPopup( '<strong>' + ahupuaa_name + '</strong>');
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){ahupuaa.resetStyle(this)},
-          click: function(){map.fitBounds( layer.getBounds())}
+          click: function(e){
+            if (map.getZoom() < zoomThreshold) {
+              map.fitBounds( layer.getBounds())
+
+              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+              L.popup({ maxWidth: 200})
+              .setLatLng(e.latlng)
+              .setContent('<strong>' + ahupuaa_name + '</strong>', { direction: 'left', sticky: true } )
+              .openOn(map);
+            }}
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
 
@@ -358,12 +382,21 @@ const moku = new L.GeoJSON.AJAX(
         moku_name = feature.properties.mokupuni;
       }
 
-      layer.bindPopup( '<b>' + moku_name + '</b>');
+      // layer.bindPopup( '<b>' + moku_name + '</b>');
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){moku.resetStyle(this)},
-          click: function(){map.fitBounds( layer.getBounds())}
+          click: function(e){
+            if (map.getZoom() < zoomThreshold) {
+              map.fitBounds( layer.getBounds())
+
+              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+              L.popup({ maxWidth: 200})
+              .setLatLng(e.latlng)
+              .setContent('<strong>' + moku_name + '</strong>', { direction: 'left', sticky: true } )
+              .openOn(map);
+            }}
 
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
@@ -399,12 +432,21 @@ const boards = new L.GeoJSON.AJAX(
     style: boundary_style,
     onEachFeature: function ( feature, layer ) {
       const boardNumber = feature.properties.BOARD_NUM;
-      layer.bindPopup( '<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>');
+      // layer.bindPopup( '<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>');
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){boards.resetStyle(this)},
-          click: function(){map.fitBounds( layer.getBounds())}
+          click: function(e){
+            if (map.getZoom() < zoomThreshold) {
+              map.fitBounds( layer.getBounds())
+
+              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+              L.popup({ maxWidth: 200})
+              .setLatLng(e.latlng)
+              .setContent('<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>', { direction: 'left', sticky: true } )
+              .openOn(map);
+            }}
         }
       );
     },
@@ -430,12 +472,21 @@ const dhhl = new L.GeoJSON.AJAX(
   {
     style: boundary_style2,
     onEachFeature: function ( feature, layer ) {
-      layer.bindPopup( '<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"));
+      // layer.bindPopup( '<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"));
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){dhhl.resetStyle(this)},
-          click: function(){map.fitBounds( layer.getBounds())}
+          click: function(e){
+            if (map.getZoom() < zoomThreshold) {
+              map.fitBounds( layer.getBounds())
+
+              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+              L.popup({ maxWidth: 200})
+              .setLatLng(e.latlng)
+              .setContent('<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"), { direction: 'left', sticky: true } )
+              .openOn(map);
+            }}
 
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
@@ -458,19 +509,20 @@ const dhhl = new L.GeoJSON.AJAX(
 
 // FEMA Flood Hazard Zones: 
 
+// ***** NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. No idea why.*****
 const femaFlood = L.tileLayer.wms(
   'https://geodata.hawaii.gov/arcgis/services/Hazards/MapServer/WMSServer',
   {
     layers: '2',
     styles: 'dfirm',
+    sld: 'http://www.soest.hawaii.edu/crc/slds/fema_flood_test.xml',
     // sld: 'http://www.pacioos.hawaii.edu/ssi/sld/flood_hazard_zones.xml',
-    // sld: '/slds/fema_flood.xml',
     version: '1.1.1',
     //brought up darker color shades on my computer strangely...
     //format: 'image/png',
-    format: 'image/gif',
+    format: 'image/png',
     transparent: true,
-    opacity: 1.00,
+    opacity: 0.5,
     // errorTileUrl: '/images/map_tile_error.png',
     attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
     //bounds: L.latLngBounds( L.latLng( 20.5001, -159.79 ), L.latLng( 22.2353, -155.979 ) ),
@@ -543,14 +595,14 @@ const overlayMaps = [
   {
     groupName: 'EXPOSURE', 
     expanded: true,
-     layers: {'<span class="layer-label">Passive Flooding</span>':passive,
+     layers: {'<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px;"></div>':passive,
       }
   },
   { groupName: 'IMPACTS',
     expanded: false,
     layers: {'<span class="layer-label">example</span>': femaFlood}},
   { groupName: 'OTHER OVERLAYS',
-    expanded: false,
+    expanded: true,
     layers: {'<span class="layer-label">Community Plan Areas</span>': devplan,
               '<span class="layer-label">Moku Boundaries</span>': moku,
               '<span class="layer-label">Ahupua&#699;a Boundaries</span>': ahupuaa,
