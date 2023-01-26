@@ -531,7 +531,7 @@ const unconnectedLayers = [land_use_districts, geology, soils];
 ///////// LAYER CONTROL OBJECTS //////////
 
 // Create basemap layer object for layer control
-export const basemaps = [
+const basemaps = [
   {
     groupName: 'BASEMAPS',
     expanded: false, 
