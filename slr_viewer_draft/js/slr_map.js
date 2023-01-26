@@ -54,98 +54,51 @@ map.getPane('admin-boundaries').style.zIndex = 425;
 
 mapboxLight.addTo(map); // initial basemap
 
-// Add styled layer control to map.
+// Add styled layer control to map
 // Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
 layerControl = L.Control.styledLayerControl( basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
 layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
 
+// Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-// Add easy print button to export map.
-// leaflet-easyPrint: https://github.com/rowanwins/leaflet-easyPrint
-// Bundle updated per this issue: https://github.com/rowanwins/leaflet-easyPrint/issues/109
-L.easyPrint({
-	title: 'Export this map',
-	position: 'topleft',
-  hideControlContainer: false,
-  exportOnly: true,
-  hideClasses: ['leaflet-control-zoom','leaflet-control-easyPrint','leaflet-control-layers'], 
-	sizeModes: ['A4Portrait', 'A4Landscape']
-}).addTo(map);
+const legendDiv = document.querySelector('.legend-container');
 
+const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
+legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
+// Set up divs for layer types just to keep things organized
+const exposureLayers = L.DomUtil.create('div','legend-exposure', legendDiv);
+const impactLayers = L.DomUtil.create('div','legend-impact', legendDiv);
+const otherLayers = L.DomUtil.create('div','legend-other', legendDiv);
 
-// Add legend with active map layers
-const legend = L.control({position: 'bottomleft'});
-legend.onAdd = function() {
-  const legendDiv = L.DomUtil.create('div','legend-container');
-  
-  // if (!L.Browser.touch) {
-  //   L.DomEvent.disableClickPropagation(legendDiv);
-  //   L.DomEvent.on(legendDiv, 'wheel', L.DomEvent.stopPropagation);
-  // } else {
-  //     L.DomEvent.on(legendDiv, 'click', L.DomEvent.stopPropagation);
-  // }
+// Set up entries for all layers/layer groups. All entries will initially be hidden.
 
-  // Prevent interactions with map when mouse is in over legend
-  L.DomEvent.addListener(legendDiv, 'mousedown', function (){
-    map.dragging.disable();
-  })
+// Exposure layers
+const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',exposureLayers);
+const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',exposureLayers);
+passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;">'
+  + '<br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px">';
+const waveinunEntry = L.DomUtil.create('div','legend-waveinun legend-entry legend-entry-hidden',exposureLayers);
 
-  L.DomEvent.addListener(document, 'mouseup', function (){
-    map.dragging.enable();
-  })
-  
-  L.DomEvent.addListener(legendDiv, 'mouseover', function () {
-      map.doubleClickZoom.disable(); 
-      map.scrollWheelZoom.enable();
-      }
-  );
-  L.DomEvent.addListener(legendDiv, 'mouseout', function () {
-      map.doubleClickZoom.enable(); 
-      map.scrollWheelZoom.enable();
-    }
-  );
+// Impact layers
 
-  const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
-  legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
+// Other layers
+// Check if map has light or dark (satellite) basemap. (Community plan areas, moku, and ahupuaʻa outline colors switch depending on basemap.)
+legendBoxClass = map.hasLayer(mapboxLight)? 'legend-box':'legend-box-dark-basemap';
+const devEntry = L.DomUtil.create('div','legend-devplan legend-entry legend-entry-hidden',otherLayers);
+devEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Community Plan Areas';
+const mokuEntry = L.DomUtil.create('div','legend-moku legend-entry legend-entry-hidden',otherLayers);
+mokuEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Moku Boundaries';
+const ahupuaaEntry = L.DomUtil.create('div','legend-ahupuaa legend-entry legend-entry-hidden',otherLayers);
+ahupuaaEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Ahupua&#699;a Boundaries';
+const boardEntry = L.DomUtil.create('div','legend-boards legend-entry legend-entry-hidden',otherLayers);
+boardEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Neighborhood Board Boundaries';
+const dhhlEntry = L.DomUtil.create('div','legend-dhhl legend-entry legend-entry-hidden',otherLayers);
+dhhlEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Hawaiian Home Land Boundaries';
 
-  // Set up divs for layer types just to keep things organized
-  const exposureLayers = L.DomUtil.create('div','legend-exposure', legendDiv);
-  const impactLayers = L.DomUtil.create('div','legend-impact', legendDiv);
-  const otherLayers = L.DomUtil.create('div','legend-other', legendDiv);
-
-  // Set up entries for all layers/layer groups. All entries will initially be hidden.
-
-  // Exposure layers
-  const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',exposureLayers);
-  const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',exposureLayers);
-  passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; margin-bottom:5px;">'
-    + '<br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px">';
-  const waveinunEntry = L.DomUtil.create('div','legend-waveinun legend-entry legend-entry-hidden',exposureLayers);
-
-  // Impact layers
-
-  // Other layers
-  // Check if map has light or dark (satellite) basemap. (Community plan areas, moku, and ahupuaʻa outline colors switch depending on basemap.)
-  legendBoxClass = map.hasLayer(mapboxLight)? 'legend-box':'legend-box-dark-basemap';
-  const devEntry = L.DomUtil.create('div','legend-devplan legend-entry legend-entry-hidden',otherLayers);
-  devEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Community Plan Areas';
-  const mokuEntry = L.DomUtil.create('div','legend-moku legend-entry legend-entry-hidden',otherLayers);
-  mokuEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Moku Boundaries';
-  const ahupuaaEntry = L.DomUtil.create('div','legend-ahupuaa legend-entry legend-entry-hidden',otherLayers);
-  ahupuaaEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Ahupua&#699;a Boundaries';
-  const boardEntry = L.DomUtil.create('div','legend-boards legend-entry legend-entry-hidden',otherLayers);
-  boardEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Neighborhood Board Boundaries';
-  const dhhlEntry = L.DomUtil.create('div','legend-dhhl legend-entry legend-entry-hidden',otherLayers);
-  dhhlEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Hawaiian Home Land Boundaries';
-
-  const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',otherLayers);
-
-  return legendDiv
-}
-legend.addTo(map);
+const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',otherLayers);
 
 // Add event listeners to update legend as layers are added/removed
 map.on('overlayadd', function(e){
@@ -162,8 +115,36 @@ map.on('overlayremove', function(e){
   entryDiv.classList.add('legend-entry-hidden');
 })
 
+let legendToggle = document.querySelector('.legend-toggle');
+
+ legendToggle.onclick = function() {
+    document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
+    document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
+
+    let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
+    const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
+    const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Back to full menu';
+    document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
+    //     const toggleState1 = 
+    // document.querySelector('.legend-toggle').innerHTML = document.querySelector('.legend-toggle').innerHTML
+ }
+
+
+// Add easy print button to export map.
+// leaflet-easyPrint: https://github.com/rowanwins/leaflet-easyPrint
+// Bundle updated per this issue: https://github.com/rowanwins/leaflet-easyPrint/issues/109
+L.easyPrint({
+	title: 'Export this map',
+	position: 'topleft',
+  hideControlContainer: false,
+  exportOnly: true,
+  hideClasses: ['leaflet-control-zoom','leaflet-control-easyPrint','leaflet-control-layers'], 
+	sizeModes: ['A4Portrait', 'A4Landscape']
+}).addTo(map);
+
+
 // Add Mapbox logo per Terms of Service
-const logoControl = L.control({position: 'bottomright'});
+const logoControl = L.control({position: 'bottomleft'});
 logoControl.onAdd = function() {
   const logoDiv = L.DomUtil.create('div','logo-control');
   logoDiv.innerHTML = '<img src="images/mapbox_logo.svg">';
@@ -375,6 +356,7 @@ function hideLoadingControl(){
   map.removeControl(loadingControl);
 }
 
+
 // Connect loading control to all layers. Note different event type for GeoJSON layers vs. other layers. 
 ajaxSingleLayers.forEach(layer => {
   layer.on('data:loading', showLoadingControl);
@@ -393,7 +375,6 @@ layerGroups.forEach(grp => {
     layer.on('load', hideLoadingControl);
   })
 })
-
 
 
 // Change layer styles based on light/dark (satellite) basemaps
@@ -434,7 +415,8 @@ function() {
 );
 
 
-// Initialize maps with passive flooding layers
+ // Initialize maps with passive flooding layers
+
 layerControl.selectLayer(passive); 
 const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
 passiveLegendEntry.classList.remove('legend-entry-hidden');

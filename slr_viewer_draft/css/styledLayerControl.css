@@ -214,6 +214,16 @@ div[id^="leaflet-control-accordion-layers"] > label {
 	font-weight: 700;
 } 
 
+.active-layer div.legend-panel{
+	display: block;
+}
+
+.legend-panel{
+	font-weight: 400;
+	display: none;
+	padding: 5px;
+}
+
 .ac-large-transition{
 	overflow: hidden;
 }
@@ -228,17 +238,60 @@ div[id^="leaflet-control-accordion-layers"] > label {
 	font-size: 12px;
 	font-weight: 700;
 	padding: 5px;
-	text-align: center; 
+	/* text-align: center;  */
 	margin: auto;
+	display: flex;
+	justify-content: space-between;
 }
 
-#styledLayerControl-utilities a{
+#styledLayerControl-utilities button{
+	background: none;
+	border: none;
 	color: #184e85;
+	cursor: pointer;
+	font-family: 'Roboto',sans-serif;
+	font-weight: 500;
 }
 
-#styledLayerControl-utilities a:hover{
+#styledLayerControl-utilities .close-btn{
+	height: 24px;
+	/* width: 24px; */
+	/* display: inline-block;
+	vertical-align: middle; */
+}
+
+#styledLayerControl-utilities svg{
+	display: inline-block;
+	vertical-align: middle;
+	fill: #184e85;
+}
+
+.close-btn svg{
+	height: 16px;
+	width: 16px;
+}
+
+.legend-toggle svg{
+	height: 14px;
+	width: 14px;
+}
+
+#styledLayerControl-utilities button:hover svg{
+	fill: #2474c6;
+}
+
+#styledLayerControl-utilities button:hover{
+	background: none;
 	color: #2474c6;
 }
+
+/* #styledLayerControl-utilities a{
+	color: #184e85;
+
+} */
+/* #styledLayerControl-utilities a:hover{
+	color: #2474c6;
+} */
 
 .leaflet-control-layers-toggle:hover{
 	background-color: #ebebec;

@@ -314,6 +314,10 @@ select {
   transform: translate(-50%, -50%);
 }
 
+.legend-container-hidden{
+  display: none !important;
+}
+
 /* Legend control styles */
 .legend-container{
   background: #fff;
@@ -325,6 +329,7 @@ select {
   font-size: 13px;
   line-height: 1.5;
   padding: 10px;
+  width: 240px;
 }
 
 .legend-entry{

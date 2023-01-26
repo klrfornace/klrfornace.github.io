@@ -262,33 +262,43 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             containers[c].style.maxHeight = this._default_maxHeight;
         }
 
+        // Insert div to hold simple legend (created separately) - KF
+        L.DomUtil.create('div','legend-container legend-container-hidden', container);
+
         // Add layer utilities for expanding, collapsing, and clearing all
         // layers (-jmaurer):
-        // Condensing to just clear all and hide menu - KF
+        // Condensing to just hide menu - KF
 
         var utilities = document.createElement('div');	
         utilities.id = 'styledLayerControl-utilities';
 
-        var clear_all = document.createElement('a');
-        var clear_all_text = document.createTextNode('Clear all');
-        clear_all.appendChild(clear_all_text);
-        clear_all.href = 'javascript:void(0)';
-        var me = this; // create closure
-        clear_all.onclick = function () { me._clearAll(); };
-        utilities.appendChild(clear_all);
+        // var clear_all = document.createElement('a');
+        // var clear_all_text = document.createTextNode('Clear all');
+        // clear_all.appendChild(clear_all_text);
+        // clear_all.href = 'javascript:void(0)';
+        // var me = this; // create closure
+        // clear_all.onclick = function () { me._clearAll(); };
+        // utilities.appendChild(clear_all);
 
-        var spacer = document.createElement('span');
-        spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
-        utilities.appendChild(spacer);
+        // var spacer = document.createElement('span');
+        // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
+        // utilities.appendChild(spacer);
 
-        var hide_menu = document.createElement('a');
-        var hide_menu_text = document.createTextNode('Hide menu');
-        hide_menu.appendChild(hide_menu_text);
-        hide_menu.href = 'javascript:void(0)';
+        var hide_menu = L.DomUtil.create('button','close-btn',utilities)
+
+        hide_menu.innerHTML = '<svg viewBox="0 0 30.56 30.28"><g><path d="M26.06,30.28H4.5c-2.48,0-4.5-2.02-4.5-4.5V4.5C0,2.02,2.02,0,4.5,0H26.06c2.48,0,4.5,2.02,4.5,4.5V25.78c0,2.48-2.02,4.5-4.5,4.5ZM4.5,3c-.83,0-1.5,.67-1.5,1.5V25.78c0,.83,.67,1.5,1.5,1.5H26.06c.83,0,1.5-.67,1.5-1.5V4.5c0-.83-.67-1.5-1.5-1.5H4.5Z"/><g><rect x="18.86" y="5.91" width="8.12" height="3.17" transform="translate(1.41 18.4) rotate(-45)"/><polygon points="17.83 6.32 15.54 14.88 24.09 12.59 17.83 6.32"/></g><g><rect x="3.58" y="21.19" width="8.12" height="3.17" transform="translate(-13.87 12.07) rotate(-45)"/><polygon points="12.73 23.96 15.02 15.4 6.46 17.69 12.73 23.96"/></g></g></svg>';
+        hide_menu.setAttribute('aria-label','Close layer control window');
         var closure = this; // create closure
         hide_menu.onclick = function () { closure._collapse(); };
-
         utilities.appendChild(hide_menu);
+
+        // var spacer = document.createElement('span');
+        // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
+        // utilities.appendChild(spacer);
+
+        var legendToggle = L.DomUtil.create('button','legend-toggle',utilities);
+        legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
+        legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
 
         container.appendChild(utilities);
 
@@ -521,7 +531,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             article = document.createElement('article');
             article.className = 'ac-large'
             
-            // KF insert for transition
+            // KF insert for transition - doesn't work
 
             // let transitionDiv = document.createElement('div');
             // transitionDiv.className = 'ac-large-transition';
@@ -659,6 +669,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         if ( document.getElementById( 'styledLayerControl-utilities' ) ) {
           document.getElementById( 'styledLayerControl-utilities' ).style.display = '';
         }
+        if ( document.querySelector( '.legend-container' ) ) {
+            document.querySelector( '.legend-container').style.display = '';
+          }
     },
 
     _collapse : function () {
@@ -667,6 +680,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         if ( document.getElementById( 'styledLayerControl-utilities' ) ) {
           document.getElementById( 'styledLayerControl-utilities' ).style.display = 'none';
         }
+        if ( document.querySelector( '.legend-container' ) ) {
+            document.querySelector( '.legend-container').style.display = 'none';
+          }
     },
 
     // _expand: function() {
