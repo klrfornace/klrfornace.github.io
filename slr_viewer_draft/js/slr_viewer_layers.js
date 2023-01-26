@@ -1,37 +1,19 @@
 //////// BASEMAPS ////////
-
-const mapboxLight = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
+const mapboxURL = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}'
+const mapboxOptions = (layerId) => ({
   attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '
               +'<strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-  id: 'mapbox/light-v10',
+  id: layerId,
   maxZoom: 20,
   tileSize: 512,
   zoomOffset: -1,
   accessToken:ak,
   pane: 'base',
-});
+})
 
-const mapboxSatellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
-  attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '
-            + '<strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong> © <a href="https://www.maxar.com/">Maxar</a>',
-  id: 'mapbox/satellite-v9',
-  maxZoom: 20,
-  tileSize: 512,
-  zoomOffset: -1,
-  accessToken:ak,
-  pane: 'base',
-});
-
-const mapboxSatelliteStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
-  attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '
-            + '<strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong> © <a href="https://www.maxar.com/">Maxar</a>',
-  id: 'mapbox/satellite-streets-v11',
-  maxZoom: 20,
-  tileSize: 512,
-  zoomOffset: -1,
-  accessToken:ak,
-  pane: 'base',
-});
+const mapboxLight = L.tileLayer(mapboxURL, mapboxOptions('mapbox/light-v10'));
+const mapboxSatellite = L.tileLayer(mapboxURL, mapboxOptions('mapbox/satellite-v9'));
+const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/satellite-streets-v11'));
 
 // const mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
 //   attribution:  '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
@@ -89,86 +71,115 @@ const mapboxSatelliteStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id
 //////// EXPOSURE LAYERS ////////
 
 const crcgeoURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/wms';
-const defaultWMSoptions = {
-  tiled:true, 
-  version:'1.1.1', 
-  format:'image/png', 
-  transparent: true,
-  opacity: 0.67,
+// const defaultWMSoptions = {
+//   tiled:true, 
+//   version:'1.1.1', 
+//   format:'image/png', 
+//   transparent: true,
+//   opacity: 0.67,
+//   // errorTileUrl: '/images/map_tile_error.png',
+//   attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+//   bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
+//   maxZoom: 19,
+//   queryable: false,
+// };
+
+
+const wmsOptions = (ft, type) => {
+  return {
+    tiled:true, 
+    version:'1.1.1', 
+    format:'image/png', 
+    transparent: true,
+    opacity: 0.67,
   // errorTileUrl: '/images/map_tile_error.png',
-  attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-  bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-  maxZoom: 19,
-  queryable: false,
-};
+    attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+    bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
+    maxZoom: 19,
+    queryable: false,
+    layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v2` : `CRC:HI_State_80prob_${ft}ft_${type}_v2`, 
+    name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,
+  }
+} 
 
-const passiveSCI_0 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_00ft_SCI_v2', name: 'Passive SCI 00ft'})
-);
-const passiveSCI_1 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_01ft_SCI_v2', name: 'Passive SCI 1ft'})
-);
-const passiveSCI_2 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_02ft_SCI_v2', name: 'Passive SCI 2ft'})
-);
-const passiveSCI_3 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_03ft_SCI_v2', name: 'Passive SCI 3ft'})
-);
-const passiveSCI_4 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_04ft_SCI_v2', name: 'Passive SCI 4ft'})
-);
-const passiveSCI_5 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_05ft_SCI_v2', name: 'Passive SCI 5ft'})
-);
-const passiveSCI_6 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_06ft_SCI_v2', name: 'Passive SCI 6ft'})
-);
-const passiveSCI_7 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_07ft_SCI_v2', name: 'Passive SCI 7ft'})
-);
-const passiveSCI_8 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_08ft_SCI_v2', name: 'Passive SCI 8ft'})
-);
-const passiveSCI_9 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_09ft_SCI_v2', name: 'Passive SCI 9ft'})
-);
-const passiveSCI_10 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_10ft_SCI_v2', name: 'Passive SCI 10ft'})
-);
+const passiveLayers = {
+  'SCI': [],
+  'GWI': []
+}
+for (let i = 0; i < 11; i++) {
+  for (let layer in passiveLayers) {
+    passiveLayers[layer][i] = L.tileLayer.wms(crcgeoURL, wmsOptions(i, layer));
+  }
+}
 
-const passiveGWI_0 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_00ft_GWI_v2', name: 'Passive GWI 00ft'})
-);
-const passiveGWI_1 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_01ft_GWI_v2', name: 'Passive GWI 1ft'})
-);
-const passiveGWI_2 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_02ft_GWI_v2', name: 'Passive GWI 2ft'})
-);
-const passiveGWI_3 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_03ft_GWI_v2', name: 'Passive GWI 3ft'})
-);
-const passiveGWI_4 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_04ft_GWI_v2', name: 'Passive GWI 4ft'})
-);
-const passiveGWI_5 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_05ft_GWI_v2', name: 'Passive GWI 5ft'})
-);
-const passiveGWI_6 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_06ft_GWI_v2', name: 'Passive GWI 6ft'})
-);
-const passiveGWI_7 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_07ft_GWI_v2', name: 'Passive GWI 7ft'})
-);
-const passiveGWI_8 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_08ft_GWI_v2', name: 'Passive GWI 8ft'})
-);
-const passiveGWI_9 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_09ft_GWI_v2', name: 'Passive GWI 9ft'})
-);
-const passiveGWI_10 = L.tileLayer.wms(crcgeoURL,
-  Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_10ft_GWI_v2', name: 'Passive GWI 10ft'})
-);
+
+// const passiveSCI_0 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_00ft_SCI_v2', name: 'Passive SCI 00ft'})
+// );
+// const passiveSCI_1 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_01ft_SCI_v2', name: 'Passive SCI 1ft'})
+// );
+// const passiveSCI_2 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_02ft_SCI_v2', name: 'Passive SCI 2ft'})
+// );
+// const passiveSCI_3 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_03ft_SCI_v2', name: 'Passive SCI 3ft'})
+// );
+// const passiveSCI_4 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_04ft_SCI_v2', name: 'Passive SCI 4ft'})
+// );
+// const passiveSCI_5 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_05ft_SCI_v2', name: 'Passive SCI 5ft'})
+// );
+// const passiveSCI_6 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_06ft_SCI_v2', name: 'Passive SCI 6ft'})
+// );
+// const passiveSCI_7 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_07ft_SCI_v2', name: 'Passive SCI 7ft'})
+// );
+// const passiveSCI_8 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_08ft_SCI_v2', name: 'Passive SCI 8ft'})
+// );
+// const passiveSCI_9 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_09ft_SCI_v2', name: 'Passive SCI 9ft'})
+// );
+// const passiveSCI_10 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_10ft_SCI_v2', name: 'Passive SCI 10ft'})
+// );
+
+// const passiveGWI_0 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_00ft_GWI_v2', name: 'Passive GWI 00ft'})
+// );
+// const passiveGWI_1 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_01ft_GWI_v2', name: 'Passive GWI 1ft'})
+// );
+// const passiveGWI_2 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_02ft_GWI_v2', name: 'Passive GWI 2ft'})
+// );
+// const passiveGWI_3 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_03ft_GWI_v2', name: 'Passive GWI 3ft'})
+// );
+// const passiveGWI_4 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_04ft_GWI_v2', name: 'Passive GWI 4ft'})
+// );
+// const passiveGWI_5 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_05ft_GWI_v2', name: 'Passive GWI 5ft'})
+// );
+// const passiveGWI_6 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_06ft_GWI_v2', name: 'Passive GWI 6ft'})
+// );
+// const passiveGWI_7 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_07ft_GWI_v2', name: 'Passive GWI 7ft'})
+// );
+// const passiveGWI_8 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_08ft_GWI_v2', name: 'Passive GWI 8ft'})
+// );
+// const passiveGWI_9 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_09ft_GWI_v2', name: 'Passive GWI 9ft'})
+// );
+// const passiveGWI_10 = L.tileLayer.wms(crcgeoURL,
+//   Object.assign(defaultWMSoptions,{layers: 'CRC:HI_State_80prob_10ft_GWI_v2', name: 'Passive GWI 10ft'})
+// );
 
 
 //////////  OTHER OVERLAYS  //////////
@@ -488,16 +499,14 @@ const femaFlood = L.tileLayer.wms(
 
 // Initialize layer groups
 // const slrxa = L.layerGroup([slrxa_2030],{legendKey:'slrxa'});
-const passive = L.layerGroup([passiveSCI_0, passiveGWI_0],{legendKey:'passive'})
+const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],{legendKey:'passive'})
 // const waveinun = L.layerGroup([waveinun_2030],{legendKey:'waveinun'});
 
 // Assign all possible layers to groups
 const layerGroups = [
   {
     "group": passive,
-    "layers":[passiveSCI_0, passiveSCI_1, passiveSCI_2, passiveSCI_3, passiveSCI_4, passiveSCI_5, passiveSCI_6,
-            passiveSCI_7, passiveSCI_8, passiveSCI_9, passiveSCI_10, passiveGWI_0, passiveGWI_1, passiveGWI_2,
-            passiveGWI_3, passiveGWI_4, passiveGWI_5, passiveGWI_6, passiveGWI_7, passiveGWI_8, passiveGWI_9, passiveGWI_10],    
+    "layers": Object.values(passiveLayers).flat(),    
   }];
 
 
