@@ -85,8 +85,8 @@ const crcgeoURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/wms';
 // };
 
 
-const wmsOptions = (ft, type) => {
-  return {
+const wmsOptions = (ft, type) => (
+  {
     tiled:true, 
     version:'1.1.1', 
     format:'image/png', 
@@ -100,7 +100,7 @@ const wmsOptions = (ft, type) => {
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v2` : `CRC:HI_State_80prob_${ft}ft_${type}_v2`, 
     name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,
   }
-} 
+) 
 
 const passiveLayers = {
   'SCI': [],
@@ -531,7 +531,7 @@ const unconnectedLayers = [land_use_districts, geology, soils];
 ///////// LAYER CONTROL OBJECTS //////////
 
 // Create basemap layer object for layer control
-const basemaps = [
+export const basemaps = [
   {
     groupName: 'BASEMAPS',
     expanded: false, 
