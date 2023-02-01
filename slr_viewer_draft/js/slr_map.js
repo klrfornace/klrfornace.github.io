@@ -63,42 +63,39 @@ layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-const legendDiv = document.querySelector('.legend-container');
-
+const legendDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl.js
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
-
-// Set up divs for layer types just to keep things organized
-const exposureLayers = L.DomUtil.create('div','legend-exposure', legendDiv);
-const impactLayers = L.DomUtil.create('div','legend-impact', legendDiv);
-const otherLayers = L.DomUtil.create('div','legend-other', legendDiv);
 
 // Set up entries for all layers/layer groups. All entries will initially be hidden.
 
 // Exposure layers
-const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',exposureLayers);
-const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',exposureLayers);
+const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
+const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
 passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;">'
   + '<br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px">';
-const waveinunEntry = L.DomUtil.create('div','legend-waveinun legend-entry legend-entry-hidden',exposureLayers);
+const waveinunEntry = L.DomUtil.create('div','legend-waveinun legend-entry legend-entry-hidden',legendDiv);
 
 // Impact layers
 
 // Other layers
-// Check if map has light or dark (satellite) basemap. (Community plan areas, moku, and ahupuaʻa outline colors switch depending on basemap.)
-legendBoxClass = map.hasLayer(mapboxLight)? 'legend-box':'legend-box-dark-basemap';
-const devEntry = L.DomUtil.create('div','legend-devplan legend-entry legend-entry-hidden',otherLayers);
-devEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Community Plan Areas';
-const mokuEntry = L.DomUtil.create('div','legend-moku legend-entry legend-entry-hidden',otherLayers);
-mokuEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Moku Boundaries';
-const ahupuaaEntry = L.DomUtil.create('div','legend-ahupuaa legend-entry legend-entry-hidden',otherLayers);
-ahupuaaEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Ahupua&#699;a Boundaries';
-const boardEntry = L.DomUtil.create('div','legend-boards legend-entry legend-entry-hidden',otherLayers);
-boardEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Neighborhood Board Boundaries';
-const dhhlEntry = L.DomUtil.create('div','legend-dhhl legend-entry legend-entry-hidden',otherLayers);
-dhhlEntry.innerHTML = '<div class="'+ legendBoxClass + '"></div> Hawaiian Home Land Boundaries';
+// Check if map has light or dark (satellite) basemap. (Outline colors switch depending on basemap.)
+const legendLineClass = map.hasLayer(mapboxLight)? '':'line-dark-basemap';
+const generalEntry =  '<svg class="legend-line '+ legendLineClass + '" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;'
+const otherLayerLabels = ['Community Plan Area Boundaries','Moku Boundaries','Ahupua&#699;a Boundaries','Neighborhood Board Boundaries','Hawaiian Home Land Boundaries'];
 
-const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',otherLayers);
+const devEntry = L.DomUtil.create('div','legend-devplan legend-entry legend-entry-hidden',legendDiv);
+devEntry.innerHTML = generalEntry + 'Community Plan Area Boundaries';
+const mokuEntry = L.DomUtil.create('div','legend-moku legend-entry legend-entry-hidden',legendDiv);
+mokuEntry.innerHTML = generalEntry + 'Moku Boundaries';
+const ahupuaaEntry = L.DomUtil.create('div','legend-ahupuaa legend-entry legend-entry-hidden',legendDiv);
+ahupuaaEntry.innerHTML = generalEntry + 'Ahupua&#699;a Boundaries';
+const boardEntry = L.DomUtil.create('div','legend-boards legend-entry legend-entry-hidden',legendDiv);
+boardEntry.innerHTML =  generalEntry + 'Neighborhood Board Boundaries';
+const dhhlEntry = L.DomUtil.create('div','legend-dhhl legend-entry legend-entry-hidden',legendDiv);
+dhhlEntry.innerHTML = generalEntry + 'Hawaiian Home Land Boundaries';
+
+const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',legendDiv);
 
 // Add event listeners to update legend as layers are added/removed
 map.on('overlayadd', function(e){
@@ -117,17 +114,57 @@ map.on('overlayremove', function(e){
 
 let legendToggle = document.querySelector('.legend-toggle');
 
+// Switch between full menu and simple legend
  legendToggle.onclick = function() {
     document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
     document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
 
+    // Change label of button
     let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
     const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
     const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Back to full menu';
     document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
-    //     const toggleState1 = 
-    // document.querySelector('.legend-toggle').innerHTML = document.querySelector('.legend-toggle').innerHTML
  }
+
+
+ // Change layer styles based on light/dark (satellite) basemaps
+map.on( 'baselayerchange',
+function() {
+  if ( map.hasLayer( mapboxLight )) {
+    boundary_style.color = '#6e6e6e';
+    boundary_style2.color = '#6e6e6e'; // Thicker line style
+    boundary_highlight_style.color = '#3c3c3c';
+
+    ahupuaa.setStyle( boundary_style );
+    devplan.setStyle( boundary_style );
+    moku.setStyle( boundary_style );
+    boards.setStyle( boundary_style );
+    dhhl.setStyle(boundary_style2)
+
+    // Also make sure legend styles are correct
+    const entries = document.querySelectorAll('.legend-line');
+    entries.forEach(entry => {
+      entry.classList.remove('line-dark-basemap');
+    })
+  }
+  else {
+    boundary_style.color = '#FFFFFF';
+    boundary_style2.color = '#FFFFFF';
+    boundary_highlight_style.color = '#FFFFFF';
+
+    ahupuaa.setStyle( boundary_style );
+    devplan.setStyle( boundary_style );
+    moku.setStyle( boundary_style );
+    boards.setStyle( boundary_style );
+    dhhl.setStyle(boundary_style2);
+
+    const entries = document.querySelectorAll('.legend-line');
+    entries.forEach(entry => {
+      entry.classList.add('line-dark-basemap');
+    })
+  }
+}
+);
 
 
 // Add easy print button to export map.
@@ -377,42 +414,6 @@ layerGroups.forEach(grp => {
 })
 
 
-// Change layer styles based on light/dark (satellite) basemaps
-map.on( 'baselayerchange',
-function() {
-  if ( map.hasLayer( mapboxLight )) {
-    boundary_style.color = '#6e6e6e';
-    boundary_style2.color = '#6e6e6e'; // Thicker line style
-    boundary_highlight_style.color = '#3c3c3c';
-
-    ahupuaa.setStyle( boundary_style );
-    devplan.setStyle( boundary_style );
-    moku.setStyle( boundary_style );
-    dhhl.setStyle(boundary_style2)
-
-    // Also make sure legend styles are correct
-    const entries = document.querySelectorAll('.legend-box');
-    entries.forEach(entry => {
-      entry.classList.remove('box-dark-basemap');
-    })
-  }
-  else {
-    boundary_style.color = '#FFFFFF';
-    boundary_style2.color = '#FFFFFF';
-    boundary_highlight_style.color = '#FFFFFF';
-
-    ahupuaa.setStyle( boundary_style );
-    devplan.setStyle( boundary_style );
-    moku.setStyle( boundary_style );
-    dhhl.setStyle(boundary_style2);
-
-    const entries = document.querySelectorAll('.legend-box');
-    entries.forEach(entry => {
-      entry.classList.add('box-dark-basemap');
-    })
-  }
-}
-);
 
 
  // Initialize maps with passive flooding layers

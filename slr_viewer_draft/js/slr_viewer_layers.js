@@ -1,5 +1,6 @@
 //////// BASEMAPS ////////
-const mapboxURL = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}'
+
+const mapboxURL = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}';
 const mapboxOptions = (layerId) => ({
   attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '
               +'<strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
@@ -71,19 +72,6 @@ const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/sate
 //////// EXPOSURE LAYERS ////////
 
 const crcgeoURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/wms';
-// const defaultWMSoptions = {
-//   tiled:true, 
-//   version:'1.1.1', 
-//   format:'image/png', 
-//   transparent: true,
-//   opacity: 0.67,
-//   // errorTileUrl: '/images/map_tile_error.png',
-//   attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-//   bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//   maxZoom: 19,
-//   queryable: false,
-// };
-
 
 const wmsOptions = (ft, type) => (
   {
@@ -506,7 +494,7 @@ const layerGroups = [
 const layerTags = ['00ft','1ft','2ft','3ft','4ft','5ft','6ft','7ft','8ft','9ft','10ft'];
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use
-const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl,];
+const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
 const wmsSingleLayers = [femaFlood]
 const unconnectedLayers = [land_use_districts, geology, soils];
 

@@ -22,6 +22,12 @@ hr {
   margin: 10px;
 }
 
+h1 {
+  font-weight: 500;
+  padding: 5px;
+  margin: 0;
+  text-align:center;
+}
 h3 {
   font-size:21px;
   /* font-weight: 500; */
@@ -36,7 +42,8 @@ h3 {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: stretch;
-    height: calc(95vh - 50px);
+    height: calc(100vh - 50px);
+    /* height: calc(95vh - 50px); */
 }
 
 .map {
@@ -354,6 +361,21 @@ select {
   height: 13px;
   width: 13px;
   margin-right: 5px;
+}
+
+.legend-line{
+  display: inline-block;
+  fill: #6e6e6e;
+  stroke: none;
+  stroke-miterlimit: 10;
+  width: 16px;
+  height: 19.5px;
+  vertical-align: middle;
+}
+
+.line-dark-basemap{
+  fill: #fff;
+  stroke: #6e6e6e;
 }
 
 .box-dark-basemap{
