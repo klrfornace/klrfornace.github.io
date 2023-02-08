@@ -244,7 +244,7 @@ const devplan = new L.GeoJSON.AJAX(
       name: 'Community Plan Areas',
       pane: 'admin-boundaries',
       legendKey: 'devplan',
-      exclude: [ 'Ahupuaa', 'Moku' ]
+      exclude: ['Community Plan Areas','Moku','Ahupuaa','Neighborhood Boards','DHHL Lands']
     }
   );
 
@@ -289,7 +289,7 @@ const ahupuaa = new L.GeoJSON.AJAX(
     name: 'Ahupuaa',
     pane: 'admin-boundaries',
     legendKey: 'ahupuaa',
-    exclude: [ 'Community Plan Areas', 'Moku' ]
+    exclude: [ 'Community Plan Areas','Moku','Neighborhood Boards','DHHL Lands']
   }
 );
 
@@ -342,7 +342,7 @@ const moku = new L.GeoJSON.AJAX(
     name: 'Moku',
     pane: 'admin-boundaries',
     legendKey: 'moku',
-    exclude: [ 'Ahupuaa', 'Community Plan Areas' ]
+    exclude: [ 'Community Plan Areas','Ahupuaa','Neighborhood Boards','DHHL Lands']
   }
 );
 
@@ -379,6 +379,7 @@ const boards = new L.GeoJSON.AJAX(
         }
       );
     },
+    name: 'Neighborhood Boards',
     pane: 'admin-boundaries',
     legendKey: 'boards',
     exclude: ['Moku','Ahupuaa','Community Plan Areas','DHHL Lands']
@@ -493,10 +494,11 @@ const layerGroups = [
 // const layerTags = ['2030','2050','2075','2100'];
 const layerTags = ['00ft','1ft','2ft','3ft','4ft','5ft','6ft','7ft','8ft','9ft','10ft'];
 
-// Arrays of all single layers (GeoJSON AJAX or WMS) for later use
+// Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
-const wmsSingleLayers = [femaFlood]
+const wmsSingleLayers = [femaFlood];
 const unconnectedLayers = [land_use_districts, geology, soils];
+
 
 ///////// LAYER CONTROL OBJECTS //////////
 
@@ -518,6 +520,9 @@ const basemaps = [
 // For all layers that change with depth, use L.LayerGroup initialized with any layer instead of individual layer. This allows for switching of layers 
 // within the group as depth changes while keeping connection between layerGroup/_leaflet_id and checkbox input intact. Note this seems to cause assigned
 // z indexes (from styledLayerControl) to go haywire, so it's safest to use panes if layer order is critical. 
+
+// const generalBoundaryEntry = '<div class="legend-panel panel-hidden"><svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;Boundaries</div>';
+
 const overlayMaps = [
   {
     groupName: 'EXPOSURE', 
@@ -530,11 +535,11 @@ const overlayMaps = [
     layers: {'<span class="layer-label">example</span>': femaFlood}},
   { groupName: 'OTHER OVERLAYS',
     expanded: true,
-    layers: {'<span class="layer-label">Community Plan Areas</span>': devplan,
+    layers: {'<span class="layer-label">Community Plan Area Boundaries</span>': devplan,
               '<span class="layer-label">Moku Boundaries</span>': moku,
               '<span class="layer-label">Ahupua&#699;a Boundaries</span>': ahupuaa,
               '<span class="layer-label">Neighborhood Board Boundaries</span>': boards,
-              '<span class="layer-label">Hawaiian Home Lands (DHHL Lands)</span>': dhhl,
+              '<span class="layer-label">Hawaiian Home Lands (DHHL Lands)': dhhl,
               }}
 ];
 // '<span class="layer-label">Sea Level Rise Exposure Area<br>(SLR-XA)</span>': slrxa,
@@ -623,154 +628,4 @@ const overlayMaps = [
 //   }
 // );
 
-// const soest_slr_2030 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_slr_flood_2030',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.00,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SOEST SLR Inundation 2030',
-//     queryable: false
-//   }
-// );
 
-// const soest_slr_2050 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_slr_flood_2050',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.00,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>', 
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SOEST SLR Inundation 2050',
-//     queryable: false
-//   }
-// );
-
-// const soest_slr_2075 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_slr_flood_2075',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.00,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SOEST SLR Inundation 2075',
-//     queryable: false
-//   }
-// );
-
-// const soest_slr_2100 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_slr_flood_2100',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.0,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SOEST SLR Inundation 2100',
-//     queryable: false
-//   }
-// );
-
-// const waveinun_2030 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_wave_flood_2030',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.00,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 20.6103, -159.8023 ), L.latLng( 22.2382, -156.3537 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'Wave Inundation 2030',
-//     queryable: true
-//   }
-// );
-
-// const waveinun_2050 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_wave_flood_2050',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.00,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',      
-//     bounds: L.latLngBounds( L.latLng( 20.6103, -159.8023 ), L.latLng( 22.2382, -156.3537 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'Wave Inundation 2050',
-//     queryable: true
-//   }
-// );
-
-// const waveinun_2075 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_wave_flood_2075',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.00,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>', 
-//     bounds: L.latLngBounds( L.latLng( 20.6103, -159.8023 ), L.latLng( 22.2382, -156.3537 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'Wave Inundation 2075',
-//     queryable: true
-//   }
-// );
-
-// const waveinun_2100 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_hcgg_all_wave_flood_2100',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1.0,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 20.6103, -159.8023 ), L.latLng( 22.2382, -156.3537 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'Wave Inundation 2100',
-//     queryable: true
-//   }
-// );

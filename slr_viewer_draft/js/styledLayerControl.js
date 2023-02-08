@@ -405,8 +405,8 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             (e.type === 'layeradd' ? 'overlayadd' : 'overlayremove') :
             (e.type === 'layeradd' ? 'baselayerchange' : null);
 
-            // KF: This was not firing baselayerchange events correctly:
-            // e.type === 'layeradd' && e.layer.isBaseLayer ? 'baselayerchange' : null;
+        // KF: This was not firing baselayerchange events correctly:
+        // e.type === 'layeradd' && e.layer.isBaseLayer ? 'baselayerchange' : null;
 
         this._checkIfDisabled();
         this._toggleLayerLabelClass();

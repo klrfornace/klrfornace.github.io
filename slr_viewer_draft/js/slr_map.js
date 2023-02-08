@@ -27,12 +27,14 @@ L.Map.include({
 
 // Set up map
 const sliderStart = 0;
-const zoomLevel = 8;
-const centerCoord = [20.602, -157.409];
+
+// Statewide zoom
+// const zoomLevel = 8;
+// const centerCoord = [20.602, -157.409];
 
 // Oʻahu zoom
-// const zoomLevel = 11;
-// const centerCoord = [21.483, -157.909];
+const zoomLevel = 11;
+const centerCoord = [21.483, -157.909];
 
 const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
 
@@ -97,13 +99,35 @@ dhhlEntry.innerHTML = generalEntry + 'Hawaiian Home Land Boundaries';
 
 const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',legendDiv);
 
-// Add event listeners to update legend as layers are added/removed
-map.on('overlayadd', function(e){
-  const legendKey = e.layer.options.legendKey;
-  const entryDiv = document.querySelector('.legend-'+ legendKey);
-  // Remove class to allow display
-  entryDiv.classList.remove('legend-entry-hidden');
-})
+// Add event listeners to manage exclusive layers and update legend as layers are added/removed.
+
+// This function is necessary to avoid firing 2 overlayadd events when removing exclusive layers. 
+// See https://gis.stackexchange.com/questions/382017/leaflet-mutually-exclusive-overlay-layers-overlayadd-event-firing-twice
+function removeWithTimeout(layer) {
+  setTimeout(function() {
+    layerControl.unSelectLayer(layer);
+  }, 10);
+}
+
+map.on('overlayadd', function addOverlay(e){
+    // Update legend
+    const legendKey = e.layer.options.legendKey;
+    const entryDiv = document.querySelector('.legend-'+ legendKey);
+    // Remove class to allow display
+    entryDiv.classList.remove('legend-entry-hidden');
+  
+    // Remove any other layers in administrative boundary pane if another is added. (Other exclusive groups to be added)
+
+    // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
+    const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
+    if (adminGroup.includes(e.layer)){
+      for(let layer of adminGroup){
+          if (layer.options.legendKey != legendKey && map.hasLayer(layer)){
+            removeWithTimeout(layer);
+        }
+      }
+    }
+});
 
 map.on('overlayremove', function(e){
   const legendKey = e.layer.options.legendKey;
@@ -412,8 +436,6 @@ layerGroups.forEach(grp => {
     layer.on('load', hideLoadingControl);
   })
 })
-
-
 
 
  // Initialize maps with passive flooding layers

@@ -46,14 +46,14 @@ noUiSlider.create(depthSlider, {
 // Add secondary axis with ticks for scenario years
 function generateSecondaryPips(activeGauge, activeScenario){
     // Clear out previous ticks
-    let existingPips = document.querySelectorAll('.noUi-pips-vertical-secondary');
+    const existingPips = document.querySelectorAll('.noUi-pips-vertical-secondary');
     existingPips.forEach(pipDiv => {
         pipDiv.remove();
       });
     let projDepths = [];
 
     // Get NOAA SLR projection data for active gauge and scenario
-    let gaugeProj = slr_proj.filter(function (proj) {
+    const gaugeProj = slr_proj.filter(function (proj) {
 	    return proj.stationName === activeGauge && proj.scenario === activeScenario;
     });
 
@@ -87,7 +87,7 @@ function generateSecondaryPips(activeGauge, activeScenario){
 
 // Regenerate secondary pips when scenario is changed
 scenarioSelect.addEventListener('change',(e) => {
-    let selectedScenario = e.target.value;
+    const selectedScenario = e.target.value;
     activeScenario = selectedScenario.split(' ').join('-');
     generateSecondaryPips(activeGauge, activeScenario);
 })
