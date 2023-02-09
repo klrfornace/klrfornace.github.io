@@ -357,9 +357,9 @@ select {
 
 .legend-box{
   float: left;
-  border: 2px solid #6e6e6e;
-  height: 13px;
-  width: 13px;
+  /* border: 2px solid #6e6e6e; */
+  height: 16px;
+  width: 16px;
   margin-right: 5px;
 }
 

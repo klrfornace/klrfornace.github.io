@@ -97,6 +97,8 @@ boardEntry.innerHTML =  generalEntry + 'Neighborhood Board Boundaries';
 const dhhlEntry = L.DomUtil.create('div','legend-dhhl legend-entry legend-entry-hidden',legendDiv);
 dhhlEntry.innerHTML = generalEntry + 'Hawaiian Home Land Boundaries';
 
+const slrxa32Entry = L.DomUtil.create('div','legend-slrxa32 legend-entry legend-entry-hidden',legendDiv);
+slrxa32Entry.innerHTML = '<div class="legend-box" style="background:#0d5de4; opacity:0.5"></div> SLR-XA 3.2 ft';
 const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',legendDiv);
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
@@ -199,7 +201,7 @@ L.easyPrint({
 	position: 'topleft',
   hideControlContainer: false,
   exportOnly: true,
-  hideClasses: ['leaflet-control-zoom','leaflet-control-easyPrint','leaflet-control-layers'], 
+  hideClasses: ['leaflet-control-zoom','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
 	sizeModes: ['A4Portrait', 'A4Landscape']
 }).addTo(map);
 
@@ -405,28 +407,38 @@ function removeAddress(address){
 const loadingControl = L.control({position: 'middlecenter'});
 loadingControl.onAdd = function() {
   const loadingDiv = L.DomUtil.create('div','loading-control');
+  loadingDiv.setAttribute('id','loading-control');
   loadingDiv.innerHTML = '<img src="images/loading_blue2.gif">';
   return loadingDiv
 }
 
 function showLoadingControl(){
+  hideLoadingControl(); // Hide any existing control
   map.addControl(loadingControl);
 }
 
 function hideLoadingControl(){
-  map.removeControl(loadingControl);
+  if (document.getElementById('loading-control')){
+    map.removeControl(loadingControl);
+  }
 }
-
 
 // Connect loading control to all layers. Note different event type for GeoJSON layers vs. other layers. 
 ajaxSingleLayers.forEach(layer => {
-  layer.on('data:loading', showLoadingControl);
+  // GeoJSON AJAX layers start loading before being added to the map, so use custom loadStatus option to track data progress.
+  layer.on('add', function(){
+    if (layer.options.loadStatus != 'loaded'){
+      showLoadingControl();
+    }
+  }); 
   layer.on('data:loaded', hideLoadingControl);
+  layer.on('remove',hideLoadingControl); // in case impatient users unselect layer before data is loaded
 });
 
 wmsSingleLayers.forEach(layer => {
   layer.on('loading', showLoadingControl);
   layer.on('load', hideLoadingControl);
+  layer.on('remove',hideLoadingControl);
 });
 
 layerGroups.forEach(grp => {
@@ -434,11 +446,12 @@ layerGroups.forEach(grp => {
   layers.forEach(layer => {
     layer.on('loading', showLoadingControl);
     layer.on('load', hideLoadingControl);
+    layer.on('remove',hideLoadingControl);
   })
 })
 
 
- // Initialize maps with passive flooding layers
+ // Initialize map with passive flooding layers
 
 layerControl.selectLayer(passive); 
 const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);

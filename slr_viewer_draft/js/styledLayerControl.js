@@ -269,7 +269,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // layers (-jmaurer):
         // Condensing to just hide menu - KF
 
-        var utilities = document.createElement('div');	
+        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',container);
         utilities.id = 'styledLayerControl-utilities';
 
         // var clear_all = document.createElement('a');
@@ -300,7 +300,6 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
         legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
 
-        container.appendChild(utilities);
 
         window.onresize = this._on_resize_window.bind(this);
 

@@ -177,9 +177,58 @@ const land_use_districts = L.tileLayer.wms(
     }
   );
   
-// Development / Community Plan Areas (Districts):
+// FEMA Flood Hazard Zones: 
 
-// General boundary styles and functions
+// ***** NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. No idea why.*****
+const femaFlood = L.tileLayer.wms(
+  'https://geodata.hawaii.gov/arcgis/services/Hazards/MapServer/WMSServer',
+  {
+    layers: '2',
+    styles: 'dfirm',
+    sld: 'http://www.soest.hawaii.edu/crc/slds/fema_flood_test.xml',
+    // sld: 'http://www.pacioos.hawaii.edu/ssi/sld/flood_hazard_zones.xml',
+    version: '1.1.1',
+    //brought up darker color shades on my computer strangely...
+    //format: 'image/png',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.5,
+    // errorTileUrl: '/images/map_tile_error.png',
+    attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
+    //bounds: L.latLngBounds( L.latLng( 20.5001, -159.79 ), L.latLng( 22.2353, -155.979 ) ),
+    bounds: L.latLngBounds( L.latLng( 18.891141, -160.250512 ), L.latLng( 22.235775, -154.730304 ) ),
+    maxZoom: 20,
+    // My custom attributes:
+    name: 'Flood Hazard Zones',
+    pane: 'underlay',
+    legendKey: 'femaflood',
+    queryable: true 
+  }
+);
+
+// SLR-XA 3.2 ft (2017)
+const slrxa32 = L.tileLayer.wms(
+  'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
+  {
+    layers: 'hi_tt_all_slrxa_2100',
+    tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
+    version: '1.1.1',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.5,
+    // errorTileUrl: '/images/map_tile_error.png',
+    attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
+    bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
+    maxZoom: 19,
+    // My custom attributes:
+    name: 'SLR-XA 2100',
+    legendKey: 'slrxa32',
+    queryable: false
+  }
+);
+
+// General boundary styles and functions for admin boundary layers
+
 const boundary_style = {
     weight: 1,
     color: '#6e6e6e',
@@ -206,6 +255,8 @@ function highlightBoundaries ( e ) {
     if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
   }
   }
+
+  // Development / Community Plan Areas (Districts):
 
 const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?where=&text=&objectIds=&time=&geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&f=geojson';
 
@@ -244,7 +295,7 @@ const devplan = new L.GeoJSON.AJAX(
       name: 'Community Plan Areas',
       pane: 'admin-boundaries',
       legendKey: 'devplan',
-      exclude: ['Community Plan Areas','Moku','Ahupuaa','Neighborhood Boards','DHHL Lands']
+      loadStatus: 'loading'
     }
   );
 
@@ -289,7 +340,7 @@ const ahupuaa = new L.GeoJSON.AJAX(
     name: 'Ahupuaa',
     pane: 'admin-boundaries',
     legendKey: 'ahupuaa',
-    exclude: [ 'Community Plan Areas','Moku','Neighborhood Boards','DHHL Lands']
+    loadStatus: 'loading'
   }
 );
 
@@ -342,7 +393,7 @@ const moku = new L.GeoJSON.AJAX(
     name: 'Moku',
     pane: 'admin-boundaries',
     legendKey: 'moku',
-    exclude: [ 'Community Plan Areas','Ahupuaa','Neighborhood Boards','DHHL Lands']
+    loadStatus: 'loading'
   }
 );
 
@@ -382,7 +433,7 @@ const boards = new L.GeoJSON.AJAX(
     name: 'Neighborhood Boards',
     pane: 'admin-boundaries',
     legendKey: 'boards',
-    exclude: ['Moku','Ahupuaa','Community Plan Areas','DHHL Lands']
+    loadStatus: 'loading'
 });
 
 // DHHL lands
@@ -433,38 +484,10 @@ const dhhl = new L.GeoJSON.AJAX(
     name: 'DHHL Lands',
     pane: 'admin-boundaries',
     legendKey: 'dhhl',
+    loadStatus: 'loading'
   }
 );
 
-
-// FEMA Flood Hazard Zones: 
-
-// ***** NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. No idea why.*****
-const femaFlood = L.tileLayer.wms(
-  'https://geodata.hawaii.gov/arcgis/services/Hazards/MapServer/WMSServer',
-  {
-    layers: '2',
-    styles: 'dfirm',
-    sld: 'http://www.soest.hawaii.edu/crc/slds/fema_flood_test.xml',
-    // sld: 'http://www.pacioos.hawaii.edu/ssi/sld/flood_hazard_zones.xml',
-    version: '1.1.1',
-    //brought up darker color shades on my computer strangely...
-    //format: 'image/png',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.5,
-    // errorTileUrl: '/images/map_tile_error.png',
-    attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
-    //bounds: L.latLngBounds( L.latLng( 20.5001, -159.79 ), L.latLng( 22.2353, -155.979 ) ),
-    bounds: L.latLngBounds( L.latLng( 18.891141, -160.250512 ), L.latLng( 22.235775, -154.730304 ) ),
-    maxZoom: 20,
-    // My custom attributes:
-    name: 'Flood Hazard Zones',
-    pane: 'underlay',
-    legendKey: 'femaflood',
-    queryable: true 
-  }
-);
 
 //////////  LAYER GROUPS  //////////
 
@@ -481,24 +504,17 @@ const layerGroups = [
   }];
 
 
-// {
-//     "group": slrxa,
-//     "layers":[slrxa_2030, slrxa_2050, slrxa_2075, slrxa_2100],
-// },
-// {
-//   "group": waveinun,
-//   "layers":[waveinun_2030, waveinun_2050, waveinun_2075, waveinun_2100],
-// }]
-
 // Tags in layer names to get each layer by depth. (These are used by slider to move layers in and out of layer groups.)
-// const layerTags = ['2030','2050','2075','2100'];
 const layerTags = ['00ft','1ft','2ft','3ft','4ft','5ft','6ft','7ft','8ft','9ft','10ft'];
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
-const wmsSingleLayers = [femaFlood];
+const wmsSingleLayers = [femaFlood, slrxa32];
 const unconnectedLayers = [land_use_districts, geology, soils];
 
+// Add event listener to GeoJSON AJAX layers to catch data:loaded event.
+//(Data starts loading before layer is added to map so this can happen before layer is added.)
+ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.loadStatus = 'loaded'));
 
 ///////// LAYER CONTROL OBJECTS //////////
 
@@ -540,6 +556,7 @@ const overlayMaps = [
               '<span class="layer-label">Ahupua&#699;a Boundaries</span>': ahupuaa,
               '<span class="layer-label">Neighborhood Board Boundaries</span>': boards,
               '<span class="layer-label">Hawaiian Home Lands (DHHL Lands)': dhhl,
+              '<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel panel-hidden"><div class="legend-box" style="background:#0d5de4; opacity:0.5; margin-left: 10px"></div> SLR-XA 3.2 ft': slrxa32
               }}
 ];
 // '<span class="layer-label">Sea Level Rise Exposure Area<br>(SLR-XA)</span>': slrxa,
@@ -547,85 +564,5 @@ const overlayMaps = [
 
 
 
-
-
-
-// old layers
-
-// const slrxa_2030 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_tt_all_slrxa_2030',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SLR-XA 2030',
-//     queryable: false,
-//   }
-// );
-
-// const slrxa_2050 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_tt_all_slrxa_2050',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SLR-XA 2050',
-//     queryable: false
-//   }
-// );
-
-// const slrxa_2075 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_tt_all_slrxa_2075',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 1,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SLR-XA 2075',
-//     queryable: false
-//   }
-// );
-
-// const slrxa_2100 = L.tileLayer.wms(
-//   'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/gwc/service/wms',
-//   {
-//     layers: 'hi_tt_all_slrxa_2100',
-//     tiled: true, // pulls from GWC if available; otherwise, stores to GWC...
-//     version: '1.1.1',
-//     format: 'image/png',
-//     transparent: true,
-//     opacity: 0.5,
-//     // errorTileUrl: '/images/map_tile_error.png',
-//     attribution: 'Data &copy; <a href="http://www.soest.hawaii.edu/coasts/" target="_blank" title="University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST) Coastal Geology Group (CGG)">UH/SOEST/CGG</a>',
-//     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
-//     maxZoom: 20,
-//     // My custom attributes:
-//     name: 'SLR-XA 2100',
-//     queryable: false
-//   }
-// );
 
 
