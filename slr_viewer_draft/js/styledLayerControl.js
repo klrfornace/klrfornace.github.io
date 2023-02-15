@@ -206,6 +206,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         var section = document.createElement('section');
         section.className = 'ac-container ' + className + '-list';
+        section.id = 'ac-container'; // to control style more specifically
 
         var form = this._form = this._section = L.DomUtil.create('form');
 

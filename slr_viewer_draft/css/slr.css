@@ -322,7 +322,12 @@ select {
 }
 
 .legend-container-hidden{
-  display: none !important;
+  display: none;
+}
+
+/* To overrule leaflet class added later when legend control is expanded/hidden*/
+#ac-container.legend-container-hidden form{
+  display: none;
 }
 
 /* Legend control styles */
@@ -336,7 +341,6 @@ select {
   font-size: 13px;
   line-height: 1.5;
   padding: 10px;
-  width: 240px;
 }
 
 .legend-entry{
@@ -346,6 +350,7 @@ select {
 .legend-entry-hidden{
   display: none;
 }
+
 
 .legend-header{
   font-weight: 500;
@@ -361,6 +366,15 @@ select {
   height: 16px;
   width: 16px;
   margin-right: 5px;
+}
+
+.road-line{
+  display: inline-block;
+  stroke: none;
+  stroke-miterlimit: 10;
+  width: 16px;
+  height: 19.5px;
+  vertical-align: middle;
 }
 
 .legend-line{

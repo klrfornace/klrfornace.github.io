@@ -12,6 +12,7 @@ L.Control.EasyPrint = L.Control.extend({
     tileWait: 500,
     hideControlContainer: true,
     hideClasses: [],
+    showClasses: [], // For potentially hidden classes to be added to print image
     customWindowTitle: window.document.title,
     spinnerBgCOlor: '#0DC5C1',
     customSpinnerClass: 'epLoader',
@@ -110,6 +111,9 @@ L.Control.EasyPrint = L.Control.extend({
     }
     if (this.options.hideClasses) {
       this._toggleClasses(this.options.hideClasses);
+    }
+    if (this.options.showClasses) {
+      this._toggleClasses(this.options.showClasses, true);
     }
     var sizeMode = typeof event !== 'string' ? event.target.className : event;
     if (sizeMode === 'CurrentSize') {

@@ -521,7 +521,7 @@ ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.lo
 // Create basemap layer object for layer control
 const basemaps = [
   {
-    groupName: 'BASEMAPS',
+    groupName: '<img src="images/basemap.svg" class="label-icon"> BASEMAPS',
     expanded: false, 
     layers: {
       'Grayscale': mapboxLight,
@@ -541,15 +541,15 @@ const basemaps = [
 
 const overlayMaps = [
   {
-    groupName: 'EXPOSURE', 
+    groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
      layers: {'<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px;"></div>':passive,
       }
   },
-  { groupName: 'IMPACTS',
+  { groupName: '<img src="images/flood.svg" class="label-icon">IMPACTS',
     expanded: false,
     layers: {'<span class="layer-label">example</span>': femaFlood}},
-  { groupName: 'OTHER OVERLAYS',
+  { groupName: '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS',
     expanded: true,
     layers: {'<span class="layer-label">Community Plan Area Boundaries</span>': devplan,
               '<span class="layer-label">Moku Boundaries</span>': moku,

@@ -79,6 +79,8 @@ passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span>
 const waveinunEntry = L.DomUtil.create('div','legend-waveinun legend-entry legend-entry-hidden',legendDiv);
 
 // Impact layers
+const roadEntry1ft = '<svg class="road-line" style="fill: #f45a9b" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4"/></g></svg> &nbsp;'
+const roadEntry2ft = '<svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="8"/></g></svg> &nbsp;'
 
 // Other layers
 // Check if map has light or dark (satellite) basemap. (Outline colors switch depending on basemap.)
@@ -142,14 +144,14 @@ let legendToggle = document.querySelector('.legend-toggle');
 
 // Switch between full menu and simple legend
  legendToggle.onclick = function() {
-    document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
-    document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
+  document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
+  document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
 
-    // Change label of button
-    let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
-    const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-    const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Back to full menu';
-    document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
+  // Change label of button
+  let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
+  const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
+  const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Full layer menu';
+  document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
  }
 
 
@@ -202,7 +204,8 @@ L.easyPrint({
   hideControlContainer: false,
   exportOnly: true,
   hideClasses: ['leaflet-control-zoom','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
-	sizeModes: ['A4Portrait', 'A4Landscape']
+  showClasses: ['legend-container'],
+	sizeModes: ['Current','A4Portrait', 'A4Landscape']
 }).addTo(map);
 
 
