@@ -140,19 +140,36 @@ map.on('overlayremove', function(e){
   entryDiv.classList.add('legend-entry-hidden');
 })
 
-let legendToggle = document.querySelector('.legend-toggle');
+const legendRadio = document.querySelector('.legend-radio-group');
 
-// Switch between full menu and simple legend
- legendToggle.onclick = function() {
-  document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
-  document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
+legendRadio.onclick = function () {
+  const radioButtonGroup = document.getElementsByName("legend-toggle");
+  const checkedRadio = Array.from(radioButtonGroup).find(
+    (radio) => radio.checked
+  );
+  if (checkedRadio.value == 'full-menu'){
+    document.querySelector('.ac-container').classList.remove('legend-container-hidden');
+    document.querySelector('.legend-container').classList.add('legend-container-hidden');
+  }
+  else {
+    document.querySelector('.ac-container').classList.add('legend-container-hidden');
+    document.querySelector('.legend-container').classList.remove('legend-container-hidden');
+  }
+};
 
-  // Change label of button
-  let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
-  const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-  const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Full layer menu';
-  document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
- }
+// let legendToggle = document.querySelector('.legend-toggle');
+
+// // Switch between full menu and simple legend
+//  legendToggle.onclick = function() {
+//   document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
+//   document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
+
+//   // Change label of button
+//   let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
+//   const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
+//   const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Full layer menu';
+//   document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
+//  }
 
 
  // Change layer styles based on light/dark (satellite) basemaps
