@@ -268,10 +268,25 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         // Add layer utilities for expanding, collapsing, and clearing all
         // layers (-jmaurer):
-        // Condensing to just hide menu - KF
+        // replacing with simple legend/full menu toggle - KF
 
         const utilities = L.DomUtil.create('div','styledLayerControl-utilities',container);
         utilities.id = 'styledLayerControl-utilities';
+
+        // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
+        // hide_menu.innerHTML = '<svg viewBox="0 0 19.41 19.41"><g><g><polyline points="1.41 18 10.03 9.38 10.8 8.62 13.32 6.09"/><polygon style="stroke: none" points="16.32 11.56 19.41 0 7.86 3.1 16.32 11.56"/><g></g></svg>';
+        // hide_menu.setAttribute('aria-label','Hide layer control window');
+        // var closure = this; // create closure
+        // hide_menu.onclick = function () { closure._collapse(); };
+        // utilities.appendChild(hide_menu);
+
+        const radioToggle = L.DomUtil.create('div','legend-radio-group',utilities);
+
+        radioToggle.innerHTML = '<input class="radio__input" type="radio" name="legend-toggle" value="full-menu" id="full-menu-radio" checked>'+
+        '<label for="full-menu-radio" class="radio__label" title="Show full layer menu">Full layer menu</label>'+
+        '<input class="radio__input" type="radio" name="legend-toggle" value="simple-legend" id="simple-legend-radio">'+
+        '<label for="simple-legend-radio" class="radio__label" title="Show simple map legend">Simple legend</label>';
+
 
         // var clear_all = document.createElement('a');
         // var clear_all_text = document.createTextNode('Clear all');
@@ -285,24 +300,24 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
         // utilities.appendChild(spacer);
 
-        var hide_menu = L.DomUtil.create('button','close-btn',utilities)
+        // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
 
-        hide_menu.innerHTML = '<svg viewBox="0 0 30.56 30.28"><g><path d="M26.06,30.28H4.5c-2.48,0-4.5-2.02-4.5-4.5V4.5C0,2.02,2.02,0,4.5,0H26.06c2.48,0,4.5,2.02,4.5,4.5V25.78c0,2.48-2.02,4.5-4.5,4.5ZM4.5,3c-.83,0-1.5,.67-1.5,1.5V25.78c0,.83,.67,1.5,1.5,1.5H26.06c.83,0,1.5-.67,1.5-1.5V4.5c0-.83-.67-1.5-1.5-1.5H4.5Z"/><g><rect x="19.41" y="5.94" width="6.99" height="3.13" transform="translate(1.4 18.4) rotate(-45)"/><polygon points="18 5.46 15.46 14.96 24.96 12.41 18 5.46"/></g><g><rect x="4.15" y="21.2" width="6.99" height="3.13" transform="translate(-13.86 12.08) rotate(-45)"/><polygon points="12.55 24.82 15.1 15.32 5.6 17.87 12.55 24.82"/></g></g></svg>';
-        hide_menu.setAttribute('aria-label','Hide layer control window');
-        var closure = this; // create closure
-        hide_menu.onclick = function () { closure._collapse(); };
-        utilities.appendChild(hide_menu);
+        // hide_menu.innerHTML = '<svg viewBox="0 0 30.56 30.28"><g><path d="M26.06,30.28H4.5c-2.48,0-4.5-2.02-4.5-4.5V4.5C0,2.02,2.02,0,4.5,0H26.06c2.48,0,4.5,2.02,4.5,4.5V25.78c0,2.48-2.02,4.5-4.5,4.5ZM4.5,3c-.83,0-1.5,.67-1.5,1.5V25.78c0,.83,.67,1.5,1.5,1.5H26.06c.83,0,1.5-.67,1.5-1.5V4.5c0-.83-.67-1.5-1.5-1.5H4.5Z"/><g><rect x="19.41" y="5.94" width="6.99" height="3.13" transform="translate(1.4 18.4) rotate(-45)"/><polygon points="18 5.46 15.46 14.96 24.96 12.41 18 5.46"/></g><g><rect x="4.15" y="21.2" width="6.99" height="3.13" transform="translate(-13.86 12.08) rotate(-45)"/><polygon points="12.55 24.82 15.1 15.32 5.6 17.87 12.55 24.82"/></g></g></svg>';
+        // hide_menu.setAttribute('aria-label','Hide layer control window');
+        // var closure = this; // create closure
+        // hide_menu.onclick = function () { closure._collapse(); };
+        // utilities.appendChild(hide_menu);
 
         // var spacer = document.createElement('span');
         // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
         // utilities.appendChild(spacer);
 
-        var legendToggle = L.DomUtil.create('button','legend-toggle',utilities);
-        legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-        legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
+        // var legendToggle = L.DomUtil.create('button','legend-toggle',utilities);
+        // legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
+        // legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
 
 
-        window.onresize = this._on_resize_window.bind(this);
+        // window.onresize = this._on_resize_window.bind(this);
 
     },
 

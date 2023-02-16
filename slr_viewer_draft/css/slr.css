@@ -24,10 +24,12 @@ hr {
 
 h1 {
   font-weight: 500;
-  padding: 5px;
+  font-size: 30px;
+  padding: 5px 20px;
   margin: 0;
-  text-align:center;
+  text-align:left;
 }
+
 h3 {
   font-size:21px;
   /* font-weight: 500; */
