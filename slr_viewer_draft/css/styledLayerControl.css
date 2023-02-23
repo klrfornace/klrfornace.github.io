@@ -236,7 +236,8 @@ div[id^="leaflet-control-accordion-layers"] > label {
 }
 
 #styledLayerControl-utilities{
-	background: #ebebec;
+	/* background: #ebebec; */
+	background: #e0e0e0;
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 	color: #184e85;
@@ -244,18 +245,56 @@ div[id^="leaflet-control-accordion-layers"] > label {
 	font-family: 'Roboto',sans-serif;
 	font-size: 12px;
 	font-weight: 700;
-	padding: 5px;
+	padding: 0;
+	width: 270px;
 	/* text-align: center;  */
-	margin: auto;
+	/* margin: auto;
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-between; */
 }
 
-#styledLayerControl-utilities button{
+.legend-radio-group{
+	display: inline-flex;
+	flex: 1;
+	overflow: hidden;
+	/* border: 1px solid #ccc; */
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.radio__input{
+	display: none;
+}
+
+.radio__input:checked + .radio__label{
+	background: #f7f7f7;
+	/* color: #184e85; */
+	color: #2d2d2d;
+	font-weight: 500;
+	outline: 1px solid #cfcfd0;
+}
+.radio__label{
+	/* padding: 5px 25px; */
+	color: #5b5b5b;
+	cursor: pointer;
+	font-weight: 400;
+	margin: auto;
+	padding: 4px 0px;
+	text-align: center;
+	width: 135px;
+	/* transition: background 0.1s; */
+}
+
+.radio__label:hover{
+	background: #d3d3d4;
+	color: #2474c6;
+}
+
+/* #styledLayerControl-utilities button{
 	cursor: pointer;
 	font-family: 'Roboto',sans-serif;
 	font-weight: 500;
-}
+} */
 
 #styledLayerControl-utilities .close-btn{
 	height: 24px;
@@ -264,7 +303,7 @@ div[id^="leaflet-control-accordion-layers"] > label {
 	vertical-align: middle; */
 }
 
-#styledLayerControl-utilities svg{
+/* #styledLayerControl-utilities svg{
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -280,9 +319,11 @@ div[id^="leaflet-control-accordion-layers"] > label {
 }
 
 .close-btn svg{
-	height: 16px;
-	width: 16px;
-	fill: #184e85;
+	height: 14px;
+	width: 14px;
+	fill: #868686;
+	stroke: #868686;
+	stroke-width: 3px;
 }
 
 .close-btn:hover svg{
@@ -296,20 +337,18 @@ div[id^="leaflet-control-accordion-layers"] > label {
 }
 
 .legend-toggle{
-	/* background: #184e85; */
 	border: none;
-	/* border: 1px solid #184e85; */
 	border-radius: 3px;
 	color: #184e85;
-}
+} */
 
-.legend-toggle:hover svg{
+/* .legend-toggle:hover svg{
 	fill: #2474c6;
 }
 
 .legend-toggle:hover{
 	color: #2474c6;
-}
+} */
 
 /* #styledLayerControl-utilities button:hover svg{
 	fill: #2474c6;
