@@ -15,7 +15,7 @@
 	.st8{opacity:0.67;fill:#09713A;}
 	.st9{opacity:0.67;fill:#056936;}
 	.st10{fill:#010101;}
-	.st11{font-family:'Roboto'; font-weight:500}
+	.st11{font-family:'Roboto',sans-serif; font-weight:500}
 	.st12{font-size:20px;}
 </style>
 <g>
