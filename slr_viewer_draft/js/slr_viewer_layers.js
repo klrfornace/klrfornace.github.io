@@ -73,14 +73,14 @@ const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/sate
 
 const crcgeoURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/wms';
 
-const wmsOptions = (ft, type) => (
+const passiveWmsOptions = (ft, type) => (
   {
     tiled:true, 
     version:'1.1.1', 
     format:'image/png', 
     transparent: true,
     opacity: 0.67,
-  // errorTileUrl: '/images/map_tile_error.png',
+    // errorTileUrl: 'http://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
@@ -98,9 +98,120 @@ const passiveLayers = {
 }
 for (let i = 0; i < 11; i++) {
   for (let layer in passiveLayers) {
-    passiveLayers[layer][i] = L.tileLayer.wms(crcgeoURL, wmsOptions(i, layer));
+    passiveLayers[layer][i] = L.tileLayer.wms(crcgeoURL, passiveWmsOptions(i, layer));
   }
 }
+
+const waveWmsOptions = (ft) => (
+  {
+    tiled:true, 
+    version:'1.1.1', 
+    format:'image/png', 
+    transparent: true,
+    opacity: 0.67,
+    errorTileUrl: 'http://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
+    attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+    bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
+    maxZoom: 19,
+    queryable: true,
+    nullValue: -999,
+    popupMinZoom: 15,
+    layers: (ft < 10) ? `CRC:puc_wave_0${ft}ft` : `CRC:puc_wave_${ft}ft`, 
+    name: (ft < 10) ? `Annual wave 0${ft}ft` : `Annual wave ${ft}ft`,
+  }
+) 
+
+const waveLayers = [];
+
+for (let i = 0; i < 11; i++) {
+    waveLayers[i] = L.tileLayer.wms(crcgeoURL, waveWmsOptions(i));
+  }
+
+//////// IMPACT LAYERS ////////
+
+// Flooded roads 
+
+// Initial styles for zoomed out map
+const roadStyle1ft = {
+  color: '#f45a9b',
+  weight: 1,
+  opacity: 1
+};
+
+const roadStyle2ft = {
+  color: '#9f0c4a',
+  weight: 1,
+  opacity: 1
+};
+
+const roadOptions = (ft, floodDepth) => (
+  {style: floodDepth == '1ft'? roadStyle1ft: roadStyle2ft,
+    // onEachFeature: function ( feature, layer ) {
+    //   var street_name = feature.properties.name;
+    //   var tooltip = '<center><b>0.5 ft scenario';
+    //   if ( street_name ) {
+    //     tooltip += ':<br/>' + street_name;
+    //   }
+    //   tooltip += '</b></center>';
+    //   layer.bindTooltip( tooltip, { sticky: true } );
+    // },
+    attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+    name: (ft < 10) ? `Flooded roads 0${ft}ft_${floodDepth}` : `Flooded roads ${ft}ft_${floodDepth}`,
+  });
+
+// const roadLayers = {
+//   '1ft': [],
+//   '2ft': []
+// }
+
+const roadLayers = {
+  '1': [],
+  '2': []
+}
+
+for (let i = 0; i < 11; i++) {
+  for (let layer in roadLayers) {
+    const layerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
+    // const layerName = (i < 10)? `CRC%3AHI_Oahu_80prob_0${i}ftSLR_${layer}_strt_v2` :  `CRC%3AHI_Oahu_80prob_${i}ftSLR_${layer}_strt_v2`;
+    const roadWFS = `http://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
+    roadLayers[layer][i] = new L.GeoJSON.AJAX(roadWFS, roadOptions(i, layer));
+  }
+}
+
+// Stormwater structures
+
+const stormwaterStyle = {
+  radius:2,
+  fillColor: '#ec297b',
+  color:'#fff',
+  weight:0.25,
+  opacity: 1,
+  fillOpacity:1
+};
+
+const stormwaterLayers = [];
+
+const stormwaterOptions = (ft) => (
+  { pointToLayer: (feature, latlng) => (L.circleMarker(latlng, stormwaterStyle)),
+    // onEachFeature: function ( feature, layer ) {
+    //   var street_name = feature.properties.name;
+    //   var tooltip = '<center><b>0.5 ft scenario';
+    //   if ( street_name ) {
+    //     tooltip += ':<br/>' + street_name;
+    //   }
+    //   tooltip += '</b></center>';
+    //   layer.bindTooltip( tooltip, { sticky: true } );
+    // },
+    attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+    name: (ft < 10) ? `Flooded stormwater structures 0${ft}ft` : `Flooded stormwater structures ${ft}ft`,
+  });
+
+for (let i = 0; i < 11; i++) {
+    const layerName = (i < 10)? `CRC%3AOahu_stormwater_struct_prelim_0${i}ft` :  `CRC%3AOahu_stormwater_struct_prelim_${i}ft`;
+    const stormwaterWFS = `http://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
+    stormwaterLayers[i] = new L.GeoJSON.AJAX(stormwaterWFS, stormwaterOptions(i));
+};
+
 
 //////////  OTHER OVERLAYS  //////////
 
@@ -185,7 +296,7 @@ const femaFlood = L.tileLayer.wms(
   {
     layers: '2',
     styles: 'dfirm',
-    sld: 'http://www.soest.hawaii.edu/crc/slds/fema_flood_test.xml',
+    sld: 'http://www.soest.hawaii.edu/crc/SLRviewer/slds/fema_flood_test.xml',
     // sld: 'http://www.pacioos.hawaii.edu/ssi/sld/flood_hazard_zones.xml',
     version: '1.1.1',
     //brought up darker color shades on my computer strangely...
@@ -494,14 +605,28 @@ const dhhl = new L.GeoJSON.AJAX(
 // Initialize layer groups
 // const slrxa = L.layerGroup([slrxa_2030],{legendKey:'slrxa'});
 const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],{legendKey:'passive'})
-// const waveinun = L.layerGroup([waveinun_2030],{legendKey:'waveinun'});
+const wave = L.layerGroup(waveLayers[0],{legendKey:'wave'});
+const roads = L.layerGroup(roadLayers[0],{legendKey:'roads'});
+const stormwater = L.layerGroup(stormwaterLayers[0],{legendKey:'stormwater'});
 
 // Assign all possible layers to groups
 const layerGroups = [
   {
     "group": passive,
     "layers": Object.values(passiveLayers).flat(),    
-  }];
+  },
+  {
+    "group": wave,
+    "layers": waveLayers,    
+  },
+  {
+    "group": roads,
+    "layers": Object.values(roadLayers).flat(),    
+  },
+  {
+    "group": stormwater,
+    "layers": stormwaterLayers,    
+  },];
 
 
 // Tags in layer names to get each layer by depth. (These are used by slider to move layers in and out of layer groups.)
@@ -543,12 +668,16 @@ const overlayMaps = [
   {
     groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
-     layers: {'<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px;"></div>':passive,
+     layers: {'<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px;"></div>':passive, 
+     '<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px;"></div>':wave
       }
   },
   { groupName: '<img src="images/flood.svg" class="label-icon">IMPACTS',
-    expanded: false,
-    layers: {'<span class="layer-label">example</span>': femaFlood}},
+    expanded: true,
+    layers: {'<span class="layer-label">Flooded Roads</span><div class="legend-panel panel-hidden"><svg class="road-line" style="fill: #f45a9b" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4"/></g></svg> &nbsp;Flood depth > 1 ft<br><svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y="-2.5" width="30.74" height="8"/></g></svg> &nbsp;Flood depth > 2 ft</div>':roads,
+    '<span class="layer-label">Stormwater Drainage Failure</span><div class="legend-panel panel-hidden"><svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level</div>':stormwater
+      }
+  },
   { groupName: '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS',
     expanded: true,
     layers: {'<span class="layer-label">Community Plan Area Boundaries</span>': devplan,
@@ -559,8 +688,13 @@ const overlayMaps = [
               '<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel panel-hidden"><div class="legend-box" style="background:#0d5de4; opacity:0.5; margin-left: 10px"></div> SLR-XA 3.2 ft': slrxa32
               }}
 ];
-// '<span class="layer-label">Sea Level Rise Exposure Area<br>(SLR-XA)</span>': slrxa,
+
+
+// '<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"></div>':wave
+
 // '<span class="layer-label">Wave Inundation</span><details id="wave-options"><summary>More options</summary>test</details>': waveinun,
+
+// '<span class="layer-label">Stormwater infrastructure failure</span><div class="legend-panel panel-hidden"><svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level</div>':stormwater
 
 
 

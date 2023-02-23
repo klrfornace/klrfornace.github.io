@@ -76,11 +76,18 @@ const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entr
 const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
 passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;">'
   + '<br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px">';
-const waveinunEntry = L.DomUtil.create('div','legend-waveinun legend-entry legend-entry-hidden',legendDiv);
+const waveEntry = L.DomUtil.create('div','legend-wave legend-entry legend-entry-hidden',legendDiv);
+waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;">';
 
 // Impact layers
+const roadEntry = L.DomUtil.create('div', 'legend-roads legend-entry legend-entry-hidden',legendDiv);
 const roadEntry1ft = '<svg class="road-line" style="fill: #f45a9b" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4"/></g></svg> &nbsp;'
-const roadEntry2ft = '<svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="8"/></g></svg> &nbsp;'
+const roadEntry2ft = '<svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y="-2.5" width="30.74" height="8"/></g></svg> &nbsp;'
+roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+ roadEntry1ft + 'Flood depth > 1 ft<br>' + roadEntry2ft + 'Flood depth > 2 ft';
+
+const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry legend-entry-hidden',legendDiv);
+const stormwaterSymbol = '<svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;'
+stormwaterEntry.innerHTML = stormwaterSymbol + 'Stormwater structures below sea level';
 
 // Other layers
 // Check if map has light or dark (satellite) basemap. (Outline colors switch depending on basemap.)
@@ -124,14 +131,19 @@ map.on('overlayadd', function addOverlay(e){
 
     // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
     const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
-    if (adminGroup.includes(e.layer)){
-      for(let layer of adminGroup){
-          if (layer.options.legendKey != legendKey && map.hasLayer(layer)){
-            removeWithTimeout(layer);
+    const exposureGroup = [passive, wave];
+
+    for(let group of [adminGroup, exposureGroup]){
+      if (group.includes(e.layer)){
+        for(let layer of group){
+            if (layer.options.legendKey != legendKey && map.hasLayer(layer)){
+              removeWithTimeout(layer);
+          }
         }
       }
     }
 });
+
 
 map.on('overlayremove', function(e){
   const legendKey = e.layer.options.legendKey;
@@ -193,6 +205,55 @@ function() {
   }
 }
 );
+
+
+//Change styles based on map zoom level
+map.on('zoomend', function(){
+  const currentZoom = map.getZoom();
+  const roadLayers1 = roadLayers['1'];
+  const roadLayers2 = roadLayers['2'];
+
+  if (currentZoom < 13){
+    roadStyle1ft.weight = 1;
+    roadStyle2ft.weight = 1;
+    stormwaterStyle.weight = 0.25;
+    stormwaterStyle.radius = 2;
+
+    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+    stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+  }
+  else if (currentZoom < 15){
+    roadStyle1ft.weight = 1.5;
+    roadStyle2ft.weight = 2;
+    stormwaterStyle.weight = 0.5;
+    stormwaterStyle.radius = 3;
+
+    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+    stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+  }
+  else if (currentZoom < 17){
+    roadStyle1ft.weight = 1.5;
+    roadStyle2ft.weight = 3;
+    stormwaterStyle.weight = 0.5;
+    stormwaterStyle.radius = 3;
+
+    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+    stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+  }
+  else {
+    roadStyle1ft.weight = 2;
+    roadStyle2ft.weight = 4;
+    stormwaterStyle.weight = 0.5;
+    stormwaterStyle.radius = 3.5;
+
+    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+    stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+  }
+})
 
 
 // Add easy print button to export map.

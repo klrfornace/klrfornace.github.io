@@ -340,11 +340,12 @@ select {
   font-family:'Roboto',sans-serif;
   font-size: 13px;
   line-height: 1.5;
-  padding: 10px;
+  padding: 10px 15px;
 }
 
 .legend-entry{
-  margin-top: 10px;
+  padding: 5px 0;
+  border-top: 1px #e7e7e7 solid;
 }
 
 .legend-entry-hidden{
@@ -354,10 +355,13 @@ select {
 
 .legend-header{
   font-weight: 500;
+  padding-bottom: 5px;
+  padding-top:5px;
 }
 
 .legend-subheader{
   font-weight: 500;
+  line-height: 24px;
 }
 
 .legend-box{
@@ -374,6 +378,13 @@ select {
   stroke-miterlimit: 10;
   width: 16px;
   height: 19.5px;
+  vertical-align: middle;
+}
+
+.stormwater{
+  display: inline-block;
+  stroke: none;
+  width: 16px;
   vertical-align: middle;
 }
 
