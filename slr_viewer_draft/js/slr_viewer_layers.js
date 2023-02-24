@@ -109,7 +109,7 @@ const waveWmsOptions = (ft) => (
     format:'image/png', 
     transparent: true,
     opacity: 0.67,
-    errorTileUrl: 'http://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
+    errorTileUrl: 'https://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
@@ -129,54 +129,88 @@ for (let i = 0; i < 11; i++) {
 
 //////// IMPACT LAYERS ////////
 
-// Flooded roads 
-
-// Initial styles for zoomed out map
-const roadStyle1ft = {
-  color: '#f45a9b',
-  weight: 1,
-  opacity: 1
-};
-
-const roadStyle2ft = {
-  color: '#9f0c4a',
-  weight: 1,
-  opacity: 1
-};
-
-const roadOptions = (ft, floodDepth) => (
-  {style: floodDepth == '1ft'? roadStyle1ft: roadStyle2ft,
-    // onEachFeature: function ( feature, layer ) {
-    //   var street_name = feature.properties.name;
-    //   var tooltip = '<center><b>0.5 ft scenario';
-    //   if ( street_name ) {
-    //     tooltip += ':<br/>' + street_name;
-    //   }
-    //   tooltip += '</b></center>';
-    //   layer.bindTooltip( tooltip, { sticky: true } );
-    // },
-    attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-    name: (ft < 10) ? `Flooded roads 0${ft}ft_${floodDepth}` : `Flooded roads ${ft}ft_${floodDepth}`,
-  });
-
-// const roadLayers = {
-//   '1ft': [],
-//   '2ft': []
-// }
+// Flooded roads - loaded as vector tiles from Geoserver
 
 const roadLayers = {
   '1': [],
   '2': []
 }
 
+
+function style1ft(properties, zoom) {
+  const wt = (zoom < 13) ? 1:
+              (zoom < 17) ? 1.5: 2;
+  return {
+      color:'#f45a9b',
+      weight: wt,
+  }
+};
+
+function style2ft(properties, zoom) {
+  const wt = (zoom < 13) ? 1:
+            (zoom < 15) ? 2:
+            (zoom < 17) ? 3: 4;
+  return {
+      color:'#9f0c4a',
+      weight: wt,
+  }
+};
+
+
 for (let i = 0; i < 11; i++) {
   for (let layer in roadLayers) {
-    const layerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
-    // const layerName = (i < 10)? `CRC%3AHI_Oahu_80prob_0${i}ftSLR_${layer}_strt_v2` :  `CRC%3AHI_Oahu_80prob_${i}ftSLR_${layer}_strt_v2`;
-    const roadWFS = `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
-    roadLayers[layer][i] = new L.GeoJSON.AJAX(roadWFS, roadOptions(i, layer));
+      const fullLayerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
+      const layerName = (i < 10)? `HI_roads_flood${layer}_prelim_0${i}ft` :  `HI_roads_flood${layer}_prelim_${i}ft`;
+      const roadURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/' + fullLayerName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+      const styleFunction = (layer == '1')? style1ft: style2ft;
+
+      const roadTileOptions = {
+        vectorTileLayerStyles: {[layerName]: styleFunction},
+        interactive: true,	// Make sure that this VectorGrid fires mouse/pointer events
+        attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+        name: (i < 10) ? `Flooded roads 0${i}ft_${layer}` : `Flooded roads ${i}ft_${layer}`,
+      }
+      roadLayers[layer][i] = L.vectorGrid.protobuf(roadURL, roadTileOptions);
   }
 }
+
+// WFS version - was too laggy for complicated shapes
+
+// Initial styles for zoomed out map
+// const roadStyle1ft = {
+//   color: '#f45a9b',
+//   weight: 1,
+//   opacity: 1
+// };
+
+// const roadStyle2ft = {
+//   color: '#9f0c4a',
+//   weight: 1,
+//   opacity: 1
+// };
+
+// const roadOptions = (ft, floodDepth) => (
+//   {style: floodDepth == '1ft'? roadStyle1ft: roadStyle2ft,
+//     // onEachFeature: function ( feature, layer ) {
+//     //   var street_name = feature.properties.name;
+//     //   var tooltip = '<center><b>0.5 ft scenario';
+//     //   if ( street_name ) {
+//     //     tooltip += ':<br/>' + street_name;
+//     //   }
+//     //   tooltip += '</b></center>';
+//     //   layer.bindTooltip( tooltip, { sticky: true } );
+//     // },
+//     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+//     name: (ft < 10) ? `Flooded roads 0${ft}ft_${floodDepth}` : `Flooded roads ${ft}ft_${floodDepth}`,
+//   });
+// for (let i = 0; i < 11; i++) {
+//   for (let layer in roadLayers) {
+//     const layerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
+//     // const layerName = (i < 10)? `CRC%3AHI_Oahu_80prob_0${i}ftSLR_${layer}_strt_v2` :  `CRC%3AHI_Oahu_80prob_${i}ftSLR_${layer}_strt_v2`;
+//     const roadWFS = `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
+//     roadLayers[layer][i] = new L.GeoJSON.AJAX(roadWFS, roadOptions(i, layer));
+//   }
+// }
 
 // Stormwater structures
 

@@ -225,52 +225,73 @@ function() {
 
 
 //Change styles based on map zoom level
+
 map.on('zoomend', function(){
   const currentZoom = map.getZoom();
-  const roadLayers1 = roadLayers['1'];
-  const roadLayers2 = roadLayers['2'];
 
   if (currentZoom < 13){
-    roadStyle1ft.weight = 1;
-    roadStyle2ft.weight = 1;
     stormwaterStyle.weight = 0.25;
     stormwaterStyle.radius = 2;
-
-    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
   }
-  else if (currentZoom < 15){
-    roadStyle1ft.weight = 1.5;
-    roadStyle2ft.weight = 2;
+  else if (currentZoom < 18){
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3;
-
-    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
-    stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
-  }
-  else if (currentZoom < 17){
-    roadStyle1ft.weight = 1.5;
-    roadStyle2ft.weight = 3;
-    stormwaterStyle.weight = 0.5;
-    stormwaterStyle.radius = 3;
-
-    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
   }
   else {
-    roadStyle1ft.weight = 2;
-    roadStyle2ft.weight = 4;
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3.5;
-
-    roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-    roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
   }
 })
+
+// map.on('zoomend', function(){
+//   const currentZoom = map.getZoom();
+//   const roadLayers1 = roadLayers['1'];
+//   const roadLayers2 = roadLayers['2'];
+
+//   if (currentZoom < 13){
+//     roadStyle1ft.weight = 1;
+//     roadStyle2ft.weight = 1;
+//     stormwaterStyle.weight = 0.25;
+//     stormwaterStyle.radius = 2;
+
+//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+//   }
+//   else if (currentZoom < 15){
+//     roadStyle1ft.weight = 1.5;
+//     roadStyle2ft.weight = 2;
+//     stormwaterStyle.weight = 0.5;
+//     stormwaterStyle.radius = 3;
+
+//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+//   }
+//   else if (currentZoom < 17){
+//     roadStyle1ft.weight = 1.5;
+//     roadStyle2ft.weight = 3;
+//     stormwaterStyle.weight = 0.5;
+//     stormwaterStyle.radius = 3;
+
+//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+//   }
+//   else {
+//     roadStyle1ft.weight = 2;
+//     roadStyle2ft.weight = 4;
+//     stormwaterStyle.weight = 0.5;
+//     stormwaterStyle.radius = 3.5;
+
+//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
+//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
+//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+//   }
+// })
 
 
 // Add easy print button to export map.
