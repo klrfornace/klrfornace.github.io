@@ -169,6 +169,7 @@ for (let i = 0; i < 11; i++) {
         interactive: true,	// Make sure that this VectorGrid fires mouse/pointer events
         attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
         name: (i < 10) ? `Flooded roads 0${i}ft_${layer}` : `Flooded roads ${i}ft_${layer}`,
+        pane: 'mvt-line'
       }
       roadLayers[layer][i] = L.vectorGrid.protobuf(roadURL, roadTileOptions);
   }

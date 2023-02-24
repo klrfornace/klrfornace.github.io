@@ -48,6 +48,9 @@ map.options.maxBounds = bounds;
 map.createPane('base'); // ensure basemaps are always the lowest layer
 map.getPane('base').style.zIndex = 150;
 
+map.createPane('mvt-line'); // for vector tiles that should be moved up
+map.getPane('mvt-line').style.zIndex = 390; // right behind line layers at 400
+
 map.createPane('underlay'); // for tile layers that need to above basemap but below all other layers
 map.getPane('underlay').style.zIndex = 175;
 
