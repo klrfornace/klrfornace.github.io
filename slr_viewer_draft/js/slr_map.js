@@ -75,43 +75,31 @@ legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level
 // Set up entries for all layers/layer groups. All entries will initially be hidden.
 
 // Exposure layers
-const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
+// const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
 const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
-passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;">'
-  + '<br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px">';
+passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>' + passive.options.legendEntry;
 const waveEntry = L.DomUtil.create('div','legend-wave legend-entry legend-entry-hidden',legendDiv);
-waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;">';
+waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>' + wave.options.legendEntry;
 
 // Impact layers
 const roadEntry = L.DomUtil.create('div', 'legend-roads legend-entry legend-entry-hidden',legendDiv);
-const roadEntry1ft = '<svg class="road-line" style="fill: #f45a9b" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4"/></g></svg> &nbsp;'
-const roadEntry2ft = '<svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y="-2.5" width="30.74" height="8"/></g></svg> &nbsp;'
-roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+ roadEntry1ft + 'Flood depth > 1 ft<br>' + roadEntry2ft + 'Flood depth > 2 ft';
+roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+ roads.options.legendEntry;
 
 const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry legend-entry-hidden',legendDiv);
-const stormwaterSymbol = '<svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;'
-stormwaterEntry.innerHTML = stormwaterSymbol + 'Stormwater structures below sea level';
+stormwaterEntry.innerHTML = stormwater.options.legendEntry;
 
 // Other layers
-// Check if map has light or dark (satellite) basemap. (Outline colors switch depending on basemap.)
-const legendLineClass = map.hasLayer(mapboxLight)? '':'line-dark-basemap';
-const generalEntry =  '<svg class="legend-line '+ legendLineClass + '" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;'
-const otherLayerLabels = ['Community Plan Area Boundaries','Moku Boundaries','Ahupua&#699;a Boundaries','Neighborhood Board Boundaries','Hawaiian Home Land Boundaries'];
+for (let layer of [devplan, moku, ahupuaa, boards, dhhl, slrxa32]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+  entry.innerHTML = layer.options.legendEntry;
+}
 
-const devEntry = L.DomUtil.create('div','legend-devplan legend-entry legend-entry-hidden',legendDiv);
-devEntry.innerHTML = generalEntry + 'Community Plan Area Boundaries';
-const mokuEntry = L.DomUtil.create('div','legend-moku legend-entry legend-entry-hidden',legendDiv);
-mokuEntry.innerHTML = generalEntry + 'Moku Boundaries';
-const ahupuaaEntry = L.DomUtil.create('div','legend-ahupuaa legend-entry legend-entry-hidden',legendDiv);
-ahupuaaEntry.innerHTML = generalEntry + 'Ahupua&#699;a Boundaries';
-const boardEntry = L.DomUtil.create('div','legend-boards legend-entry legend-entry-hidden',legendDiv);
-boardEntry.innerHTML =  generalEntry + 'Neighborhood Board Boundaries';
-const dhhlEntry = L.DomUtil.create('div','legend-dhhl legend-entry legend-entry-hidden',legendDiv);
-dhhlEntry.innerHTML = generalEntry + 'Hawaiian Home Land Boundaries';
-
-const slrxa32Entry = L.DomUtil.create('div','legend-slrxa32 legend-entry legend-entry-hidden',legendDiv);
-slrxa32Entry.innerHTML = '<div class="legend-box" style="background:#0d5de4; opacity:0.5"></div> SLR-XA 3.2 ft';
 const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',legendDiv);
+
+// const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
+// const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
+// const geologyEntry = L.DomUtil.create('div','legend-geology legend-entry legend-entry-hidden',legendDiv);
+
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
 
@@ -124,8 +112,9 @@ function removeWithTimeout(layer) {
 }
 
 map.on('overlayadd', function addOverlay(e){
+    const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
     // Update legend
-    const legendKey = e.layer.options.legendKey;
+
     const entryDiv = document.querySelector('.legend-'+ legendKey);
     // Remove class to allow display
     entryDiv.classList.remove('legend-entry-hidden');
@@ -149,7 +138,7 @@ map.on('overlayadd', function addOverlay(e){
 
 
 map.on('overlayremove', function(e){
-  const legendKey = e.layer.options.legendKey;
+  const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
   const entryDiv = document.querySelector('.legend-'+ legendKey);
   // Restore class to remove display
   entryDiv.classList.add('legend-entry-hidden');
@@ -248,54 +237,6 @@ map.on('zoomend', function(){
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
   }
 })
-
-// map.on('zoomend', function(){
-//   const currentZoom = map.getZoom();
-//   const roadLayers1 = roadLayers['1'];
-//   const roadLayers2 = roadLayers['2'];
-
-//   if (currentZoom < 13){
-//     roadStyle1ft.weight = 1;
-//     roadStyle2ft.weight = 1;
-//     stormwaterStyle.weight = 0.25;
-//     stormwaterStyle.radius = 2;
-
-//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
-//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
-//   }
-//   else if (currentZoom < 15){
-//     roadStyle1ft.weight = 1.5;
-//     roadStyle2ft.weight = 2;
-//     stormwaterStyle.weight = 0.5;
-//     stormwaterStyle.radius = 3;
-
-//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
-//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
-//   }
-//   else if (currentZoom < 17){
-//     roadStyle1ft.weight = 1.5;
-//     roadStyle2ft.weight = 3;
-//     stormwaterStyle.weight = 0.5;
-//     stormwaterStyle.radius = 3;
-
-//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
-//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
-//   }
-//   else {
-//     roadStyle1ft.weight = 2;
-//     roadStyle2ft.weight = 4;
-//     stormwaterStyle.weight = 0.5;
-//     stormwaterStyle.radius = 3.5;
-
-//     roadLayers1.forEach((layer) => layer.setStyle(roadStyle1ft));
-//     roadLayers2.forEach((layer) => layer.setStyle(roadStyle2ft));
-//     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
-//   }
-// })
-
 
 // Add easy print button to export map.
 // leaflet-easyPrint: https://github.com/rowanwins/leaflet-easyPrint

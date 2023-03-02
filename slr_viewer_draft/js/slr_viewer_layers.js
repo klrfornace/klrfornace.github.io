@@ -369,6 +369,7 @@ const slrxa32 = L.tileLayer.wms(
     // My custom attributes:
     name: 'SLR-XA 2100',
     legendKey: 'slrxa32',
+    legendEntry: '<div class="legend-box" style="background:#0d5de4; opacity:0.5;"></div> SLR-XA 3.2 ft',
     queryable: false
   }
 );
@@ -402,7 +403,7 @@ function highlightBoundaries ( e ) {
   }
   }
 
-  // Development / Community Plan Areas (Districts):
+// Development / Community Plan Areas (Districts):
 
 const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?where=&text=&objectIds=&time=&geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&f=geojson';
 
@@ -441,6 +442,8 @@ const devplan = new L.GeoJSON.AJAX(
       name: 'Community Plan Areas',
       pane: 'admin-boundaries',
       legendKey: 'devplan',
+      legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Community Plan Area Boundaries',
+      legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
       loadStatus: 'loading'
     }
   );
@@ -486,6 +489,8 @@ const ahupuaa = new L.GeoJSON.AJAX(
     name: 'Ahupuaa',
     pane: 'admin-boundaries',
     legendKey: 'ahupuaa',
+    legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Ahupua&#699;a Boundaries',
+    legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
     loadStatus: 'loading'
   }
 );
@@ -539,6 +544,8 @@ const moku = new L.GeoJSON.AJAX(
     name: 'Moku',
     pane: 'admin-boundaries',
     legendKey: 'moku',
+    legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Moku Boundaries',
+    legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
     loadStatus: 'loading'
   }
 );
@@ -579,6 +586,8 @@ const boards = new L.GeoJSON.AJAX(
     name: 'Neighborhood Boards',
     pane: 'admin-boundaries',
     legendKey: 'boards',
+    legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Neighborhood Board Boundaries',
+    legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
     loadStatus: 'loading'
 });
 
@@ -630,6 +639,8 @@ const dhhl = new L.GeoJSON.AJAX(
     name: 'DHHL Lands',
     pane: 'admin-boundaries',
     legendKey: 'dhhl',
+    legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Hawaiian Home Land Boundaries',
+    legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
     loadStatus: 'loading'
   }
 );
@@ -637,12 +648,21 @@ const dhhl = new L.GeoJSON.AJAX(
 
 //////////  LAYER GROUPS  //////////
 
-// Initialize layer groups
+// Initialize layer groups that change with depth
+
 // const slrxa = L.layerGroup([slrxa_2030],{legendKey:'slrxa'});
-const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],{legendKey:'passive'})
-const wave = L.layerGroup(waveLayers[0],{legendKey:'wave'});
-const roads = L.layerGroup(roadLayers[0],{legendKey:'roads'});
-const stormwater = L.layerGroup(stormwaterLayers[0],{legendKey:'stormwater'});
+const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],{
+  legendKey:'passive',
+  legendEntry: 'Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px">'})
+const wave = L.layerGroup(waveLayers[0],{
+  legendKey:'wave',
+  legendEntry: 'Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px;">'});
+const roads = L.layerGroup(roadLayers[0],{
+  legendKey:'roads',
+  legendEntry: '<svg class="road-line" style="fill: #f45a9b" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4"/></g></svg> &nbsp;Flood depth > 1 ft<br><svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y="-2.5" width="30.74" height="8"/></g></svg> &nbsp;Flood depth > 2 ft'});
+const stormwater = L.layerGroup(stormwaterLayers[0],{
+  legendKey:'stormwater',
+  legendEntry:'<svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level'});
 
 // Assign all possible layers to groups
 const layerGroups = [
@@ -666,6 +686,10 @@ const layerGroups = [
 
 // Tags in layer names to get each layer by depth. (These are used by slider to move layers in and out of layer groups.)
 const layerTags = ['00ft','1ft','2ft','3ft','4ft','5ft','6ft','7ft','8ft','9ft','10ft'];
+
+// Create layer groups with sublayers that can be toggled on/off by user in legend
+const testGroup = L.layerGroup([geology, soils],options={legendKey:'test'})
+
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
@@ -695,34 +719,37 @@ const basemaps = [
 // Create overlay layer object for layer control
 // For all layers that change with depth, use L.LayerGroup initialized with any layer instead of individual layer. This allows for switching of layers 
 // within the group as depth changes while keeping connection between layerGroup/_leaflet_id and checkbox input intact. Note this seems to cause assigned
-// z indexes (from styledLayerControl) to go haywire, so it's safest to use panes if layer order is critical. 
-
-// const generalBoundaryEntry = '<div class="legend-panel panel-hidden"><svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;Boundaries</div>';
+// z indexes (from styledLayerControl) to go haywire, so it's safest to use map panes if layer order is critical. 
+// For groups of sublayers added to map together but with individual sublayer controls, enter layer as object like:
+//      layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2}}
 
 const overlayMaps = [
   {
     groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
-     layers: {'<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">Marine flooding: water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/gwi_colorbar2.svg" style="width:220px; height:17px;"></div>':passive, 
-     '<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px;"></div>':wave
+     layers: {['<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">'+ passive.options.legendEntry + '</div>']:passive, 
+              ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave
       }
   },
   { groupName: '<img src="images/flood.svg" class="label-icon">IMPACTS',
     expanded: true,
-    layers: {'<span class="layer-label">Flooded Roads</span><div class="legend-panel panel-hidden"><svg class="road-line" style="fill: #f45a9b" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4"/></g></svg> &nbsp;Flood depth > 1 ft<br><svg class="road-line" style="fill: #9f0c4a" viewBox="0 0 31.74 5.74"><g><rect x=".5" y="-2.5" width="30.74" height="8"/></g></svg> &nbsp;Flood depth > 2 ft</div>':roads,
-    '<span class="layer-label">Stormwater Drainage Failure</span><div class="legend-panel panel-hidden"><svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level</div>':stormwater
+    layers: {['<span class="layer-label">Flooded Roads</span><div class="legend-panel panel-hidden">'+roads.options.legendEntry+'</div>']:roads,
+            ['<span class="layer-label">Stormwater Drainage Failure</span><div class="legend-panel panel-hidden">'+stormwater.options.legendEntry+'</div>']:stormwater,
+            // 'test':{'layer':testGroup,
+            //         'sublayers':{'geology':geology, 'soils': soils}},
       }
   },
   { groupName: '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS',
     expanded: true,
-    layers: {'<span class="layer-label">Community Plan Area Boundaries</span>': devplan,
-              '<span class="layer-label">Moku Boundaries</span>': moku,
-              '<span class="layer-label">Ahupua&#699;a Boundaries</span>': ahupuaa,
-              '<span class="layer-label">Neighborhood Board Boundaries</span>': boards,
-              '<span class="layer-label">Hawaiian Home Lands (DHHL Lands)': dhhl,
-              '<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel panel-hidden"><div class="legend-box" style="background:#0d5de4; opacity:0.5; margin-left: 10px"></div> SLR-XA 3.2 ft': slrxa32
-              }}
+    layers: {['<div class="legend-panel-inline panel-hidden">'+ devplan.options.legendSymbol + '</div><span class="layer-label">Community Plan Area Boundaries</span>']: devplan,
+              ['<div class="legend-panel-inline panel-hidden">'+ moku.options.legendSymbol + '</div><span class="layer-label">Moku Boundaries</span>']: moku,
+              ['<div class="legend-panel-inline panel-hidden">'+ ahupuaa.options.legendSymbol + '</div><span class="layer-label">Ahupua&#699;a Boundaries</span>']: ahupuaa,
+              ['<div class="legend-panel-inline panel-hidden">'+ boards.options.legendSymbol + '</div><span class="layer-label">Neighborhood Board Boundaries</span>']: boards,
+              ['<div class="legend-panel-inline panel-hidden">'+ dhhl.options.legendSymbol + '</div><span class="layer-label">Hawaiian Home Lands']: dhhl,
+              ['<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel panel-hidden">'+slrxa32.options.legendEntry + '</div>']: slrxa32
+              }},
 ];
+
 
 
 // '<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"></div>':wave

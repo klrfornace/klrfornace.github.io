@@ -45,14 +45,21 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             let groupedOverlay = groupedOverlays[i];
             let layerKeys = Object.keys(groupedOverlay.layers);
             for (let j = 0; j < layerKeys.length; j++) {
-                let layer_name = layerKeys[j];
-                let layer_obj = groupedOverlay.layers[layer_name];
-                this._addLayer(layer_obj, layer_name, groupedOverlay, true);
+                const layer_name = layerKeys[j];
+                const layer_obj = groupedOverlay.layers[layer_name]
+
+                // For layer groups that will have sublayers that can be individually toggled on/off
+                if (!Object.keys(layer_obj).includes('sublayers')){
+                    this._addLayer(layer_obj, layer_name, groupedOverlay, true);
+                }
+                else{
+                    const layerGroup = layer_obj['layer'];
+                    const sublayers = layer_obj['sublayers'];
+                    this._addLayer(layerGroup, layer_name, groupedOverlay, true, sublayers);
+                }
+
             }
         }
-
-
-
     },
 
     onAdd: function(map) {
@@ -339,14 +346,18 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         return value;
     },
 
-    _addLayer: function(layer, name, group, overlay) {
+    _addLayer: function(layer, name, group, overlay, sublayers) {
         var id = L.Util.stamp(layer);
 
         this._layers[id] = {
             layer: layer,
             name: name,
-            overlay: overlay
+            overlay: overlay,
         };
+
+        // KF addition - add sublayers to object if present
+        if (sublayers) {
+            this._layers[id].sublayers = sublayers};
 
         if (group) {
             var groupId = this._groupList.indexOf(group);
@@ -644,6 +655,39 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             groupContainer.getElementsByTagName('article')[0].appendChild(label);
         }
 
+        // KF addition
+        // Add sublayer inputs which can be toggled by user to show/hide sublayers within a layer group
+        if (obj.sublayers){
+            const sublayerContainer = document.createElement('div');
+            const layerGroup = obj.layer;
+            sublayerContainer.id = id + '_sublayers';
+
+            //sublayers-hidden class is used to hide sublayer inputs when layer group is not selected
+            sublayerContainer.className = "sublayers sublayers-hidden"; 
+
+            L.DomEvent.on(input, 'click', this._resetSublayers, this);
+
+            // Create sublayer inputs/labels
+            for (let i=0; i < Object.entries(obj.sublayers).length; i++){
+                const sublayerName = Object.keys(obj.sublayers)[i];
+                const sublayer = Object.values(obj.sublayers)[i];
+
+                const sublayerDiv = L.DomUtil.create('div','menu-item-checkbox',sublayerContainer)
+                const sublayerInput = L.DomUtil.create('input','leaflet-control-layers-selector',sublayerDiv)
+                const sublayerInputId = 'ac_layer_input_sublayer_' + obj.layer._leaflet_id + '_' + i;
+                sublayerInput.type = 'checkbox';
+                sublayerInput.checked = layerGroup.hasLayer(sublayer);
+                sublayerInput.id = sublayerInputId;
+
+                const me = this; // create closure
+                sublayerInput.onclick = function () { me._onSublayerClick( sublayerInput, sublayer, layerGroup, obj ); };
+                
+                const sublayerLabel = L.DomUtil.create('label','',sublayerDiv);
+                sublayerLabel.innerHTML = '<label id="' + sublayerInputId +'-label" for="' + sublayerInputId + '">' + sublayerName + '</label>';
+            }
+            label.append(sublayerContainer);
+        }
+        // end addition
 
         return label;
     },
@@ -708,7 +752,8 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
     //     this._container.className = this._container.className.replace(' leaflet-control-layers-expanded', '');
     // },
 
-    //KF addition
+    //KF additions
+
     // Add class to label to show/hide/change style of control entry as layers are added/removed
     _toggleLayerLabelClass: function(){
         for (layerId in this._layers) {
@@ -719,7 +764,44 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         }
     },
 
-   
+    // Add/remove sublayers from layer group based on sublayer checkbox inputs
+   _onSublayerClick: function(input, sublayer, layerGroup){
+        const checked = input.checked;
+        const currentLabel = document.getElementById(input.id + '-label');
+
+        if (checked){
+            layerGroup.addLayer(sublayer);
+            currentLabel.classList.add("active-layer");
+            this._map.fire('overlayadd', sublayer); // fire overlayadd to trigger legend update
+        }
+        else{
+            layerGroup.removeLayer(sublayer);
+            currentLabel.classList.remove("active-layer");
+            this._map.fire('overlayremove', sublayer); // fire overlayremove to trigger legend update
+        }
+   },
+
+   // Reset layer group and sublayer checkbox inputs when layer group is added/removed from map
+   _resetSublayers: function(e){
+        const layerGroup = this._layers[e.target.layerId].layer;
+        const layerId = this._layers[e.target.layerId].layer._leaflet_id;
+        const sublayers = this._layers[e.target.layerId].sublayers;
+
+        // Add all sublayers back to layer group and check all sublayer inputs
+        for (let i=0; i < Object.values(sublayers).length; i++){
+            layerGroup.addLayer(Object.values(sublayers)[i]);
+            const currentInput = document.getElementById('ac_layer_input_sublayer_' + layerId + '_' + i);
+            currentInput.checked = true;
+            const currentLabel = document.getElementById('ac_layer_input_sublayer_' + layerId + '_' + i + '-label');
+            currentLabel.classList.add("active-layer");
+        }
+        
+        // Toggle class to show/hide sublayers
+        const layerInput = document.getElementById('ac_layer_input_' + layerId);
+        const currentContainer = document.getElementById('ac_layer_input_' + layerId + '_sublayers');
+        layerInput.checked? currentContainer.classList.remove("sublayers-hidden"):currentContainer.classList.add("sublayers-hidden");
+   },
+
     /* jmaurer; groupName optional: */ 
     _clearAll : function ( groupName ) {
         var i,

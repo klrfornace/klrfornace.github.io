@@ -68,8 +68,10 @@ div[id^="leaflet-control-accordion-layers"] > label {
 
 .ac-container input.menu + label{
 	background: #c9eaf8;
+	background:#dcf0f7;
 	color: #184e85;
 	outline: 1px solid #b4d2df;
+	outline: 1px solid #c7e7f2;
 	/* border-bottom: 1px solid #184e85; */
 	/* text-shadow: 0px 1px 1px rgba(255,255,255, 0.6);
 	box-shadow:
@@ -106,6 +108,7 @@ div[id^="leaflet-control-accordion-layers"] > label {
 
 .ac-container input.menu + label:hover{
 	background: #b2e1f5;
+	background: #c9eaf8;
 	/* text-shadow: 0px 1px 1px rgba(255,255,255, 0.6);
 	box-shadow:
 		0px 0px 0px 1px rgba(155,155,155,0.3),
@@ -225,10 +228,20 @@ div[id^="leaflet-control-accordion-layers"] > label {
 	display: block;
 }
 
+.active-layer div.legend-panel-inline{
+	display: inline;
+}
+
 .legend-panel{
 	font-weight: 400;
 	display: none;
 	padding: 5px;
+}
+
+.legend-panel-inline{
+	font-weight: 400;
+	display: none;
+	padding-left: 3px;
 }
 
 .ac-large-transition{
@@ -301,6 +314,10 @@ div[id^="leaflet-control-accordion-layers"] > label {
 	/* width: 24px; */
 	/* display: inline-block;
 	vertical-align: middle; */
+}
+
+.sublayers-hidden{
+	display: none;
 }
 
 /* #styledLayerControl-utilities svg{

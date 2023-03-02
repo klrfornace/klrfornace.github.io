@@ -82,7 +82,8 @@ h3 {
 
 .header {
     font-family:'Roboto Condensed', 'Arial Narrow', sans-serif; 
-    background-color:#c9eaf8;
+    /* background-color:#c9eaf8; */
+    background-color:#dcf0f7;
     color: #14416f;
     color: #184e85;
     padding: 10px 15px;
