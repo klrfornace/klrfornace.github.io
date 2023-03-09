@@ -412,6 +412,11 @@ select {
   margin-right: 8px;
 }
 
+.leaflet-control-home{
+  background-image: url('../images/home.svg');
+  background-size: 16px 16px;
+}
+
 /* Loading icon control */
 .loading-control {
   background: #fff;
@@ -426,7 +431,7 @@ select {
 
 /* Geocoded control */
 #geocoder-control {
-  margin-top: -110px;
+  margin-top: -154px;
   margin-left: 60px;
   } 
 

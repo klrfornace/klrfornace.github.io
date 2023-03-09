@@ -59,6 +59,9 @@ map.getPane('admin-boundaries').style.zIndex = 425;
 
 mapboxLight.addTo(map); // initial basemap
 
+
+//////// LAYER CONTROL AND LEGEND ////////
+
 // Add styled layer control to map
 // Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
 layerControl = L.Control.styledLayerControl( basemaps, overlayMaps, {collapsed: false, position:'topright'});
@@ -68,7 +71,7 @@ layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-const legendDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl.js
+const legendDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
@@ -99,6 +102,28 @@ const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-e
 // const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
 // const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
 // const geologyEntry = L.DomUtil.create('div','legend-geology legend-entry legend-entry-hidden',legendDiv);
+
+// Show/hide simple legend according to legend radio button state (created in styledLayerControl)
+// const legendRadio = document.querySelector('.legend-radio-group');
+
+// function toggleLegendRadio(){
+//   const radioButtonGroup = document.getElementsByName("legend-toggle");
+//   const checkedRadio = Array.from(radioButtonGroup).find(
+//     (radio) => radio.checked
+//   );
+//   if (checkedRadio.value == 'full-menu'){
+//     document.querySelector('.ac-container').classList.remove('legend-container-hidden');
+//     document.querySelector('.legend-container').classList.add('legend-container-hidden');
+//   }
+//   else {
+//     document.querySelector('.ac-container').classList.add('legend-container-hidden');
+//     document.querySelector('.legend-container').classList.remove('legend-container-hidden');
+//   }
+// }
+// legendRadio.onclick = function () {
+//   toggleLegendRadio();
+// };
+
 
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
@@ -144,22 +169,7 @@ map.on('overlayremove', function(e){
   entryDiv.classList.add('legend-entry-hidden');
 })
 
-const legendRadio = document.querySelector('.legend-radio-group');
 
-legendRadio.onclick = function () {
-  const radioButtonGroup = document.getElementsByName("legend-toggle");
-  const checkedRadio = Array.from(radioButtonGroup).find(
-    (radio) => radio.checked
-  );
-  if (checkedRadio.value == 'full-menu'){
-    document.querySelector('.ac-container').classList.remove('legend-container-hidden');
-    document.querySelector('.legend-container').classList.add('legend-container-hidden');
-  }
-  else {
-    document.querySelector('.ac-container').classList.add('legend-container-hidden');
-    document.querySelector('.legend-container').classList.remove('legend-container-hidden');
-  }
-};
 
 // let legendToggle = document.querySelector('.legend-toggle');
 
@@ -178,41 +188,41 @@ legendRadio.onclick = function () {
 
  // Change layer styles based on light/dark (satellite) basemaps
 map.on( 'baselayerchange',
-function() {
-  if ( map.hasLayer( mapboxLight )) {
-    boundary_style.color = '#6e6e6e';
-    boundary_style2.color = '#6e6e6e'; // Thicker line style
-    boundary_highlight_style.color = '#3c3c3c';
+  function() {
+    if ( map.hasLayer( mapboxLight )) {
+      boundary_style.color = '#6e6e6e';
+      boundary_style2.color = '#6e6e6e'; // Thicker line style
+      boundary_highlight_style.color = '#3c3c3c';
 
-    ahupuaa.setStyle( boundary_style );
-    devplan.setStyle( boundary_style );
-    moku.setStyle( boundary_style );
-    boards.setStyle( boundary_style );
-    dhhl.setStyle(boundary_style2)
+      ahupuaa.setStyle( boundary_style );
+      devplan.setStyle( boundary_style );
+      moku.setStyle( boundary_style );
+      boards.setStyle( boundary_style );
+      dhhl.setStyle(boundary_style2)
 
-    // Also make sure legend styles are correct
-    const entries = document.querySelectorAll('.legend-line');
-    entries.forEach(entry => {
-      entry.classList.remove('line-dark-basemap');
-    })
+      // Also make sure legend styles are correct
+      const entries = document.querySelectorAll('.legend-line');
+      entries.forEach(entry => {
+        entry.classList.remove('line-dark-basemap');
+      })
+    }
+    else {
+      boundary_style.color = '#FFFFFF';
+      boundary_style2.color = '#FFFFFF';
+      boundary_highlight_style.color = '#FFFFFF';
+
+      ahupuaa.setStyle( boundary_style );
+      devplan.setStyle( boundary_style );
+      moku.setStyle( boundary_style );
+      boards.setStyle( boundary_style );
+      dhhl.setStyle(boundary_style2);
+
+      const entries = document.querySelectorAll('.legend-line');
+      entries.forEach(entry => {
+        entry.classList.add('line-dark-basemap');
+      })
+    }
   }
-  else {
-    boundary_style.color = '#FFFFFF';
-    boundary_style2.color = '#FFFFFF';
-    boundary_highlight_style.color = '#FFFFFF';
-
-    ahupuaa.setStyle( boundary_style );
-    devplan.setStyle( boundary_style );
-    moku.setStyle( boundary_style );
-    boards.setStyle( boundary_style );
-    dhhl.setStyle(boundary_style2);
-
-    const entries = document.querySelectorAll('.legend-line');
-    entries.forEach(entry => {
-      entry.classList.add('line-dark-basemap');
-    })
-  }
-}
 );
 
 
@@ -238,17 +248,43 @@ map.on('zoomend', function(){
   }
 })
 
+
+//////// OTHER CONTROLS ////////
+
+// Home zoom button
+function returnHome(){
+  map.setView(centerCoord,zoomLevel)
+  this.blur();
+}
+
+const homeControl = L.control({position: 'topleft'});
+homeControl.onAdd = function(){
+  const btnContainer = L.DomUtil.create('div','leaflet-bar');
+  const homeButton = L.DomUtil.create('a','leaflet-control-home', btnContainer);
+  homeButton.role = "button";
+  homeButton.href = '#';
+  homeButton.title = 'Return to original view';
+  homeButton.setAttribute('aria-label','Return to original view');
+  homeButton.setAttribute('aria-disable',false);
+  homeButton.innerHTML = '<span aria-hidden="true"></span></a>';
+  homeButton.onclick = returnHome;
+
+  return btnContainer
+}
+homeControl.addTo(map);
+
 // Add easy print button to export map.
 // leaflet-easyPrint: https://github.com/rowanwins/leaflet-easyPrint
 // Bundle updated per this issue: https://github.com/rowanwins/leaflet-easyPrint/issues/109
 L.easyPrint({
 	title: 'Export this map',
 	position: 'topleft',
+  filename: 'slr_viewer_map',
   hideControlContainer: false,
   exportOnly: true,
-  hideClasses: ['leaflet-control-zoom','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
+  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
   showClasses: ['legend-container'],
-	sizeModes: ['Current','A4Portrait', 'A4Landscape']
+	// sizeModes: ['Current','A4Portrait', 'A4Landscape']
 }).addTo(map);
 
 

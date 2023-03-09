@@ -338,7 +338,7 @@ const femaFlood = L.tileLayer.wms(
     //format: 'image/png',
     format: 'image/png',
     transparent: true,
-    opacity: 0.5,
+    opacity: 0.67,
     // errorTileUrl: '/images/map_tile_error.png',
     attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
     //bounds: L.latLngBounds( L.latLng( 20.5001, -159.79 ), L.latLng( 22.2353, -155.979 ) ),
@@ -351,6 +351,50 @@ const femaFlood = L.tileLayer.wms(
     queryable: true 
   }
 );
+
+const leveeURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27%LEVEE%%27&outFields=*&outSR=4326&f=geojson'
+const floodwayURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27FLOODWAY%27&outFields=*&outSR=4326&f=geojson'
+
+const leveeHatch = new L.GeoJSON.AJAX(leveeURL, {style:{fill:false, weight: 0.000001, opacity: 0.4}, imgId:'hatch-gray'});
+const floodwayHatch = new L.GeoJSON.AJAX(floodwayURL, {style:{fill:false, weight: 0.000001, opacity: 0.67},imgId:'hatch-red'});
+
+
+function femaStyle(properties, zoom) {
+  const zone = properties.fld_zone;
+  const subtype = properties.zone_subty;
+
+  if (zone === 'D' || (zone === 'X' && subtype.includes('MINIMAL'))){
+    return {
+      weight: 0,
+      fill: false
+    }
+  }
+
+  else{
+    const fillColor = (['A','AE','AH','AO','VE'].includes(zone)) ? '#5cffff':'#ff9648';
+    return {
+      weight: 1,
+      color: '#ffffff',
+      fillColor: fillColor,
+      fillOpacity: 0.5,
+      fill: true
+    }
+  }
+
+};
+
+
+
+const femaMVT = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/CRC%3AFlood_Hazard_Areas_(DFIRM)_-_Statewide@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+
+const femaTest = L.vectorGrid.protobuf(femaMVT, {
+  vectorTileLayerStyles: {'Flood_Hazard_Areas_(DFIRM)_-_Statewide':femaStyle},
+  interactive: true,
+  attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
+  pane: 'underlay',
+  legendKey: 'femaflood'
+})
+
 
 // SLR-XA 3.2 ft (2017)
 const slrxa32 = L.tileLayer.wms(
@@ -381,7 +425,7 @@ const boundary_style = {
     color: '#6e6e6e',
     opacity: 1.0,
     fill: 0.000001,
-    fillOpacity: 0.0
+    fillOpacity: 0
   };
 
 const boundary_highlight_style = {
@@ -688,7 +732,7 @@ const layerGroups = [
 const layerTags = ['00ft','1ft','2ft','3ft','4ft','5ft','6ft','7ft','8ft','9ft','10ft'];
 
 // Create layer groups with sublayers that can be toggled on/off by user in legend
-const testGroup = L.layerGroup([geology, soils],options={legendKey:'test'})
+const testGroup = L.layerGroup([femaTest, leveeHatch, floodwayHatch],options={legendKey:'test',pane:'underlay'});
 
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
@@ -735,8 +779,9 @@ const overlayMaps = [
     expanded: true,
     layers: {['<span class="layer-label">Flooded Roads</span><div class="legend-panel panel-hidden">'+roads.options.legendEntry+'</div>']:roads,
             ['<span class="layer-label">Stormwater Drainage Failure</span><div class="legend-panel panel-hidden">'+stormwater.options.legendEntry+'</div>']:stormwater,
+            // 'test': testGroup,
             // 'test':{'layer':testGroup,
-            //         'sublayers':{'geology':geology, 'soils': soils}},
+            //         'sublayers':{'fema':femaFlood, 'levee': leveeHatch, 'floodway':floodwayHatch}},
       }
   },
   { groupName: '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS',

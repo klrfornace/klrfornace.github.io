@@ -275,7 +275,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         // Add layer utilities for expanding, collapsing, and clearing all
         // layers (-jmaurer):
-        // replacing with simple legend/full menu toggle - KF
+        // replacing with simple legend/full interactive menu toggle - KF
 
         const utilities = L.DomUtil.create('div','styledLayerControl-utilities',container);
         utilities.id = 'styledLayerControl-utilities';
@@ -287,13 +287,37 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // hide_menu.onclick = function () { closure._collapse(); };
         // utilities.appendChild(hide_menu);
 
-        const radioToggle = L.DomUtil.create('div','legend-radio-group',utilities);
+        // Create two buttons to toggle between full layer menu and simple legend views
+        const legendToggle = L.DomUtil.create('div','legend-radio-group',utilities);
 
-        radioToggle.innerHTML = '<input class="radio__input" type="radio" name="legend-toggle" value="full-menu" id="full-menu-radio" checked>'+
-        '<label for="full-menu-radio" class="radio__label" title="Show full layer menu">Full layer menu</label>'+
-        '<input class="radio__input" type="radio" name="legend-toggle" value="simple-legend" id="simple-legend-radio">'+
-        '<label for="simple-legend-radio" class="radio__label" title="Show simple map legend">Simple legend</label>';
+        const fullMenuBtn = L.DomUtil.create('button','legend-button active-view',legendToggle);
+        fullMenuBtn.id = 'full-menu';
+        fullMenuBtn.innerHTML = 'Full layer menu';
+        const simpleLegendBtn = L.DomUtil.create('button','legend-button',legendToggle);
+        simpleLegendBtn.id = 'simple-legend';
+        simpleLegendBtn.innerHTML = 'Simple legend';
+        const btnGroup = [fullMenuBtn, simpleLegendBtn];
 
+        for (let button of btnGroup){
+            button.onclick = () => {
+                button.classList.add("active-view");
+                const otherButton = Array.from(btnGroup).find((btn) => btn!=button);
+                otherButton.classList.remove("active-view");
+                if (button.id == 'full-menu'){
+                    document.querySelector('.ac-container').classList.remove('legend-container-hidden');
+                    document.querySelector('.legend-container').classList.add('legend-container-hidden');
+                }
+                else {
+                    document.querySelector('.ac-container').classList.add('legend-container-hidden');
+                    document.querySelector('.legend-container').classList.remove('legend-container-hidden');
+                }
+            }
+        }
+
+        // radioToggle.innerHTML = '<input class="radio__input" type="radio" name="legend-toggle" value="full-menu" id="full-menu-radio" checked>'+
+        // '<label for="full-menu-radio" role="button" tabindex="0" aria-pressed="true" class="radio__label" title="Show full layer menu">Full layer menu</label>'+
+        // '<input class="radio__input" type="radio" name="legend-toggle" value="simple-legend" id="simple-legend-radio">'+
+        // '<label for="simple-legend-radio" role="button" tabindex="0" aria-pressed="false" class="radio__label" title="Show simple map legend">Simple legend</label>';
 
         // var clear_all = document.createElement('a');
         // var clear_all_text = document.createTextNode('Clear all');
@@ -545,17 +569,31 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             groupContainer = document.createElement('div');
             groupContainer.id = 'leaflet-control-accordion-layers-' + obj.group.id;
 
+
+            // Change to accordion buttons for accessibility/simplicity -KF
+
             // verify if group is expanded
-            var s_expanded = obj.group.expanded ? ' checked = "true" ' : '';
+            const s_expanded = obj.group.expanded ? '' : 'content-hidden';
 
-            // verify if type is exclusive
-            var s_type_exclusive = this.options.exclusive ? ' type="radio" ' : ' type="checkbox" ';
+            const accordionButton = L.DomUtil.create('button','ac-container-accordion ' + s_expanded, groupContainer);
+            accordionButton.innerHTML = obj.group.name;
+            L.DomEvent.on(accordionButton, 'click', this._toggleAccordion, this);
 
-            inputElement = '<input id="ac' + obj.group.id + '" name="accordion-1" class="menu" ' + s_expanded + s_type_exclusive + '/>';
-            inputLabel = '<label for="ac' + obj.group.id + '">' + obj.group.name + '</label>';
+            const accordionGroup = L.DomUtil.create('article', 'ac-large', groupContainer);
+            accordionGroup.appendChild(label);
 
-            article = document.createElement('article');
-            article.className = 'ac-large'
+
+            // // verify if group is expanded
+            // var s_expanded = obj.group.expanded ? ' checked = "true" ' : '';
+
+            // // verify if type is exclusive
+            // var s_type_exclusive = this.options.exclusive ? ' type="radio" ' : ' type="checkbox" ';
+
+            // inputElement = '<input id="ac' + obj.group.id + '" name="accordion-1" class="menu" ' + s_expanded + s_type_exclusive + '/>';
+            // inputLabel = '<label for="ac' + obj.group.id + '">' + obj.group.name + '</label>';
+
+            // article = document.createElement('article');
+            // article.className = 'ac-large'
             
             // KF insert for transition - doesn't work
 
@@ -565,16 +603,16 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             // transitionDiv.appendChild(label);
             // end insert
 
-            article.appendChild(label);
+            // article.appendChild(label);
 
             // process options of ac-large css class - to options.group_maxHeight property
             if (this.options.group_maxHeight) {
                 article.style.maxHeight = this.options.group_maxHeight;
             }
 
-            groupContainer.innerHTML = inputElement + inputLabel;
+            // groupContainer.innerHTML = inputElement + inputLabel;
 
-            groupContainer.appendChild(article);
+            // groupContainer.appendChild(article);
 
             // Link to toggle all layers
             if (obj.overlay && this.options.group_togglers.show) {
@@ -801,6 +839,10 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         const currentContainer = document.getElementById('ac_layer_input_' + layerId + '_sublayers');
         layerInput.checked? currentContainer.classList.remove("sublayers-hidden"):currentContainer.classList.add("sublayers-hidden");
    },
+
+    _toggleAccordion: function(e){
+        e.target.classList.toggle('content-hidden')
+    },
 
     /* jmaurer; groupName optional: */ 
     _clearAll : function ( groupName ) {
