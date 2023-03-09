@@ -659,7 +659,7 @@
                 // Disable mouseover toggle and just make simple button when only size option - KF
                 if (this.options.sizeModes.length == 1){
                     L.DomEvent.addListener(t, "click", this.printMap, this);
-                    t.classList.add(this.options.sizeModes[0].className);
+                    this.link.classList.add(this.options.sizeModes[0].className);
                 }
                 // Original code for multiple size modes
                 else {
@@ -680,6 +680,7 @@
             return t
         },
         printMap: function(t, e) {
+            console.log(t);
             e && (this.options.filename = e),
             this.options.exportOnly || (this._page = window.open("", "_blank", "toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,left=10, top=10, width=200, height=250, visible=none"),
             this._page.document.write(this._createSpinner(this.options.customWindowTitle, this.options.customSpinnerClass, this.options.spinnerBgCOlor))),
@@ -701,14 +702,12 @@
             this.options.hidden || this._togglePageSizeButtons({
                 type: null
             }),
-            console.log(this._togglePageSizeButtons({
-                type: null
-            })),
             this.options.hideControlContainer && this._toggleControls(),
             this.options.hideClasses && this.options.hideClasses.length > 0 && this._hideClasses(),
             this.options.showClasses && this.options.showClasses.length > 0 && this._showClasses();
             var n = "string" != typeof t ? t.target.className : t;
-            if ("CurrentSize" === n)
+            n = n.replace('leaflet-control-easyPrint-button-export ',''); // For single button option -KF
+            if (n ==="CurrentSize")
                 return this._printOpertion(n);
             this.outerContainer = this._createOuterContainer(this.mapContainer),
             this.originalState.widthWasAuto && (this.outerContainer.style.width = this.originalState.mapWidth),
