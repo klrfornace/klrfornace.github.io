@@ -105,11 +105,11 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	margin-left: 5px;
 }
 
-.ac-container-accordion.content-hidden{
+.ac-container-accordion.accordion-content-hidden{
 	border-bottom: 0.5px solid #dcf0f7;
 }
 
-.ac-container-accordion.content-hidden:after,
+.ac-container-accordion.accordion-content-hidden:after,
 .ac-container input.menu + label:after{
 	content: '+';
 	color: #184e85;
@@ -145,7 +145,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	display: none;
 }
 
-.ac-container-accordion.content-hidden ~ article.ac-large{
+.ac-container-accordion.accordion-content-hidden ~ article.ac-large{
 	display: none;
 }
 
