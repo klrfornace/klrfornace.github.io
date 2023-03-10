@@ -573,9 +573,10 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             // Change to accordion buttons for accessibility/simplicity -KF
 
             // verify if group is expanded
-            const s_expanded = obj.group.expanded ? '' : 'content-hidden';
+            const s_expanded = obj.group.expanded ? '' : 'accordion-content-hidden';
 
             const accordionButton = L.DomUtil.create('button','ac-container-accordion ' + s_expanded, groupContainer);
+            accordionButton.type = "button";
             accordionButton.innerHTML = obj.group.name;
             L.DomEvent.on(accordionButton, 'click', this._toggleAccordion, this);
 
@@ -841,7 +842,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
    },
 
     _toggleAccordion: function(e){
-        e.target.classList.toggle('content-hidden')
+        e.target.classList.toggle('accordion-content-hidden');
     },
 
     /* jmaurer; groupName optional: */ 
