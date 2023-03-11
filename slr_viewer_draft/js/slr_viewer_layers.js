@@ -127,6 +127,31 @@ for (let i = 0; i < 11; i++) {
     waveLayers[i] = L.tileLayer.wms(crcgeoURL, waveWmsOptions(i));
   }
 
+  const compFloodWmsOptions = (ft) => (
+    {
+      tiled:true, 
+      version:'1.1.1', 
+      format:'image/png', 
+      transparent: true,
+      opacity: 0.67,
+      errorTileUrl: 'https://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
+      attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
+      bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
+      maxZoom: 19,
+      queryable: true,
+      nullValue: -999,
+      popupMinZoom: 15,
+      layers: (ft < 10) ? `CRC:compound_flooding_prelim_0${ft}ft` : `CRC:compound_flooding_prelim_${ft}ft`, 
+      name: (ft < 10) ? `Kona storm scenario 0${ft}ft` : `Kona storm scenario ${ft}ft`,
+    }
+  ) 
+  
+  const compFloodLayers = [];
+  
+  for (let i = 0; i < 11; i++) {
+    compFloodLayers[i] = L.tileLayer.wms(crcgeoURL, compFloodWmsOptions(i));
+    }
+
 //////// IMPACT LAYERS ////////
 
 // Flooded roads - loaded as vector tiles from Geoserver
@@ -707,6 +732,9 @@ const roads = L.layerGroup(roadLayers[0],{
 const stormwater = L.layerGroup(stormwaterLayers[0],{
   legendKey:'stormwater',
   legendEntry:'<svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level'});
+const compFlood = L.layerGroup(compFloodLayers[0],{
+  legendKey:'comp-flood',
+  legendEntry:'Floodwater Depth<br><img src="images/gist_ncar_colorbar.svg" style="width:225px; height: 17px;margin-bottom:5px;">'});
 
 // Assign all possible layers to groups
 const layerGroups = [
@@ -725,7 +753,12 @@ const layerGroups = [
   {
     "group": stormwater,
     "layers": stormwaterLayers,    
-  },];
+  },
+  {
+    "group":compFlood,
+    "layers":compFloodLayers,
+  }
+];
 
 
 // Tags in layer names to get each layer by depth. (These are used by slider to move layers in and out of layer groups.)
@@ -772,7 +805,8 @@ const overlayMaps = [
     groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">'+ passive.options.legendEntry + '</div>']:passive, 
-              ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave
+              ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
+              ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }
   },
   { groupName: '<img src="images/flood.svg" class="label-icon">IMPACTS',

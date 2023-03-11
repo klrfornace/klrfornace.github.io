@@ -84,6 +84,9 @@ passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span>
 const waveEntry = L.DomUtil.create('div','legend-wave legend-entry legend-entry-hidden',legendDiv);
 waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>' + wave.options.legendEntry;
 
+const compFloodEntry = L.DomUtil.create('div','legend-comp-flood legend-entry legend-entry-hidden',legendDiv);
+compFloodEntry.innerHTML = '<span class="legend-subheader">Compound Flooding Scenario<br>(December 2021 Kona Storm)</span><br>' + compFlood.options.legendEntry;
+
 // Impact layers
 const roadEntry = L.DomUtil.create('div', 'legend-roads legend-entry legend-entry-hidden',legendDiv);
 roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+ roads.options.legendEntry;
@@ -148,7 +151,7 @@ map.on('overlayadd', function addOverlay(e){
 
     // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
     const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
-    const exposureGroup = [passive, wave];
+    const exposureGroup = [passive, wave, compFlood];
 
     for(let group of [adminGroup, exposureGroup]){
       if (group.includes(e.layer)){
