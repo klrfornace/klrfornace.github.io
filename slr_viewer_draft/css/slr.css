@@ -54,6 +54,10 @@ h3 {
 
 .info-button {
   background-color: #aaaaaa;
+  background-image: url('../images/information.svg');
+  background-repeat: no-repeat;
+  background-size: 70% auto;
+  background-position: 50% 50%;
   height: 14px;
   border: none;
   border-radius: 100%;
@@ -61,7 +65,7 @@ h3 {
   padding: 0;
   cursor: pointer;
   outline: inherit;
-  width: 15px;
+  width: 14px;
   vertical-align: text-top;
 }
 
