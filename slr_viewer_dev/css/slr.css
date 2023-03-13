@@ -1,0 +1,489 @@
+body {
+    /* width: 100%;
+    height: 100%; */
+    font-family: "Roboto",sans-serif; 
+    margin: 0;
+}
+
+#nav-bar{
+  width: 100%;
+  /* position: fixed;
+  top: 0px;
+  left: 0px; */
+  height: 50px;
+  background-color: #14416f;
+  color: #fff;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #e6e7e8;
+  height:0;
+  margin: 10px;
+}
+
+h1 {
+  font-weight: 500;
+  font-size: 30px;
+  padding: 5px 20px;
+  margin: 0;
+  text-align:left;
+}
+
+h3 {
+  font-size:21px;
+  /* font-weight: 500; */
+  padding: 0;
+  margin:0;
+}
+
+#map-container {
+    /* top: 50px;
+    left: 0px; */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    height: calc(100vh - 50px);
+    /* height: calc(95vh - 50px); */
+}
+
+.map {
+  flex-grow: 1;
+}
+
+.info-button {
+  background-color: #aaaaaa;
+  background-image: url('../images/information.svg');
+  background-repeat: no-repeat;
+  background-size: 70% auto;
+  background-position: 50% 50%;
+  height: 14px;
+  border: none;
+  border-radius: 100%;
+  margin-left: 2px;
+  padding: 0;
+  cursor: pointer;
+  outline: inherit;
+  width: 14px;
+  vertical-align: text-top;
+}
+
+.info-icon {
+  font-size: 11px;
+  font-family: 'Roboto',sans-serif;
+  font-weight:500;
+  line-height: 15px;
+  /* color: #aaaaaa; */
+  color: #fff;
+  border-radius: 100%;
+  text-align: center;
+}
+
+.info-icon:hover{
+  background-color: #888888
+}
+
+.header {
+    font-family:'Roboto Condensed', 'Arial Narrow', sans-serif; 
+    /* background-color:#c9eaf8; */
+    background-color:#dcf0f7;
+    color: #14416f;
+    color: #184e85;
+    padding: 10px 15px;
+}
+
+/* Side panel styles */
+.side-panel-container {
+  width: 225px;
+  background: #fff;
+}
+
+.side-panel-header{
+  align-items:center;
+  display: flex;
+  width: 195px;
+}
+
+.side-panel-content{
+  padding: 10px 5px;
+}
+
+#depth-level-label{
+  font-family: 'Roboto',sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+#slr-icon{
+  height: 40px;
+  width: auto;
+  margin-right: 12px;
+}
+
+.depth-axis-label{
+  position:relative;
+  top:0px;
+  left: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  color:#14416f;
+  color: #184e85;
+}
+
+.time-axis-label{
+  position:relative;
+  font-size: 13px;
+  top:0px;
+  left: 60px;
+  font-weight: 500;
+  color:#626364; 
+}
+
+.scenario-select-label {
+  font-size: 13px;
+  font-weight: 500;
+  padding-right: 20px;
+  padding-left: 10px;
+}
+
+.gauge-info{
+  font-size:12px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 0px 10px 10px 10px;
+}
+
+#gauge-label {
+  font-size:14px;
+  font-weight: 500;
+  padding: 0 10px 10px 10px;
+  text-align: center;
+}
+
+select {
+  font-size: 13px;
+  font-family: 'Roboto',sans-serif;
+  padding: 2px 5px;
+  margin-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.slider-container{
+  padding: 15px 0px 20px 80px;
+  background: #fff;
+  margin-bottom: 25px;
+}
+
+#depth-slider {
+    height: 325px;
+    width: 15px;
+    border-radius: 5px;
+    background: #e6e7e8;
+    border: none;
+    /* border: 1px solid #e6e7e8; */
+    box-shadow: none;
+}
+
+/* Styles to override NoUI slider defaults */
+
+.noUi-connects {
+  border-radius: 5px; 
+}
+.noUi-connect {
+  /* background: #1b75bb; */
+  background: #14416f;
+  background: #184e85;
+}
+
+ /* Moving pips to left of vertical slider (default position is to the right of vertical slider) */
+.noUi-pips-vertical {
+    padding: 0px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    /* left: -75%; */
+    font-size: 13px;
+    font-weight: 500;
+    color:#14416f;
+    color:#184e85;
+}
+
+.noUi-value-vertical {
+    -webkit-transform: translate(0, 50%);
+    transform: translate(-125%, 50%);
+    padding-left: 18px;
+    text-align: right;
+}
+
+.noUi-vertical .noUi-marker-large {
+  width: 15px;
+  background: none;
+  height: 0px;
+  border-top: 2px solid #fff;
+}
+
+.noUi-rtl .noUi-value-vertical {
+    -webkit-transform: translate(-125%, 50%);
+    transform: translate(-125%, 50%);
+}
+
+
+/* Secondary tick axis for slider */
+ .noUi-pips-vertical-secondary {
+  padding: 0 10px;
+  height: 100%;
+  top: 0;
+  left: 100%;
+  font-size: 13px;
+  color: #626364;
+}
+.noUi-value-vertical-secondary {
+  -webkit-transform: translate(0, -50%);
+  transform: translate(0, -50%);
+  padding-left: 30px;
+  text-align: left;
+}
+.noUi-rtl .noUi-value-vertical-secondary{
+  -webkit-transform: translate(0, 50%);
+  transform: translate(0, 50%);
+}
+
+.noUi-marker-vertical-secondary.noUi-marker {
+    width: 5px;
+    height: 0px;
+    margin-top: -1px;
+    border-top: 2px #aaa dotted;
+    background: none;
+  }
+
+.noUi-marker-vertical-secondary.noUi-marker-large {
+    width: 20px;
+}
+
+  /* Hides ticks at ends of slider */
+.end-range {
+    display:none;
+}
+
+/* Restyle handle to create round handle */
+.noUi-vertical .noUi-handle {
+  /* background: #1b75bb; */
+  background: #14416f;
+  background:#184e85;
+  border: 2px solid #fff;
+  /* border: 2px solid #eaeaea; */
+  border-radius: 12px;
+  box-shadow: none;
+  height: 24px;
+  width: 24px;
+  right: -5px; 
+  bottom: -12px;
+}
+
+.noUi-vertical .noUi-handle::before,
+.noUi-vertical .noUi-handle::after {
+    display: none;
+}
+
+/* Create touch area larger than handle */
+.noUi-handle .noUi-touch-area {
+  border: 1px solid transparent;
+  border-radius: 100%;
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  width: auto;
+  height: auto;
+}
+
+/* Add hover effect to area the handle responds to */
+.noUi-handle:hover .noUi-touch-area {
+  border: none;
+  background: #14416f;
+  background: #184e85;
+  opacity: 20%;
+}
+
+/* Styles for Leaflet controls */
+
+/* Additional positions for controls */
+.leaflet-center {
+  left: 50%;
+  transform: translate(-50%, 0%);
+}
+
+.leaflet-middle {
+  top: 50%;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  transform: translate(0%, -50%);
+}
+
+.leaflet-center.leaflet-middle {
+  transform: translate(-50%, -50%);
+}
+
+.legend-container-hidden{
+  display: none;
+}
+
+/* To overrule leaflet class added later when legend control is expanded/hidden*/
+#ac-container.legend-container-hidden form{
+  display: none;
+}
+
+/* Legend control styles */
+.legend-container{
+  background: #fff;
+  /* background-clip: padding-box; */
+  /* border: 2px solid rgba(0,0,0,0.2); */
+  border-radius: 4px;
+  box-shadow: 0 0 3px rgba(0,0,0,0.2);
+  font-family:'Roboto',sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 15px;
+}
+
+.legend-entry{
+  padding: 5px 0;
+  border-top: 1px #e7e7e7 solid;
+}
+
+.legend-entry-hidden{
+  display: none;
+}
+
+
+.legend-header{
+  font-weight: 500;
+  padding-bottom: 5px;
+  padding-top:5px;
+}
+
+.legend-subheader{
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.legend-box{
+  float: left;
+  /* border: 2px solid #6e6e6e; */
+  height: 16px;
+  width: 16px;
+  margin-right: 5px;
+}
+
+.road-line{
+  display: inline-block;
+  stroke: none;
+  stroke-miterlimit: 10;
+  width: 16px;
+  height: 19.5px;
+  vertical-align: middle;
+}
+
+.stormwater{
+  display: inline-block;
+  stroke: none;
+  width: 16px;
+  vertical-align: middle;
+}
+
+.legend-line{
+  display: inline-block;
+  fill: #6e6e6e;
+  stroke: none;
+  stroke-miterlimit: 10;
+  width: 16px;
+  height: 19.5px;
+  vertical-align: middle;
+}
+
+.line-dark-basemap{
+  fill: #fff;
+  stroke: #6e6e6e;
+}
+
+.box-dark-basemap{
+  border: 1px solid #6e6e6e;
+  box-shadow: 0 0 0 2px white, 0 0 0 3px #6e6e6e;
+  margin-right: 8px;
+}
+
+.leaflet-control-home{
+  background-image: url('../images/home.svg');
+  background-size: 16px 16px;
+}
+
+/* Loading icon control */
+.loading-control {
+  background: #fff;
+  border-radius: 5px;
+  padding: 5px 5px 0px 5px;
+}
+
+/* Mapbox logo control */
+.logo-control{
+  margin-bottom: 5px !important; 
+}
+
+/* Geocoded control */
+#geocoder-control {
+  margin-top: -154px;
+  margin-left: 60px;
+  } 
+
+#geocoder-error-default {
+  display: none;
+}
+
+
+/* Styles for Tippy tooltips */
+.tippy-box[data-theme~='tippy-error'] {
+    background-color: #cc0000;
+    color:'white';
+    font-size: 13px;
+}
+
+.tippy-box[data-theme~='light-border'] {
+  font-size: 13px;
+}
+
+.tippy-box[data-theme~='dark'] {
+  font-size: 13px;
+}
+
+.tippy-box[data-theme~='dark'] a{
+  color:#fff;
+}
+.tippy-box[data-theme~='tippy-error'][data-placement^='top'] > .tippy-arrow::before {
+  border-top-color: #cc0000;
+}
+.tippy-box[data-theme~='tippy-error'][data-placement^='bottom'] > .tippy-arrow::before {
+  border-bottom-color: #cc0000;
+}
+.tippy-box[data-theme~='tippy-error'][data-placement^='left'] > .tippy-arrow::before {
+  border-left-color: #cc0000;
+}
+.tippy-box[data-theme~='tippy-error'][data-placement^='right'] > .tippy-arrow::before {
+  border-right-color: #cc0000;
+}
+
+/* Styles for map popups */
+.leaflet-popup-content{
+  font-family: 'Roboto', sans-serif;
+  font-size:13px;
+}
+
+.leaflet-popup-content a{
+  font-size:12px;
+}
+
+/* Change marker color */
+img.huechange { filter: hue-rotate(140deg); }
