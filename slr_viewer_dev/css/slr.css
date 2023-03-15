@@ -52,6 +52,10 @@ h3 {
   flex-grow: 1;
 }
 
+.leaflet-container.pointer-cursor {
+  cursor:pointer;
+}
+
 .info-button {
   background-color: #aaaaaa;
   background-image: url('../images/information.svg');
@@ -244,6 +248,7 @@ select {
   transform: translate(0, -50%);
   padding-left: 30px;
   text-align: left;
+  transition: bottom 0.3s linear;
 }
 .noUi-rtl .noUi-value-vertical-secondary{
   -webkit-transform: translate(0, 50%);
@@ -256,6 +261,7 @@ select {
     margin-top: -1px;
     border-top: 2px #aaa dotted;
     background: none;
+    transition: bottom 0.3s linear;
   }
 
 .noUi-marker-vertical-secondary.noUi-marker-large {
@@ -306,6 +312,10 @@ select {
   background: #14416f;
   background: #184e85;
   opacity: 20%;
+}
+
+.pip-hidden{
+  display: none;
 }
 
 /* Styles for Leaflet controls */
@@ -479,10 +489,15 @@ select {
 .leaflet-popup-content{
   font-family: 'Roboto', sans-serif;
   font-size:13px;
+  line-height:1.5;
 }
 
 .leaflet-popup-content a{
   font-size:12px;
+}
+
+.popup-data{
+  font-size:14px;
 }
 
 /* Change marker color */

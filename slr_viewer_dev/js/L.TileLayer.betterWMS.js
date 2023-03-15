@@ -7,6 +7,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     //   Register a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onAdd.call(this, map);
     map.on('click', this.getFeatureInfo, this);
+    // L.DomUtil.addClass(map._container,'pointer-cursor');
   },
   
   onRemove: function (map) {
@@ -14,6 +15,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     //   Unregister a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onRemove.call(this, map);
     map.off('click', this.getFeatureInfo, this);
+    // L.DomUtil.removeClass(map._container,'pointer-cursor');
   },
   
   getFeatureInfo: function (evt) {
@@ -39,8 +41,9 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         })
         .then((data) => {
           var err = (isJsonRequest && data.features.length > 0) ? null : data;
-          if (data.features[0].properties.GRAY_INDEX != this.wmsParams.nullValue){
-            showResults(err, evt.latlng, data.features[0].properties.GRAY_INDEX);
+          const prop = this.wmsParams.queryProperty;
+          if (data.features[0].properties[prop] != this.wmsParams.nullValue){
+            showResults(err, evt.latlng, data.features[0].properties[prop]);
           }
         })
         .catch((error) => {showResults(error)});
@@ -79,9 +82,9 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   showGetFeatureInfo: function (err, latlng, content) {
     if (err) { console.log(err); return; } // do nothing if there's an error
     // Otherwise show the content in a popup, or something.
-    L.popup({ maxWidth: 800})
+    L.popup({ maxWidth: 200})
       .setLatLng(latlng)
-      .setContent(String(content))
+      .setContent(this.wmsParams.queryDisplay(String(content)))
       .openOn(this._map);
   }
 });

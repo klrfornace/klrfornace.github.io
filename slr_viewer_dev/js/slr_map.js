@@ -59,7 +59,6 @@ map.getPane('admin-boundaries').style.zIndex = 425;
 
 mapboxLight.addTo(map); // initial basemap
 
-
 //////// LAYER CONTROL AND LEGEND ////////
 
 // Add styled layer control to map
@@ -251,6 +250,22 @@ map.on('zoomend', function(){
   }
 })
 
+//Close tooltips for admin boundary layers at high zooms 
+//Also adjust cursor based on if clickable tile layers are present
+map.on('zoomend', function() {
+  const tooltips = document.querySelectorAll('.leaflet-tooltip');
+  if (map.getZoom() < zoomThreshold) {
+    tooltips.forEach((tooltip) => tooltip.style.display = "block");
+    L.DomUtil.removeClass(map._container,'pointer-cursor');
+  } else { 
+    tooltips.forEach((tooltip) => tooltip.style.display = "none");
+    queryableWMSLayers.forEach(layer => {
+      if (map.hasLayer(layer)) {
+        L.DomUtil.addClass(map._container,'pointer-cursor');
+      }
+    })
+  }
+})
 
 //////// OTHER CONTROLS ////////
 

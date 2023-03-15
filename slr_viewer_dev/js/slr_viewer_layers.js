@@ -35,7 +35,7 @@ const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/sate
 //     basemapName: 'Google_Grayscale_Simple'
 //   }
 // );
-// Google_Grayscale_Simple.addTo(map);
+
 
 // var Google_Satellite = L.gridLayer.googleMutant( { type: 'satellite', maxZoom: 20, basemap: true, basemapName: 'Google_Satellite' } );
 
@@ -85,6 +85,8 @@ const passiveWmsOptions = (ft, type) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
+    queryProperty: 'GRAY_INDEX',
+    queryDisplay: type === "SCI"? ((data) => '<strong>Water depth at average highest tide of the day:</strong> ' + (data-1) + '-' + data + ' ft'):  ((data) => '<strong>Depth below sea level:</strong> ' + (data-1) + '-' + data + ' ft'),
     nullValue: 127,
     popupMinZoom: 15,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v2` : `CRC:HI_State_80prob_${ft}ft_${type}_v2`, 
@@ -98,7 +100,7 @@ const passiveLayers = {
 }
 for (let i = 0; i < 11; i++) {
   for (let layer in passiveLayers) {
-    passiveLayers[layer][i] = L.tileLayer.wms(crcgeoURL, passiveWmsOptions(i, layer));
+    passiveLayers[layer][i] = L.tileLayer.betterWms(crcgeoURL, passiveWmsOptions(i, layer));
   }
 }
 
@@ -114,6 +116,7 @@ const waveWmsOptions = (ft) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
+    queryProperty: 'GRAY_INDEX',
     nullValue: -999,
     popupMinZoom: 15,
     layers: (ft < 10) ? `CRC:puc_wave_0${ft}ft` : `CRC:puc_wave_${ft}ft`, 
@@ -124,7 +127,7 @@ const waveWmsOptions = (ft) => (
 const waveLayers = [];
 
 for (let i = 0; i < 11; i++) {
-    waveLayers[i] = L.tileLayer.wms(crcgeoURL, waveWmsOptions(i));
+    waveLayers[i] = L.tileLayer.betterWms(crcgeoURL, waveWmsOptions(i));
   }
 
   const compFloodWmsOptions = (ft) => (
@@ -481,20 +484,21 @@ const devplan = new L.GeoJSON.AJAX(
     {
       style: boundary_style,
       onEachFeature: function ( feature, layer ) {
-        // layer.bindPopup( '<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } );
+        layer.bindTooltip( '<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true, permanent: false } );
         layer.on(
           {
             mouseover: highlightBoundaries,
             mouseout: function(){devplan.resetStyle(this)},
             click: function(e){
+              const tooltip = layer.getTooltip();
+              map.closeTooltip(tooltip)
               if (map.getZoom() < zoomThreshold) {
                 map.fitBounds( layer.getBounds())
-
                 // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-                L.popup({ maxWidth: 200})
-                .setLatLng(e.latlng)
-                .setContent('<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } )
-                .openOn(map);
+                // L.popup({ maxWidth: 200})
+                // .setLatLng(e.latlng)
+                // .setContent('<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } )
+                // .openOn(map);
               }}
 
             // Zoom to clicked polygon if no other clickable overlays are
@@ -528,20 +532,22 @@ const ahupuaa = new L.GeoJSON.AJAX(
     onEachFeature: function ( feature, layer ) {
       var ahupuaa_name = feature.properties.ahupuaa;
       ahupuaa_name = ahupuaa_name.replace( /�/g, '&#299;' );
-      // layer.bindPopup( '<strong>' + ahupuaa_name + '</strong>');
+      layer.bindTooltip( '<strong>' + ahupuaa_name + '</strong>',{ direction: 'left', sticky: true });
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){ahupuaa.resetStyle(this)},
           click: function(e){
+            const tooltip = layer.getTooltip();
+            map.closeTooltip(tooltip)
             if (map.getZoom() < zoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              L.popup({ maxWidth: 200})
-              .setLatLng(e.latlng)
-              .setContent('<strong>' + ahupuaa_name + '</strong>', { direction: 'left', sticky: true } )
-              .openOn(map);
+              // L.popup({ maxWidth: 200})
+              // .setLatLng(e.latlng)
+              // .setContent('<strong>' + ahupuaa_name + '</strong>', { direction: 'left', sticky: true } )
+              // .openOn(map);
             }}
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
@@ -582,20 +588,22 @@ const moku = new L.GeoJSON.AJAX(
         moku_name = feature.properties.mokupuni;
       }
 
-      // layer.bindPopup( '<b>' + moku_name + '</b>');
+      layer.bindTooltip( '<strong>' + moku_name + '</strong>',{ direction: 'left', sticky: true });
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){moku.resetStyle(this)},
           click: function(e){
+            const tooltip = layer.getTooltip();
+            map.closeTooltip(tooltip)
             if (map.getZoom() < zoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              L.popup({ maxWidth: 200})
-              .setLatLng(e.latlng)
-              .setContent('<strong>' + moku_name + '</strong>', { direction: 'left', sticky: true } )
-              .openOn(map);
+              // L.popup({ maxWidth: 200})
+              // .setLatLng(e.latlng)
+              // .setContent('<strong>' + moku_name + '</strong>', { direction: 'left', sticky: true } )
+              // .openOn(map);
             }}
 
           // Zoom to clicked polygon if no other clickable overlays are
@@ -634,20 +642,22 @@ const boards = new L.GeoJSON.AJAX(
     style: boundary_style,
     onEachFeature: function ( feature, layer ) {
       const boardNumber = feature.properties.BOARD_NUM;
-      // layer.bindPopup( '<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>');
+      layer.bindTooltip( '<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>',{ direction: 'left', sticky: true });
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){boards.resetStyle(this)},
           click: function(e){
+            const tooltip = layer.getTooltip();
+            map.closeTooltip(tooltip)
             if (map.getZoom() < zoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              L.popup({ maxWidth: 200})
-              .setLatLng(e.latlng)
-              .setContent('<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>', { direction: 'left', sticky: true } )
-              .openOn(map);
+              // L.popup({ maxWidth: 200})
+              // .setLatLng(e.latlng)
+              // .setContent('<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>', { direction: 'left', sticky: true } )
+              // .openOn(map);
             }}
         }
       );
@@ -677,20 +687,22 @@ const dhhl = new L.GeoJSON.AJAX(
   {
     style: boundary_style2,
     onEachFeature: function ( feature, layer ) {
-      // layer.bindPopup( '<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"));
+      layer.bindTooltip( '<strong>' + feature.properties.name20 + '</strong>',{ direction: 'left', sticky: true });
       layer.on(
         {
           mouseover: highlightBoundaries,
           mouseout: function(){dhhl.resetStyle(this)},
           click: function(e){
+            const tooltip = layer.getTooltip();
+            map.closeTooltip(tooltip)
             if (map.getZoom() < zoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              L.popup({ maxWidth: 200})
-              .setLatLng(e.latlng)
-              .setContent('<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"), { direction: 'left', sticky: true } )
-              .openOn(map);
+              // L.popup({ maxWidth: 200})
+              // .setLatLng(e.latlng)
+              // .setContent('<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"), { direction: 'left', sticky: true } )
+              // .openOn(map);
             }}
 
           // Zoom to clicked polygon if no other clickable overlays are
@@ -767,6 +779,8 @@ const layerTags = ['00ft','1ft','2ft','3ft','4ft','5ft','6ft','7ft','8ft','9ft',
 // Create layer groups with sublayers that can be toggled on/off by user in legend
 const testGroup = L.layerGroup([femaTest, leveeHatch, floodwayHatch],options={legendKey:'test',pane:'underlay'});
 
+// Array of queryable WMS tile layers/layer groups
+const queryableWMSLayers = [passive, wave, femaFlood, geology];
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
@@ -805,11 +819,11 @@ const overlayMaps = [
     groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">'+ passive.options.legendEntry + '</div>']:passive, 
-              ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
-              ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
+              // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
+              // ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }
   },
-  { groupName: '<img src="images/flood.svg" class="label-icon">IMPACTS',
+  { groupName: '<img src="images/flood_outline.svg" class="label-icon">IMPACTS',
     expanded: true,
     layers: {['<span class="layer-label">Flooded Roads</span><div class="legend-panel panel-hidden">'+roads.options.legendEntry+'</div>']:roads,
             ['<span class="layer-label">Stormwater Drainage Failure</span><div class="legend-panel panel-hidden">'+stormwater.options.legendEntry+'</div>']:stormwater,

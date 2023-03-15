@@ -43,58 +43,85 @@ noUiSlider.create(depthSlider, {
     pips: {mode: 'values', values: [0,1,2,3,4,5,6,7,8,9,10], density:50, format:format},
 });
 
-// Add secondary axis with ticks for scenario years
-function generateSecondaryPips(activeGauge, activeScenario){
-    // Clear out previous ticks
-    const existingPips = document.querySelectorAll('.noUi-pips-vertical-secondary');
-    existingPips.forEach(pipDiv => {
-        pipDiv.remove();
-      });
-    let projDepths = [];
 
-    // Get NOAA SLR projection data for active gauge and scenario
+// Add secondary axis with ticks for scenario years
+// First create initial secondary pips and labels with initial active scenario/gauge
+secondaryPips = '';
+let gaugeProj = slr_proj.filter(function (proj) {
+    return proj.stationName === activeGauge && proj.scenario === activeScenario;
+});
+
+let projDepths = [];
+projYears.forEach(function(yr){
+    let obj = gaugeProj.find(proj => proj.projectionYear == yr)
+    projDepths.push(obj.projectionRsl)
+})
+
+// Generate secondary pips
+for(let i=0; i < projYears.length; i++){
+    // Position of element relative to slider
+    let pct = projDepths[i]/maxDepth * 100; 
+    let displayClass = '';
+    // Hide off-scale ticks/labels
+    if (pct > 100){ 
+        displayClass = 'pip-hidden';
+    }
+    let newMarkerDiv = '<div class="noUi-marker noUi-marker-vertical-secondary noUi-marker-large' + displayClass +'" id="' + projYears[i] + '-pip" style="bottom: '
+        + pct +'%;"></div>';
+    // Add 'Baseline' to baseline year 
+    let yearLabel =  projYears[i] == baselineYear ? 'Baseline<br>('+ projYears[i]+')': projYears[i];
+    // Shift baseline (0 ft) label down since it is 2 lines
+    let adjPct = pct == 0 ? -2 : pct;
+    let newValueDiv ='<div class="noUi-value noUi-value-vertical-secondary noUi-value-large' + displayClass +'" id="' + projYears[i] + '-label" style="bottom: '
+        + adjPct + '%;">' + yearLabel +'</div>';
+    secondaryPips += newMarkerDiv + newValueDiv;
+};
+
+const pipsdiv = document.getElementsByClassName("noUi-pips")[0];
+pipsdiv.insertAdjacentHTML('afterend', '<div class="noUi-pips noUi-pips-vertical-secondary">'+ secondaryPips +'</div>');
+
+// Function to adjust position of pips when scenario/gauge is changed
+function regenerateSecondaryPips(activeGauge, activeScenario){
+    // Get NOAA SLR projection data for new active gauge/scenario
     const gaugeProj = slr_proj.filter(function (proj) {
 	    return proj.stationName === activeGauge && proj.scenario === activeScenario;
     });
 
     // Get RSL by scenario year
+    let projDepths = [];
     projYears.forEach(function(yr){
         let obj = gaugeProj.find(proj => proj.projectionYear == yr)
         projDepths.push(obj.projectionRsl)
     })
 
-    const pipsdiv = document.getElementsByClassName("noUi-pips")[0];
-    let secondaryPips = [];
-
-    // Generate secondary pips
+    // Move secondary pips to new positions
     for(let i=0; i < projYears.length; i++){
+        const yearPip = document.getElementById(projYears[i]+'-pip');
+        const yearLabel = document.getElementById(projYears[i]+'-label');
         // Position of element relative to slider
         let pct = projDepths[i]/maxDepth * 100; 
+        yearPip.style = 'bottom: ' + pct + '%';
+        let adjPct = pct == 0 ? -2 : pct;
+        yearLabel.style = 'bottom: ' + adjPct + '%';
+
+        // Hide any off-scale pips
         if (pct <= 100){ 
-            let newMarkerDiv = '<div class="noUi-marker noUi-marker-vertical-secondary noUi-marker-large" style="bottom: '
-                + pct +'%;"></div>';
-            // Add 'Baseline' to baseline year 
-            let yearLabel =  projYears[i] == baselineYear ? 'Baseline<br>('+ projYears[i]+')': projYears[i];
-            // Shift baseline (0 ft) label down since it is 2 lines
-            let adjPct = pct == 0 ? -2 : pct;
-            let newValueDiv ='<div class="noUi-value noUi-value-vertical-secondary noUi-value-large" style="bottom: '
-                + adjPct + '%;">' + yearLabel +'</div>';
-            secondaryPips += newMarkerDiv + newValueDiv;
+            yearPip.classList.remove('pip-hidden');
+            yearLabel.classList.remove('pip-hidden');
+        }
+        else{
+            yearPip.classList.add('pip-hidden');
+            yearLabel.classList.add('pip-hidden');
         }
     }
-    pipsdiv.insertAdjacentHTML('afterend', '<div class="noUi-pips noUi-pips-vertical-secondary">'+ secondaryPips +'</div>');
-};
+}
 
 // Regenerate secondary pips when scenario is changed
 scenarioSelect.addEventListener('change',(e) => {
     const selectedScenario = e.target.value;
     activeScenario = selectedScenario.split(' ').join('-');
-    generateSecondaryPips(activeGauge, activeScenario);
+    regenerateSecondaryPips(activeGauge, activeScenario);
 })
-
-// Initialize secondary pips
-generateSecondaryPips(activeGauge,activeScenario);
-
 
 // Update map and map controls when slider value is updated
 depthSlider.noUiSlider.on('update', function(value) {
