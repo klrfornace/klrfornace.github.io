@@ -395,7 +395,7 @@ function queryTMK(tmk){
   // Define the ArcGIS REST API URL; return result in GeoJSON format; include
   // parcel acres in addition to the geometry of the search result:
 
-  var url = 'http://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/25/query?f=geojson&outFields=gisacres,tmk_txt&where=tmk%3D' + tmk;
+  var url = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/25/query?f=geojson&outFields=gisacres,tmk_txt&where=tmk%3D' + tmk;
 
   // Ensure same-domain request (not sure this is necessary, but seemed to
   // fix error that Brad Romine was getting):
