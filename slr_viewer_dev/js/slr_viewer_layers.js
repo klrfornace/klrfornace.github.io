@@ -86,7 +86,12 @@ const passiveWmsOptions = (ft, type) => (
     maxZoom: 19,
     queryable: true,
     queryProperty: 'GRAY_INDEX',
-    queryDisplay: type === "SCI"? ((data) => '<strong>Water depth at average highest tide of the day:</strong> ' + (data-1) + '-' + data + ' ft'):  ((data) => '<strong>Depth below sea level:</strong> ' + (data-1) + '-' + data + ' ft'),
+    queryDisplay: type === "SCI"? ((data) => 
+                data == 11? ('Water depth at average highest tide of the day: <div class="popup-data"> 10+ ft</div>'):
+                ('Water depth at average highest tide of the day: <div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')):
+                ((data) => 
+                data == 11? ('Depth below sea level:<div class="popup-data"> 10+ ft</div>'): 
+                ('Depth below sea level:<div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')),
     nullValue: 127,
     popupMinZoom: 15,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v2` : `CRC:HI_State_80prob_${ft}ft_${type}_v2`, 
