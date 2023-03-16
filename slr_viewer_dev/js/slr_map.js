@@ -302,6 +302,7 @@ L.easyPrint({
   exportOnly: true,
   hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
   showClasses: ['legend-container'],
+  sizeModes: ['A4Landscape']
 	// sizeModes: ['Current','A4Portrait', 'A4Landscape']
 }).addTo(map);
 

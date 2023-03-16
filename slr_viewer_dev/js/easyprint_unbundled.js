@@ -633,12 +633,12 @@
                     height: this._a4PageSize.height,
                     width: this._a4PageSize.width,
                     name: this.options.defaultSizeTitles.A4Landscape,
-                    className: "A4Landscape page"
+                    className: "A4Landscape"
                 } : "A4Portrait" === t ? {
                     height: this._a4PageSize.width,
                     width: this._a4PageSize.height,
                     name: this.options.defaultSizeTitles.A4Portrait,
-                    className: "A4Portrait page"
+                    className: "A4Portrait"
                 } : t
             }, this);
             var t = L.DomUtil.create("div", "leaflet-control-easyPrint leaflet-bar leaflet-control");
