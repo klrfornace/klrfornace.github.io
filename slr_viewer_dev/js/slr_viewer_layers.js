@@ -819,11 +819,12 @@ const basemaps = [
 // For groups of sublayers added to map together but with individual sublayer controls, enter layer as object like:
 //      layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2}}
 
+
 const overlayMaps = [
   {
     groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
-     layers: {['<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">'+ passive.options.legendEntry + '</div>']:passive, 
+     layers: {['<span class="layer-label">Passive Flooding </span><button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button><div class="legend-panel panel-hidden">'+ passive.options.legendEntry + '</div>']:passive, 
               // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
               // ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }

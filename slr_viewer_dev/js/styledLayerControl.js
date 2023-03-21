@@ -135,13 +135,13 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
     selectLayer: function(layer) {
         this._map.addLayer(layer);
-        this._update();
+        this._update(); 
         this._toggleLayerLabelClass();
     },
 
     unSelectLayer: function(layer) {
         this._map.removeLayer(layer);
-        this._update();
+        this._update(); 
         this._toggleLayerLabelClass();
     },
 
@@ -529,9 +529,44 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         L.DomEvent.on(input, 'click', this._onInputClick, this);
 
-        var name = document.createElement('label');
-        //KF modified
-        name.innerHTML = '<label id="' + id +'-label" for="' + id + '">' + obj.name + '</label>';
+        var name = document.createElement('div');
+        name.style.display = 'inline';
+
+        // This is a very complicated way of dealing with multiple elements within a label. For all elements up to element with class "layer-label",
+        // keep in the label. For other elements (e.g., info button, hidden panel, etc.), append after the label.
+        if (obj.name.includes('layer-label')){
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(obj.name, 'text/html');
+            const labelSpan = htmlDoc.querySelector('.layer-label');
+
+            // Get previous siblings - this will be INCLUDED in label
+            let prevSibling = labelSpan.previousElementSibling;
+            const prevSiblings = [];
+            while (prevSibling){
+                prevSiblings.push(prevSibling);
+                prevSibling = prevSibling.prevElementSibling;
+            }
+
+            // Get next siblings - this will be appended OUTSIDE of label
+            let nextSibling = labelSpan.nextElementSibling;
+            const nextSiblings = [];
+            while (nextSibling){
+                nextSiblings.push(nextSibling);
+                nextSibling = nextSibling.nextElementSibling;
+            }
+
+            const nameLabel = L.DomUtil.create('label','',name);
+            nameLabel.setAttribute('id',id +'-label');
+            nameLabel.setAttribute('for', id);
+
+            prevSiblings.forEach((el) => nameLabel.appendChild(el));
+            nameLabel.appendChild(labelSpan);
+            nextSiblings.forEach((el) => name.append(el));
+        }
+        else{
+            name.innerHTML = '<label id="' + id +'-label" for="' + id + '">' + obj.name + '</label>';
+        }
+
         // name.innerHTML = '<label for="' + id + '">' + obj.name + '</label>';
 
         label.appendChild(input);
@@ -578,42 +613,25 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             const accordionButton = L.DomUtil.create('button','ac-container-accordion ' + s_expanded, groupContainer);
             accordionButton.type = "button";
             accordionButton.innerHTML = obj.group.name;
+            accordionButton.setAttribute('aria-expanded',obj.group.expanded);
             L.DomEvent.on(accordionButton, 'click', this._toggleAccordion, this);
-
-            const accordionGroup = L.DomUtil.create('article', 'ac-large', groupContainer);
-            accordionGroup.appendChild(label);
-
-
-            // // verify if group is expanded
-            // var s_expanded = obj.group.expanded ? ' checked = "true" ' : '';
-
-            // // verify if type is exclusive
-            // var s_type_exclusive = this.options.exclusive ? ' type="radio" ' : ' type="checkbox" ';
-
-            // inputElement = '<input id="ac' + obj.group.id + '" name="accordion-1" class="menu" ' + s_expanded + s_type_exclusive + '/>';
-            // inputLabel = '<label for="ac' + obj.group.id + '">' + obj.group.name + '</label>';
-
-            // article = document.createElement('article');
-            // article.className = 'ac-large'
             
-            // KF insert for transition - doesn't work
+            const accordionGroup = L.DomUtil.create('article', 'ac-large', groupContainer);
+            accordionGroup.setAttribute('id','leaflet-control-accordion-article-' + obj.group.id);
+            accordionButton.setAttribute('aria-controls', 'leaflet-control-accordion-article-' + obj.group.id);
+            
+            // Create wrapper around checkbox items with padding set to allow for smooth transition of article element
+            const wrapperDiv = L.DomUtil.create('div', 'wrapper', accordionGroup);
+            wrapperDiv.appendChild(label);
 
-            // let transitionDiv = document.createElement('div');
-            // transitionDiv.className = 'ac-large-transition';
-            // article.appendChild(transitionDiv);
-            // transitionDiv.appendChild(label);
-            // end insert
-
-            // article.appendChild(label);
-
+            // Hide overflow-y during transition
+            accordionGroup.addEventListener('transitionstart', ()=> accordionGroup.style.overflowY = 'hidden');
+            accordionGroup.addEventListener('transitionend', ()=> accordionGroup.style.overflowY = 'auto');
+            
             // process options of ac-large css class - to options.group_maxHeight property
             if (this.options.group_maxHeight) {
                 article.style.maxHeight = this.options.group_maxHeight;
             }
-
-            // groupContainer.innerHTML = inputElement + inputLabel;
-
-            // groupContainer.appendChild(article);
 
             // Link to toggle all layers
             if (obj.overlay && this.options.group_togglers.show) {
@@ -691,7 +709,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             this._domGroups[obj.group.id] = groupContainer;
         } else {
 
-            groupContainer.getElementsByTagName('article')[0].appendChild(label);
+            groupContainer.getElementsByClassName('wrapper')[0].appendChild(label); // add checkbox items to wrapper
         }
 
         // KF addition
@@ -842,7 +860,11 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
    },
 
     _toggleAccordion: function(e){
-        e.target.classList.toggle('accordion-content-hidden');
+        const button = e.target.tagName.toLowerCase() === 'button'? e.target: e.target.parentElement; //make sure button is selected (not image)
+        const expanded = button.getAttribute('aria-expanded');
+        expanded === 'true' ? button.setAttribute('aria-expanded', 'false') : button.setAttribute('aria-expanded', 'true');
+
+        button.classList.toggle('accordion-content-hidden');
     },
 
     /* jmaurer; groupName optional: */ 

@@ -108,25 +108,6 @@ const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-e
 // Show/hide simple legend according to legend radio button state (created in styledLayerControl)
 // const legendRadio = document.querySelector('.legend-radio-group');
 
-// function toggleLegendRadio(){
-//   const radioButtonGroup = document.getElementsByName("legend-toggle");
-//   const checkedRadio = Array.from(radioButtonGroup).find(
-//     (radio) => radio.checked
-//   );
-//   if (checkedRadio.value == 'full-menu'){
-//     document.querySelector('.ac-container').classList.remove('legend-container-hidden');
-//     document.querySelector('.legend-container').classList.add('legend-container-hidden');
-//   }
-//   else {
-//     document.querySelector('.ac-container').classList.add('legend-container-hidden');
-//     document.querySelector('.legend-container').classList.remove('legend-container-hidden');
-//   }
-// }
-// legendRadio.onclick = function () {
-//   toggleLegendRadio();
-// };
-
-
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
 
@@ -163,7 +144,6 @@ map.on('overlayadd', function addOverlay(e){
     }
 });
 
-
 map.on('overlayremove', function(e){
   const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
   const entryDiv = document.querySelector('.legend-'+ legendKey);
@@ -171,21 +151,6 @@ map.on('overlayremove', function(e){
   entryDiv.classList.add('legend-entry-hidden');
 })
 
-
-
-// let legendToggle = document.querySelector('.legend-toggle');
-
-// // Switch between full menu and simple legend
-//  legendToggle.onclick = function() {
-//   document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
-//   document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
-
-//   // Change label of button
-//   let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
-//   const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-//   const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Full layer menu';
-//   document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
-//  }
 
 
  // Change layer styles based on light/dark (satellite) basemaps
@@ -228,7 +193,7 @@ map.on( 'baselayerchange',
 );
 
 
-//Change styles based on map zoom level
+// Change styles based on map zoom level
 
 map.on('zoomend', function(){
   const currentZoom = map.getZoom();
@@ -250,8 +215,9 @@ map.on('zoomend', function(){
   }
 })
 
-//Close tooltips for admin boundary layers at high zooms 
-//Also adjust cursor based on if clickable tile layers are present
+// Close tooltips for admin boundary layers at high zooms 
+// Also adjust cursor based on if clickable tile layers are present
+
 map.on('zoomend', function() {
   const tooltips = document.querySelectorAll('.leaflet-tooltip');
   if (map.getZoom() < zoomThreshold) {
@@ -272,7 +238,7 @@ map.on('zoomend', function() {
 // Home zoom button
 function returnHome(){
   map.setView(centerCoord,zoomLevel)
-  this.blur();
+  this.blur(); // Remove focus after button is clicked (to prevent style from sticking)
 }
 
 const homeControl = L.control({position: 'topleft'});
@@ -317,21 +283,7 @@ logoControl.onAdd = function() {
 logoControl.addTo(map);
 
 
-// Configure info tooltips using Tippy library
-const infoTooltips = {
-  '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>'
-};
-Object.keys(infoTooltips).forEach(key => {
-  tippy(key, {
-    content: infoTooltips[key],
-    trigger:'click',
-    placement: 'right',
-    theme: 'dark',
-    allowHTML: true,
-    interactive: true,
-    appendTo: () => document.body
-  })
-});
+
 
 
 // Set up address/TMK search bar with Mapbox geocoder and State of Hawaiʻi TMK database
@@ -342,7 +294,7 @@ var activeAddress = {};
 // Keep track of layers assigned to queried TMKs so correct shape can be removed
 var activeTMK = {};
 
-const control = new L.Control.Geocoder({ geocoder: null, position:'topleft',placeholder:'Search by address or TMK', collapsed: false, suggestMinLength: 7, defaultMarkGeocode: false })
+const geocoderControl = new L.Control.Geocoder({ geocoder: null, position:'topleft',placeholder:'Search by address or TMK', collapsed: false, suggestMinLength: 7, defaultMarkGeocode: false })
   .on('startgeocode', function(e){
     inputStr = e.input.trim(); // Get input and remove any white space
 
@@ -394,8 +346,8 @@ const control = new L.Control.Geocoder({ geocoder: null, position:'topleft',plac
 
 // Set up geocoder restricted to bounding box around Hawaiʻi
 const geocoder = L.Control.Geocoder.mapbox({apiKey: ak, geocodingQueryParams:{'bbox':'-162,18,-154,23'}});
-control.options.geocoder = geocoder;
-control.addTo(map);
+geocoderControl.options.geocoder = geocoder;
+geocoderControl.addTo(map);
 
 // Set id to control position via css
 const geocoderDiv = document.querySelector('.leaflet-control-geocoder');
@@ -551,9 +503,31 @@ layerGroups.forEach(grp => {
   })
 })
 
-
  // Initialize map with passive flooding layers
 
-layerControl.selectLayer(passive); 
-const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
-passiveLegendEntry.classList.remove('legend-entry-hidden');
+ layerControl.selectLayer(passive); 
+ const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
+ passiveLegendEntry.classList.remove('legend-entry-hidden');
+ 
+
+// Configure info tooltips using Tippy library
+// For some reason, this needs to be after the map is initialized with first set of layers. 
+// StyledLayerControl is interfering somehow, but I can't figure out how. -KF
+const infoTooltips = {
+  '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>',
+  '#mhhw-info':'Mean Higher High Water (MHHW): The water level at the average highest tide of the day.',
+  '#passive-flooding-info':'More info about passive flooding. <br><a href="#">Click here for full details.</a>',
+};
+
+Object.keys(infoTooltips).forEach(key => {
+  tippy(key, {
+    content: infoTooltips[key],
+    trigger:'click',
+    placement: 'right',
+    theme: 'light-border',
+    allowHTML: true,
+    interactive: true,
+    appendTo: () => document.body
+  });
+});
+

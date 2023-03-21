@@ -146,7 +146,9 @@ div[id^="leaflet-control-accordion-layers"] > button {
 }
 
 .ac-container-accordion.accordion-content-hidden ~ article.ac-large{
-	display: none;
+	max-height: 0px;
+	padding: 0px;
+	/* display: none; */
 }
 
 .ac-container article{
@@ -155,32 +157,36 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	overflow: hidden;
 	max-height: 0px;
 	height: 0px;
-    padding: 0px;
+    /* padding: 8px 0; */
     line-height: 0px;
 	position: relative;
 	z-index: 10;
-	-webkit-transition: height 0.4s ease-out;
-	-moz-transition:  height 0.4s ease-out;
-	-o-transition: height 0.4s ease-out;
-	-ms-transition:  height 0.4s ease-out;
-	transition:  height 0.4s ease-out;
+	-webkit-transition: max-height 0.3s ease-out;
+	-moz-transition: max-height 0.3s ease-out;
+	-o-transition: max-height 0.3s ease-out;
+	-ms-transition: max-height 0.3s ease-out;
+	transition:  max-height 0.3s ease-out;
 }
 
-.ac-container input.menu:checked ~ article{
-	-webkit-transition: height 0.5s ease-out;
-	-moz-transition:  height 0.5s ease-out;
-	-o-transition:  height 0.5s ease-out;
-	-ms-transition:  height 0.5s ease-out;
-	transition:  height 0.5s ease-out;
+.ac-container input.menu:checked ~ article,
+.ac-container-accordion ~ article{
+	-webkit-transition: max-height 0.3s ease-out;
+	-moz-transition: max-height 0.3s ease-out;
+	-o-transition:  max-height 0.3s ease-out;
+	-ms-transition: max-height 0.3s ease-out;
+	transition:  max-height 0.3s ease-out
 }
 
 .ac-container-accordion ~ article.ac-large,
 .ac-container input.menu:checked ~ article.ac-large{
 	height: auto; 
 	max-height : 200px; /* increasing from 100px to account for more legend content */
-	padding: 8px 0;
 	overflow-y: auto;
     line-height: 18px;
+}
+
+.wrapper{
+	padding: 8px 0;
 }
 
 .ac-container article label {
@@ -245,7 +251,8 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	font-weight: 700;
 } 
 
-.active-layer div.legend-panel{
+.active-layer div.legend-panel,
+.active-layer ~ div.legend-panel{
 	display: block;
 }
 
@@ -263,10 +270,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	font-weight: 400;
 	display: none;
 	padding-left: 3px;
-}
-
-.ac-large-transition{
-	overflow: hidden;
 }
 
 #styledLayerControl-utilities{
@@ -490,79 +493,4 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	font-size: 13px;
 	padding-left: 20px;
 }
-/* Styles for legend entries in active/inactive states -KF */
 
-/* .legend-panel{
-	display: none;
-	margin-left: 22px;
-}
-
-.legend-header{
-	font-weight: 400;
-	margin-left: 2px;
-}
-
-.active-legend div.legend-panel{
-   	display: block;
-}
-
-.active-legend span.legend-header{
-	font-weight: 700;
-} */
-
-/* .slider-container input.menu:checked + label,
-.slider-container input.menu:checked + label:hover{
-	background: #c6e1ec;
-	color: #3d7489;
-	text-shadow: 0px 1px 1px rgba(255,255,255, 0.6);
-	box-shadow:
-		0px 0px 0px 1px rgba(155,155,155,0.3),
-		0px 2px 2px rgba(0,0,0,0.1);
-}
-.slider-container div[id^="leaflet-control-accordion-layers"] > label:hover:after,
-.slider-container input.menu:checked + div[id^="leaflet-control-accordion-layers"] > label:hover:after{
-	content: '';
-	position: absolute;
-	width: 24px;
-	height: 24px;
-	right: 13px;
-	top: 7px;
-	background: transparent url(images/arrow_down.png) no-repeat center center;
-}
-.slider-container input.menu:checked + div[id^="leaflet-control-accordion-layers"] > label:hover:after{
-	background-image: url(images/arrow_up.png);
-}
-.slider-container input.menu{
-	display: none;
-}
-
-.slider-container article{
-	background: rgba(255, 255, 255, 0.5);
-	margin-top: -1px;
-	overflow: hidden;
-	height: 0px;
-    padding: 0px;
-    line-height: 0px;
-	position: relative;
-	z-index: 10;
-	-webkit-transition: height 0.3s ease-in-out, box-shadow 0.6s linear;
-	-moz-transition: height 0.3s ease-in-out, box-shadow 0.6s linear;
-	-o-transition: height 0.3s ease-in-out, box-shadow 0.6s linear;
-	-ms-transition: height 0.3s ease-in-out, box-shadow 0.6s linear;
-	transition: height 0.3s ease-in-out, box-shadow 0.6s linear;
-}
-
-.slider-container input.menu:checked ~ article{
-	-webkit-transition: height 0.5s ease-in-out, box-shadow 0.1s linear;
-	-moz-transition: height 0.5s ease-in-out, box-shadow 0.1s linear;
-	-o-transition: height 0.5s ease-in-out, box-shadow 0.1s linear;
-	-ms-transition: height 0.5s ease-in-out, box-shadow 0.1s linear;
-	transition: height 0.5s ease-in-out, box-shadow 0.1s linear;
-}
-
-.slider-container input.menu:checked ~ article.ac-large{
-	height: auto;
-	padding: 30px 100px 30px 50px;
-	overflow-y: hidden;
-    line-height: 18px;
-} */

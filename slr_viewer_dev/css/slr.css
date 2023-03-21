@@ -58,33 +58,31 @@ h3 {
 
 .info-button {
   background-color: #aaaaaa;
-  background-image: url('../images/information.svg');
+  background-image: url('../images/info.svg');
   background-repeat: no-repeat;
-  background-size: 70% auto;
-  background-position: 50% 50%;
+  background-size: 25% auto;
+  background-position: 48% 50%; 
   height: 14px;
   border: none;
   border-radius: 100%;
   margin-left: 2px;
   padding: 0;
   cursor: pointer;
-  outline: inherit;
   width: 14px;
   vertical-align: text-top;
 }
 
-.info-icon {
+/* .info-icon {
   font-size: 11px;
   font-family: 'Roboto',sans-serif;
   font-weight:500;
   line-height: 15px;
-  /* color: #aaaaaa; */
   color: #fff;
   border-radius: 100%;
   text-align: center;
-}
+} */
 
-.info-icon:hover{
+.info-button:hover{
   background-color: #888888
 }
 
@@ -93,7 +91,7 @@ h3 {
     /* background-color:#c9eaf8; */
     background-color:#dcf0f7;
     color: #14416f;
-    color: #184e85;
+    /* color: #184e85; */
     padding: 10px 15px;
 }
 
@@ -101,7 +99,20 @@ h3 {
 .side-panel-container {
   width: 225px;
   background: #fff;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+  z-index: 1000; /* same z index as Leaflet controls */
 }
+
+/* .side-panel-container:after{
+	content: '\2013';
+	color: #184e85;
+	font-size: 18px;
+	font-family:'Roboto',sans-serif;
+	font-weight: 700;
+  position: absolute;
+  top: 50%;
+  left: 220px;
+} */
 
 .side-panel-header{
   align-items:center;
@@ -128,9 +139,9 @@ h3 {
 .depth-axis-label{
   position:relative;
   top:0px;
-  left: 30px;
+  left: 18px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   color:#14416f;
   color: #184e85;
 }
@@ -139,7 +150,7 @@ h3 {
   position:relative;
   font-size: 13px;
   top:0px;
-  left: 60px;
+  left: 42px;
   font-weight: 500;
   color:#626364; 
 }
@@ -306,7 +317,8 @@ select {
   height: auto;
 }
 
-/* Add hover effect to area the handle responds to */
+/* Add hover/keyboard focus effect to area the handle responds to */
+.noUi-handle:focus-visible .noUi-touch-area,
 .noUi-handle:hover .noUi-touch-area {
   border: none;
   background: #14416f;
@@ -455,23 +467,26 @@ select {
 
 
 /* Styles for Tippy tooltips */
+
+.tippy-box[data-theme~='dark'], 
+.tippy-box[data-theme~='light-border'],
+.tippy-box[data-theme~='dark-blue']{
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tippy-box[data-theme~='dark'] a,
+.tippy-box[data-theme~='dark-blue'] a{
+  color:#fff;
+}
+
 .tippy-box[data-theme~='tippy-error'] {
     background-color: #cc0000;
     color:'white';
     font-size: 13px;
+    font-weight: 500;
 }
 
-.tippy-box[data-theme~='light-border'] {
-  font-size: 13px;
-}
-
-.tippy-box[data-theme~='dark'] {
-  font-size: 13px;
-}
-
-.tippy-box[data-theme~='dark'] a{
-  color:#fff;
-}
 .tippy-box[data-theme~='tippy-error'][data-placement^='top'] > .tippy-arrow::before {
   border-top-color: #cc0000;
 }
@@ -483,6 +498,31 @@ select {
 }
 .tippy-box[data-theme~='tippy-error'][data-placement^='right'] > .tippy-arrow::before {
   border-right-color: #cc0000;
+}
+
+.tippy-box[data-theme~='dark-blue'] {
+  background-color: #14416f;
+  color:'white';
+  font-size: 13px;
+}
+
+.tippy-box[data-theme~='dark-blue'][data-placement^='top'] > .tippy-arrow::before {
+border-top-color: #14416f;
+}
+.tippy-box[data-theme~='dark-blue'][data-placement^='bottom'] > .tippy-arrow::before {
+border-bottom-color: #14416f;
+}
+.tippy-box[data-theme~='dark-blue'][data-placement^='left'] > .tippy-arrow::before {
+border-left-color: #14416f;
+}
+.tippy-box[data-theme~='dark-blue'][data-placement^='right'] > .tippy-arrow::before {
+border-right-color: #14416f;
+}
+
+
+
+.tippy-content{
+  padding: 7px 9px;
 }
 
 /* Styles for map popups */
