@@ -272,7 +272,6 @@ L.easyPrint({
 	// sizeModes: ['Current','A4Portrait', 'A4Landscape']
 }).addTo(map);
 
-
 // Add Mapbox logo per Terms of Service
 const logoControl = L.control({position: 'bottomleft'});
 logoControl.onAdd = function() {
@@ -281,10 +280,6 @@ logoControl.onAdd = function() {
   return logoDiv
 }
 logoControl.addTo(map);
-
-
-
-
 
 // Set up address/TMK search bar with Mapbox geocoder and State of Hawaiʻi TMK database
 // Leaflet-control-geocoder: https://github.com/perliedman/leaflet-control-geocoder
@@ -357,6 +352,45 @@ geocoderDiv.setAttribute('id','geocoder-control');
 const geocoderErrorDiv = document.querySelector('.leaflet-control-geocoder-form-no-error');
 geocoderErrorDiv.setAttribute('id','geocoder-error-default');
 
+// Add button to open side panel - initially hidden since panel is open
+
+function closePanel(){
+  const panel = document.querySelector('.side-panel-container');
+  panel.style.width = 0;
+
+  setTimeout(() => {
+    const panelControl = document.querySelector('.panel-control');
+    panelControl.classList.remove('side-panel-open');
+  },200);
+}
+
+function openPanel(){
+  const panel = document.querySelector('.side-panel-container');
+  panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
+  const panelControl = document.querySelector('.panel-control');
+  panelControl.classList.add('side-panel-open');
+}
+
+// Add functionality to close button
+const closeButton = document.querySelector('.side-panel-close');
+closeButton.onclick = closePanel;
+
+const sidePanelControl = L.control({position:'topleft'})
+sidePanelControl.onAdd = function() {
+  const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
+  tab.id = 'slr-tab-container';
+  const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
+  tabButton.id = 'slr-tab-button';
+  tabButton.role = "button";
+  tabButton.href = '#';
+  tabButton.title = 'Open sea level slider';
+  tabButton.setAttribute('aria-label','Current sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
+  tabButton.setAttribute('aria-disable',false);
+  tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
+  tabButton.onclick = openPanel;
+  return tab
+}
+sidePanelControl.addTo(map);
 
 function queryTMK(tmk){
 
@@ -530,4 +564,3 @@ Object.keys(infoTooltips).forEach(key => {
     appendTo: () => document.body
   });
 });
-

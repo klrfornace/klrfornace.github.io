@@ -266,8 +266,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             }
 
             // set the max-height of control to y value of map object
-            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : (this._map.getSize().y - 70);
-            containers[c].style.maxHeight = this._default_maxHeight;
+            // Adding extra 15px to account for button group at button -KF
+            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : (this._map.getSize().y - 90);
+            containers[c].style.maxHeight = this._default_maxHeight + 'px';
         }
 
         // Insert div to hold simple legend (created separately) - KF
@@ -347,8 +348,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
         // legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
 
-
-        // window.onresize = this._on_resize_window.bind(this);
+        window.onresize = this._on_resize_window.bind(this);
 
     },
 
@@ -356,8 +356,12 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // listen to resize of screen to reajust de maxHeight of container
         for (var c = 0; c < containers.length; c++) {
             // input the new value to height
-            containers[c].style.maxHeight = (window.innerHeight - 90) < this._removePxToInt(this._default_maxHeight) ? (window.innerHeight - 90) + "px" : this._removePxToInt(this._default_maxHeight) + "px";
-            
+            // adjusted height factor to account for button group - KF
+
+            containers[c].style.maxHeight = (window.innerHeight - 110) < this._removePxToInt(this._default_maxHeight) ? 
+            (window.innerHeight - 110) + "px" : 
+            this._default_maxHeight = this._removePxToInt(this._default_maxHeight) + "px"; // This line had bug (wasn't actually setting new default max height) - KF
+
             // add resizing to min width based on window width
         }
     },

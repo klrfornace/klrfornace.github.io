@@ -153,6 +153,11 @@ depthSlider.noUiSlider.on('update', function(value) {
         depthLabel.innerHTML = '+ '+ depths[parseInt(value)];
         depthLabelLegend.innerHTML = '+ '+ depths[parseInt(value)];
     }
+
+    // Switch background image of side panel open button
+    const sidePanelButton = document.getElementById("slr-tab-button");
+    const newURL = (parseInt(value) < 10)? 'images/slr0' + parseInt(value) + '.svg':'images/slr' + parseInt(value) + '.svg';
+    sidePanelButton.style.backgroundImage = "url("+ newURL + ")";
 }
 )
 

@@ -101,27 +101,50 @@ h3 {
   background: #fff;
   box-shadow: 0 0 5px rgb(0 0 0 / 20%);
   z-index: 1000; /* same z index as Leaflet controls */
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: width 0.3s linear;
 }
-
-/* .side-panel-container:after{
-	content: '\2013';
-	color: #184e85;
-	font-size: 18px;
-	font-family:'Roboto',sans-serif;
-	font-weight: 700;
+/* 
+.side-panel-container:after{
+  background-image: url('../images/chevron.svg'); 
+  background-repeat: no-repeat;
+  background-size: 67%;
+	content : "";
   position: absolute;
-  top: 50%;
-  left: 220px;
+  height: 45px;
+  width: 20px;
+  top: 5%;
+  left: 205px;
+  opacity:0.1;
 } */
+
 
 .side-panel-header{
   align-items:center;
   display: flex;
   width: 195px;
+  position: relative;
+}
+
+.side-panel-close{
+  color: #14416f;
+  font-size: 18px;
+  text-decoration: none;
+  cursor: pointer;
+  position:absolute; 
+  opacity: 50%;
+  top: 5px;
+  right:10px;
+}
+
+.side-panel-close:hover{
+  opacity: 100%
 }
 
 .side-panel-content{
   padding: 10px 5px;
+  width: 215px;
 }
 
 #depth-level-label{
@@ -441,6 +464,30 @@ select {
 .leaflet-control-home{
   background-image: url('../images/home.svg');
   background-size: 16px 16px;
+}
+
+/* Side panel open button */
+#slr-tab-button{
+  width: 65px;
+  height: 50px;
+  background-color: #dcf0f7;
+  background-image: url('../images/slr00.svg');
+  background-repeat: no-repeat;
+  background-size: 80%;
+}
+
+#slr-tab-button:hover{
+	background-color: #c9eaf8;
+}
+
+#slr-tab-container{
+  border: 0px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+}
+
+.side-panel-open{
+  display: none;
 }
 
 /* Loading icon control */
