@@ -9,7 +9,7 @@ const baselineYear = 2005;
 
 let activeScenario = 'Intermediate';
 let activeGauge = 'MOKUOLOE_ISLAND';
-
+let activeDepth = 0;
 
 const format = {
     to: function(value) {
@@ -125,14 +125,14 @@ scenarioSelect.addEventListener('change',(e) => {
 
 // Update map and map controls when slider value is updated
 depthSlider.noUiSlider.on('update', function(value) {
-    const activeDepth = layerTags[parseInt(value)];
+    const currentDepth = layerTags[parseInt(value)];
 
     // Switch layers in all layer groups 
     for (let i = 0; i < layerGroups.length; i++){
         const group = layerGroups[i].group;
         const layers = layerGroups[i].layers;
         // Find layer(s) with name that contains correct tag
-        const newLayers = layers.filter(layer => layer.options.name.includes(activeDepth));
+        const newLayers = layers.filter(layer => layer.options.name.includes(currentDepth));
         // Remove old layer/add new layer
         group.eachLayer(function(layer) {
             group.removeLayer(layer);
@@ -154,10 +154,9 @@ depthSlider.noUiSlider.on('update', function(value) {
         depthLabelLegend.innerHTML = '+ '+ depths[parseInt(value)];
     }
 
-    // Switch background image of side panel open button
-    const sidePanelButton = document.getElementById("slr-tab-button");
-    const newURL = (parseInt(value) < 10)? 'images/slr0' + parseInt(value) + '.svg':'images/slr' + parseInt(value) + '.svg';
-    sidePanelButton.style.backgroundImage = "url("+ newURL + ")";
+    // Set global variable for other uses
+    activeDepth = parseInt(value);
+    console.log(activeDepth);
 }
 )
 

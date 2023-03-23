@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52.34 30.96">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 21px;
+        letter-spacing: -.1em;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        fill: #14416f;
+      }
+
+      .cls-1, .cls-3 {
+        font-family: Roboto-Medium, Roboto;
+        font-weight: 500;
+      }
+
+      .cls-4 {
+        stroke-width: .66px;
+      }
+
+      .cls-4, .cls-5, .cls-6, .cls-7, .cls-8 {
+        fill: none;
+        stroke: #14416f;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-5 {
+        stroke-width: .39px;
+      }
+
+      .cls-6 {
+        stroke-width: 2.15px;
+      }
+
+      .cls-3 {
+        font-size: 11px;
+      }
+
+      .cls-7 {
+        stroke-width: 1.12px;
+      }
+
+      .cls-8 {
+        stroke-width: 1.07px;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g>
+        <text class="cls-1" transform="translate(16.45 22.8)"><tspan x="0" y="0">6</tspan></text>
+        <g>
+          <path class="cls-8" d="m1.27,24.99V.53h9.62v24.67"/>
+          <line class="cls-7" x1="1.32" y1="9.59" x2="8.3" y2="9.59"/>
+          <line class="cls-4" x1="1.32" y1="15.63" x2="5.08" y2="15.63"/>
+          <line class="cls-5" x1="1.32" y1="18.65" x2="4.81" y2="18.65"/>
+          <line class="cls-4" x1="1.32" y1="3.55" x2="5.08" y2="3.55"/>
+          <line class="cls-4" x1="1.32" y1="6.57" x2="5.08" y2="6.57"/>
+          <line class="cls-4" x1="1.32" y1="12.61" x2="5.08" y2="12.61"/>
+          <line class="cls-7" x1="1.32" y1="18.65" x2="8.3" y2="18.65"/>
+          <line class="cls-4" x1="1.32" y1="21.67" x2="5.08" y2="21.67"/>
+        </g>
+        <text class="cls-3" transform="translate(30.32 22.8)"><tspan x="0" y="0">ft</tspan></text>
+        <path class="cls-6" d="m44.05,29.67c-2.07,0-3.95-1.01-5.31-2.63-1.37,1.68-3.39,2.64-5.52,2.64s-3.75-1.03-5.31-2.65c-1.46,1.52-3.37,2.85-5.49,2.85s-3.86-1.11-5.22-2.74c-1.37,1.68-3.28,2.74-5.4,2.74s-3.95-1.01-5.31-2.64c-1.37,1.63-3.28,2.63-5.4,2.63-.1,0-.19,0-.29,0"/>
+      </g>
+      <path class="cls-2" d="m46.24,6.76c.4,0,.79.18,1.02.52l4.82,7.1c.34.5.34,1.15,0,1.65l-4.82,7.1c-.36.53-1.1.68-1.66.34-.56-.34-.73-1.04-.37-1.57l4.56-6.71-4.51-6.64c-.34-.5-.28-1.18.21-1.56.23-.17.5-.26.76-.26Z"/>
+    </g>
+  </g>
+</svg>

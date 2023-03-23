@@ -354,43 +354,70 @@ geocoderErrorDiv.setAttribute('id','geocoder-error-default');
 
 // Add button to open side panel - initially hidden since panel is open
 
-function closePanel(){
+function openClosePanel(){
   const panel = document.querySelector('.side-panel-container');
-  panel.style.width = 0;
+  const tabContainer = document.querySelector('.side-panel-tab-container');
 
-  setTimeout(() => {
-    const panelControl = document.querySelector('.panel-control');
-    panelControl.classList.remove('side-panel-open');
-  },200);
+  // Open the side panel
+  if (this.classList.contains('panel-closed')){
+    panel.style.width = '225px';
+    tabContainer.style.left = '225px';
+
+    this.classList.remove('panel-closed');
+    this.style.backgroundImage = "url(images/close2.svg)";
+
+    this.setAttribute('aria-label', 'Close the sea level slider panel');
+  }
+  // Close the side panel
+  else{
+    panel.style.width = 0;
+    tabContainer.style.left = '0px';
+
+    this.classList.add('panel-closed');
+    console.log(activeDepth);
+    const newURL = (activeDepth < 10)? 'images/slr0' + activeDepth + '_open.svg':'images/slr' + activeDepth + '_open.svg';
+    this.style.backgroundImage = "url("+ newURL + ")";
+
+    // Also update aria-label
+    this.setAttribute('aria-label', 'Displayed sea level is ' + activeDepth + ' feet. Click to open sea level slider to adjust depth.');
+  }
 }
 
-function openPanel(){
-  const panel = document.querySelector('.side-panel-container');
-  panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
-  const panelControl = document.querySelector('.panel-control');
-  panelControl.classList.add('side-panel-open');
-}
+// function openPanel(){
+//   const panel = document.querySelector('.side-panel-container');
+//   panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
+//   const panelControl = document.querySelector('.panel-control');
+//   panelControl.classList.add('side-panel-open');
+// }
 
 // Add functionality to close button
-const closeButton = document.querySelector('.side-panel-close');
-closeButton.onclick = closePanel;
+const closeButton = document.querySelector('.side-panel-tab');
+closeButton.onclick = openClosePanel;
 
-const sidePanelControl = L.control({position:'topleft'})
-sidePanelControl.onAdd = function() {
-  const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
-  tab.id = 'slr-tab-container';
-  const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
-  tabButton.id = 'slr-tab-button';
-  tabButton.role = "button";
-  tabButton.href = '#';
-  tabButton.title = 'Open sea level slider';
-  tabButton.setAttribute('aria-label','Current sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
-  tabButton.setAttribute('aria-disable',false);
-  tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
-  tabButton.onclick = openPanel;
-  return tab
-}
-sidePanelControl.addTo(map);
+// const sidePanelControl = L.control({position:'topleft'})
+// sidePanelControl.onAdd = function() {
+//   const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
+//   tab.id = 'slr-tab-container';
+//   const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
+//   tabButton.id = 'slr-tab-button';
+//   tabButton.role = "button";
+//   tabButton.href = '#';
+//   tabButton.title = 'Open sea level slider';
+//   tabButton.setAttribute('aria-label','Displayed sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
+//   tabButton.setAttribute('aria-disable',false);
+//   tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
+//   tabButton.onclick = openPanel;
+
+//   tab.setAttribute('aria-haspopup', true);
+//   if (!L.Browser.touch) {
+//       L.DomEvent.disableClickPropagation(tab);
+//       L.DomEvent.on(tab, 'wheel', L.DomEvent.stopPropagation);
+//   } else {
+//       L.DomEvent.on(tab, 'click', L.DomEvent.stopPropagation);
+//   }
+//   return tab
+// }
+// sidePanelControl.addTo(map);
 
 function queryTMK(tmk){
 
