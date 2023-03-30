@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CRC Sea Level Rise Viewer</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="js/config.js"></script>
+
+    <!-- Load Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+
+    <!-- Older leaflet version -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+     -->
+    <!-- Load Leaflet plugins -->
+    
+    <!-- Leaflet-AJAX -->
+    <script src="js/leaflet.ajax.min.js"></script>
+
+    <!--Load Leaflet.VectorGrid -->
+    <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
+    
+    <!-- Leaflet.StyledLayerControl -->
+    <link rel="stylesheet" href="css/styledLayerControl.css">
+    <script src="js/styledLayerControl.js"></script>
+    
+    <!-- Leaflet-easyPrint -->
+    <script src="js/easyprint_unbundled.js"></script>
+    
+    <!-- Leaflet-Control-Geocoder -->
+    <link rel="stylesheet" href="css/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <!-- Leaflet WMS extension -->
+    <script src="js/L.TileLayer.betterWMS.js"></script>
+
+    <!-- Leaflet polygon pattern fill extension -->
+    <script src="js/leaflet-polygon.fillPattern.js"></script>
+
+    <!-- Leaflet polygon pattern fill extension (canvas)-->
+    <script src="js/leaflet-polygon.fillPattern-canvas.js"></script>
+
+    <!-- <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script> -->
+    
+    <!-- <link href="css/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="css/mapbox-gl-geocoder.css" type="text/css"> -->
+    
+    <!-- Load Esri Leaflet -->
+    <!-- <script src="https://unpkg.com/esri-leaflet@3.0.7/dist/esri-leaflet.js"
+    integrity="sha512-ciMHuVIB6ijbjTyEdmy1lfLtBwt0tEHZGhKVXDzW7v7hXOe+Fo3UA1zfydjCLZ0/vLacHkwSARXB5DmtNaoL/g=="
+    crossorigin=""></script> -->
+
+    <!-- Load Esri Leaflet Vector -->
+    <!-- <script src="https://unpkg.com/esri-leaflet-vector@3.1.2/dist/esri-leaflet-vector.js"
+    integrity="sha512-SnA/TobYvMdLwGPv48bsO+9ROk7kqKu/tI9TelKQsDe+KZL0TUUWml56TZIMGcpHcVctpaU6Mz4bvboUQDuU3w=="
+    crossorigin=""></script> -->
+
+    <!-- Load Esri Leaflet Geocoder -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.1/dist/esri-leaflet-geocoder.css"
+    integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
+    crossorigin="">
+    <script src="https://unpkg.com/esri-leaflet-geocoder@3.1.1/dist/esri-leaflet-geocoder.js"
+    integrity="sha512-enHceDibjfw6LYtgWU03hke20nVTm+X5CRi9ity06lGQNtC9GkBNl/6LoER6XzSudGiXy++avi1EbIg9Ip4L1w=="
+    crossorigin=""></script> -->
+
+    <!-- Load JQuery -->
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+
+    <!-- <link rel="stylesheet" href="css/leaflet_legend_working.css">
+    <script src="js/leaflet_legend_working.js"></script> -->
+    
+    <!-- Other libraries/stylesheets -->
+    <!-- Load NoUI Slider (https://refreshless.com/nouislider/)-->
+    <link rel="stylesheet" href="css/nouislider.css">
+    <script src="js/nouislider.js"></script>
+    
+    <!-- Tippy style-->
+    <link rel="stylesheet" href="css/tippy-light-border.css">
+
+    <!-- Main stylesheet-->
+    <link rel="stylesheet" href="css/slr.css">
+    
+</head>
+
+<body> 
+    <div id="nav-bar">
+        <h1>CRC Sea Level Rise Viewer - DRAFT</h1>
+    </div>
+    <div id="map-container">
+        <div class="side-panel-container">
+            <div class="header side-panel-header">
+                <img id="slr-icon" src="images/slr_icon5_2.png">
+                <h3>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h3>
+            </div>
+            <div class="side-panel-content">
+                <label class="scenario-select-label" for="scenario-select">SEA LEVEL RISE SCENARIO <button class="info-button" id="scenario-select-info" aria-label="more info"></button></label>
+                <div><select id="scenario-select" class="scenario-select">
+                    <option value="Intermediate-Low">Intermediate Low</option>
+                    <option value="Intermediate" selected>Intermediate</option>
+                    <option value="Intermediate-High">Intermediate High</option>
+                    <option value="High">High</option>
+                </select></div>
+                <div>
+                    <span class="depth-axis-label">MHHW <button class="info-button" id="mhhw-info" aria-label="more info"></button></span>
+                    <span class="time-axis-label">EXPECTED BY</span>
+                </div>
+                <div class="slider-container">
+                    <!-- slider -->
+                    <div id="depth-slider"></div>
+                </div>
+                <hr>
+                <div class="gauge-info">Timing of sea level rise based on local projections for:</div>
+                <div id="gauge-label">HONOLULU HARBOR/<br>MOKU O LO&#699;E ISLAND</div>
+                    <!-- <div id="gauge-label">MOKU O LO&#699;E ISLAND</div> -->
+            </div>
+        </div>
+        <div class="side-panel-tab-container">
+            <a class="side-panel-tab" role="button" href="#" aria-label="Close sea level slider panel"></a>
+        </div>
+        <!-- Map -->
+         <div id="map" class="map"></div>
+
+         <img id="hatch-gray" style="display:none; width: 8px;" src="images/hatch_darkgray.png">
+         <img id="hatch-red" style="display:none; width: 8px;" src="images/hatch_red.png">
+    </div>
+
+    <!-- Load Tippy and Popper libraries -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+
+    <!-- Load NOAA SLR projection data -->
+    <script type="text/javascript" src='js/gauge_slr_proj.js'></script>
+    <!-- Get layers -->
+    <script type="text/javascript" src='js/slr_viewer_layers.js'></script>
+    <!-- Create map -->
+    <script type="text/javascript" src='js/slr_map.js'></script>
+    <!-- Create slider -->
+    <script type="text/javascript" src='js/slider.js'></script>
+
+
+</body>
+</html>
+

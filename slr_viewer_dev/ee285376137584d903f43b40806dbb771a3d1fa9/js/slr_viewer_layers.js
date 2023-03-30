@@ -189,11 +189,10 @@ function style2ft(properties, zoom) {
   }
 };
 
-
 for (let i = 0; i < 11; i++) {
   for (let layer in roadLayers) {
-      const fullLayerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
-      const layerName = (i < 10)? `HI_roads_flood${layer}_prelim_0${i}ft` :  `HI_roads_flood${layer}_prelim_${i}ft`;
+      const fullLayerName = (i < 10)? `CRC%3Ahi_state_80prob_0${i}ftslr_${layer}ft_strt_v3` :  `CRC%3Ahi_state_80prob_${i}ftslr_${layer}ft_strt_v3`;
+      const layerName = (i < 10)? `hi_state_80prob_0${i}ftslr_${layer}ft_strt_v3` :  `hi_state_80prob_${i}ftslr_${layer}ft_strt_v3`;
       const roadURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/' + fullLayerName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
       const styleFunction = (layer == '1')? style1ft: style2ft;
 
@@ -275,7 +274,7 @@ const stormwaterOptions = (ft) => (
   });
 
 for (let i = 0; i < 11; i++) {
-    const layerName = (i < 10)? `CRC%3AOahu_stormwater_struct_prelim_0${i}ft` :  `CRC%3AOahu_stormwater_struct_prelim_${i}ft`;
+    const layerName = (i < 10)? `CRC%3Ahi_oahu_80prob_0${i}ftslr_strm_dr_v3` :  `CRC%3Ahi_oahu_80prob_${i}ftslr_strm_dr_v3`;
     const stormwaterWFS = `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
     stormwaterLayers[i] = new L.GeoJSON.AJAX(stormwaterWFS, stormwaterOptions(i));
 };

@@ -34,7 +34,7 @@ const sliderStart = 0;
 
 // Oʻahu zoom
 const zoomLevel = 11;
-const centerCoord = [21.483, -157.909];
+const centerCoord = [21.483, -157.980];
 
 const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
 
@@ -237,7 +237,7 @@ map.on('zoomend', function() {
 
 // Home zoom button
 function returnHome(){
-  map.setView(centerCoord,zoomLevel)
+  map.setView(centerCoord,zoomLevel);
   this.blur(); // Remove focus after button is clicked (to prevent style from sticking)
 }
 
@@ -351,73 +351,6 @@ geocoderDiv.setAttribute('id','geocoder-control');
 // Add id to default geocoder error div to always hide display via css (using Tippy to create custom error tooltips instead)
 const geocoderErrorDiv = document.querySelector('.leaflet-control-geocoder-form-no-error');
 geocoderErrorDiv.setAttribute('id','geocoder-error-default');
-
-// Add button to open side panel - initially hidden since panel is open
-
-function openClosePanel(){
-  const panel = document.querySelector('.side-panel-container');
-  const tabContainer = document.querySelector('.side-panel-tab-container');
-
-  // Open the side panel
-  if (this.classList.contains('panel-closed')){
-    panel.style.width = '225px';
-    tabContainer.style.left = '225px';
-
-    this.classList.remove('panel-closed');
-    this.style.backgroundImage = "url(images/close2.svg)";
-
-    this.setAttribute('aria-label', 'Close the sea level slider panel');
-  }
-  // Close the side panel
-  else{
-    panel.style.width = 0;
-    tabContainer.style.left = '0px';
-
-    this.classList.add('panel-closed');
-    console.log(activeDepth);
-    const newURL = (activeDepth < 10)? 'images/slr0' + activeDepth + '_open.svg':'images/slr' + activeDepth + '_open.svg';
-    this.style.backgroundImage = "url("+ newURL + ")";
-
-    // Also update aria-label
-    this.setAttribute('aria-label', 'Displayed sea level is ' + activeDepth + ' feet. Click to open sea level slider to adjust depth.');
-  }
-}
-
-// function openPanel(){
-//   const panel = document.querySelector('.side-panel-container');
-//   panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
-//   const panelControl = document.querySelector('.panel-control');
-//   panelControl.classList.add('side-panel-open');
-// }
-
-// Add functionality to close button
-const closeButton = document.querySelector('.side-panel-tab');
-closeButton.onclick = openClosePanel;
-
-// const sidePanelControl = L.control({position:'topleft'})
-// sidePanelControl.onAdd = function() {
-//   const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
-//   tab.id = 'slr-tab-container';
-//   const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
-//   tabButton.id = 'slr-tab-button';
-//   tabButton.role = "button";
-//   tabButton.href = '#';
-//   tabButton.title = 'Open sea level slider';
-//   tabButton.setAttribute('aria-label','Displayed sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
-//   tabButton.setAttribute('aria-disable',false);
-//   tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
-//   tabButton.onclick = openPanel;
-
-//   tab.setAttribute('aria-haspopup', true);
-//   if (!L.Browser.touch) {
-//       L.DomEvent.disableClickPropagation(tab);
-//       L.DomEvent.on(tab, 'wheel', L.DomEvent.stopPropagation);
-//   } else {
-//       L.DomEvent.on(tab, 'click', L.DomEvent.stopPropagation);
-//   }
-//   return tab
-// }
-// sidePanelControl.addTo(map);
 
 function queryTMK(tmk){
 
@@ -564,12 +497,33 @@ layerGroups.forEach(grp => {
   })
 })
 
- // Initialize map with passive flooding layers
+// Error control
 
- layerControl.selectLayer(passive); 
- const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
- passiveLegendEntry.classList.remove('legend-entry-hidden');
- 
+map.on('easyPrint-error', () => console.log('printing error'));
+
+const errorControl = L.control({position: 'middlecenter'});
+errorControl.onAdd = function() {
+  const errorDiv = L.DomUtil.create('div','error-control');
+  errorDiv.innerHTML = 'Printing error. Sorry!';
+  const closeButton = L.DomUtil.create('a','close-btn',errorDiv);
+  closeButton.innerHTML = '&#10006;';
+  closeButton.setAttribute('role','button');
+  closeButton.onclick = removeErrorControl;
+  return errorDiv
+}
+
+function removeErrorControl(){
+  map.removeControl(errorControl);
+}
+map.on('easyPrint-error', () => map.addControl(errorControl));
+
+
+// Initialize map with passive flooding layers
+
+layerControl.selectLayer(passive); 
+const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
+passiveLegendEntry.classList.remove('legend-entry-hidden');
+
 
 // Configure info tooltips using Tippy library
 // For some reason, this needs to be after the map is initialized with first set of layers. 
@@ -591,3 +545,78 @@ Object.keys(infoTooltips).forEach(key => {
     appendTo: () => document.body
   });
 });
+
+// Add tab button to open/close side panel
+
+function openClosePanel(){
+  const panel = document.querySelector('.side-panel-container');
+  const tabContainer = document.querySelector('.side-panel-tab-container');
+
+  // Open the side panel
+  if (this.classList.contains('panel-closed')){
+    panel.style.width = '225px';
+    tabContainer.style.left = '225px';
+
+    this.classList.remove('panel-closed');
+    this.style.backgroundImage = "url(images/close2.svg)";
+
+    this.setAttribute('aria-label', 'Close the sea level slider panel');
+
+    // Move left side controls over
+    const leftControls = document.querySelectorAll('.leaflet-left .leaflet-control');
+    leftControls.forEach(control => control.classList.remove('side-panel-closed'));
+  }
+  // Close the side panel
+  else{
+    panel.style.width = 0;
+    tabContainer.style.left = '0px';
+
+    this.classList.add('panel-closed');
+    console.log(activeDepth);
+    const newURL = (activeDepth < 10)? 'images/slr0' + activeDepth + '_open.svg':'images/slr' + activeDepth + '_open.svg';
+    this.style.backgroundImage = "url("+ newURL + ")";
+
+    // Also update aria-label
+    this.setAttribute('aria-label', 'Displayed sea level is ' + activeDepth + ' feet. Click to open sea level slider to adjust depth.');
+
+    // Move left side controls over
+    const leftControls = document.querySelectorAll('.leaflet-left .leaflet-control');
+    leftControls.forEach(control => control.classList.add('side-panel-closed'));
+  }
+}
+
+// function openPanel(){
+//   const panel = document.querySelector('.side-panel-container');
+//   panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
+//   const panelControl = document.querySelector('.panel-control');
+//   panelControl.classList.add('side-panel-open');
+// }
+
+// Add functionality to close button
+const closeButton = document.querySelector('.side-panel-tab');
+closeButton.onclick = openClosePanel;
+
+// const sidePanelControl = L.control({position:'topleft'})
+// sidePanelControl.onAdd = function() {
+//   const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
+//   tab.id = 'slr-tab-container';
+//   const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
+//   tabButton.id = 'slr-tab-button';
+//   tabButton.role = "button";
+//   tabButton.href = '#';
+//   tabButton.title = 'Open sea level slider';
+//   tabButton.setAttribute('aria-label','Displayed sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
+//   tabButton.setAttribute('aria-disable',false);
+//   tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
+//   tabButton.onclick = openPanel;
+
+//   tab.setAttribute('aria-haspopup', true);
+//   if (!L.Browser.touch) {
+//       L.DomEvent.disableClickPropagation(tab);
+//       L.DomEvent.on(tab, 'wheel', L.DomEvent.stopPropagation);
+//   } else {
+//       L.DomEvent.on(tab, 'click', L.DomEvent.stopPropagation);
+//   }
+//   return tab
+// }
+// sidePanelControl.addTo(map);

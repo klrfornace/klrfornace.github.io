@@ -156,7 +156,6 @@ depthSlider.noUiSlider.on('update', function(value) {
 
     // Set global variable for other uses
     activeDepth = parseInt(value);
-    console.log(activeDepth);
 }
 )
 

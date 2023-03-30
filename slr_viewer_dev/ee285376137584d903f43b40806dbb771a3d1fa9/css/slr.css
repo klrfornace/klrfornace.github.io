@@ -40,69 +40,38 @@ h3 {
 #map-container {
     /* top: 50px;
     left: 0px; */
-    display: flex;
+    /* display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: stretch;
+    align-items: stretch; */
     height: calc(100vh - 50px);
+    width: 100%;
+    position: relative;
     /* height: calc(95vh - 50px); */
 }
 
 .map {
-  flex-grow: 1;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  /* flex-grow: 1; */
 }
 
 .leaflet-container.pointer-cursor {
   cursor:pointer;
 }
 
-.info-button {
-  background-color: #aaaaaa;
-  background-image: url('../images/info.svg');
-  background-repeat: no-repeat;
-  background-size: 25% auto;
-  background-position: 48% 50%; 
-  height: 14px;
-  border: none;
-  border-radius: 100%;
-  margin-left: 2px;
-  padding: 0;
-  cursor: pointer;
-  width: 14px;
-  vertical-align: text-top;
-}
-
-/* .info-icon {
-  font-size: 11px;
-  font-family: 'Roboto',sans-serif;
-  font-weight:500;
-  line-height: 15px;
-  color: #fff;
-  border-radius: 100%;
-  text-align: center;
-} */
-
-.info-button:hover{
-  background-color: #888888
-}
-
-.header {
-    font-family:'Roboto Condensed', 'Arial Narrow', sans-serif; 
-    /* background-color:#c9eaf8; */
-    background-color:#dcf0f7;
-    color: #14416f;
-    /* color: #184e85; */
-    padding: 10px 15px;
-}
 
 /* Side panel styles */
 .side-panel-container {
   width: 225px;
+  height: 100%;
   background: #fff;
   box-shadow: 0 0 5px rgb(0 0 0 / 20%);
   z-index: 1000; /* same z index as Leaflet controls */
   overflow-x: hidden;
   overflow-y: auto;
+  position: absolute;
   transition: width 0.3s linear;
 }
 /* 
@@ -119,6 +88,14 @@ h3 {
   opacity:0.1;
 } */
 
+.header {
+  font-family:'Roboto Condensed', 'Arial Narrow', sans-serif; 
+  /* background-color:#c9eaf8; */
+  background-color:#dcf0f7;
+  color: #14416f;
+  /* color: #184e85; */
+  padding: 10px 15px;
+}
 
 .side-panel-header{
   align-items:center;
@@ -338,6 +315,50 @@ select {
   display: none;
 }
 
+/* Side panel open/close tab */
+
+.side-panel-tab-container{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+  position:absolute; 
+  top: calc(50% - 25px);
+  left:225px;
+  z-index:9999;
+  display: block;
+  clip-path: inset(-8px -8px -8px 0px);
+  transition: left 0.3s linear;
+}
+
+.side-panel-tab{
+  background-color:#dcf0f7;
+  background-image: url('../images/close2.svg');
+  background-position: 45% center;
+  background-repeat: no-repeat;
+  background-size: 45%;
+  cursor: pointer;
+  display: block;
+  width: 20px;
+  height: 50px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  /* top: 50%;
+  left: 0px; */
+}
+
+.side-panel-tab:hover{
+	background-color: #c9eaf8;
+}
+
+.side-panel-tab.panel-closed{
+  background-size: 80%;
+  width: 75px;
+}
+.side-panel-close:hover{
+  opacity: 100%
+}
+
+
 /* Styles for Leaflet controls */
 
 /* Additional positions for controls */
@@ -367,6 +388,70 @@ select {
   display: none;
 }
 
+/* Loading icon control */
+.loading-control {
+  background: #fff;
+  border-radius: 5px;
+  padding: 5px 5px 0px 5px;
+}
+
+/* Mapbox logo control */
+.logo-control{
+  margin-bottom: 5px !important; 
+}
+
+/* Error message control */
+.error-control {
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+  font-family: 'Roboto',sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 25px 20px 10px 20px;
+  position: relative;
+}
+
+.error-control a{
+  color: #2d2d2d;
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+  position:absolute; 
+  opacity: 30%;
+  top: 0px;
+  right:5px;
+}
+
+.error-control:hover a{
+  opacity: 60%;
+}
+/* Geocoded control */
+#geocoder-control {
+  margin-top: -153px;
+  margin-left: 285px;
+  transition: margin-left 0.3s linear;
+  } 
+
+#geocoder-error-default {
+  display: none;
+}
+
+/* Styles to move control positions when side panel is open/closed */
+
+.leaflet-left .leaflet-control{
+  margin-left: 235px;
+  transition: margin-left 0.3s linear;
+}
+
+.leaflet-left .leaflet-control.side-panel-closed{
+  margin-left: 10px;
+}
+
+#geocoder-control.side-panel-closed{
+  margin-left: 60px;
+}
+
 /* Legend control styles */
 .legend-container{
   background: #fff;
@@ -388,7 +473,6 @@ select {
 .legend-entry-hidden{
   display: none;
 }
-
 
 .legend-header{
   font-weight: 500;
@@ -451,103 +535,6 @@ select {
   background-size: 16px 16px;
 }
 
-/* Side panel open/close tab */
-
-/* .side-panel-close{
-  color: #14416f;
-  font-size: 18px;
-  text-decoration: none;
-  cursor: pointer;
-  position:absolute; 
-  opacity: 50%;
-  top: 5px;
-  right:10px;
-} */
-
-.side-panel-tab-container{
-  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
-  position:absolute; 
-  top: calc(50% - 25px);
-  left:225px;
-  z-index:1000;
-  display: block;
-  clip-path: inset(-8px -8px -8px 0px);
-  transition: left 0.3s linear;
-}
-
-.side-panel-tab{
-  background-color:#dcf0f7;
-  background-image: url('../images/close2.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 45%;
-  cursor: pointer;
-  display: block;
-  width: 20px;
-  height: 50px;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  /* top: 50%;
-  left: 0px; */
-}
-
-.side-panel-tab:hover{
-	background-color: #c9eaf8;
-}
-
-.side-panel-tab.panel-closed{
-  background-size: 80%;
-  width: 75px;
-}
-.side-panel-close:hover{
-  opacity: 100%
-}
-
-
-/* #slr-tab-container{
-  border: 0px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
-}
-
-#slr-tab-button{
-  width: 65px;
-  height: 50px;
-  background-color: #dcf0f7;
-  background-image: url('../images/slr00.svg');
-  background-repeat: no-repeat;
-  background-size: 80%;
-}
-
-#slr-tab-button:hover{
-	background-color: #c9eaf8;
-} */
-
-/* .side-panel-open{
-  display: none;
-} */
-
-/* Loading icon control */
-.loading-control {
-  background: #fff;
-  border-radius: 5px;
-  padding: 5px 5px 0px 5px;
-}
-
-/* Mapbox logo control */
-.logo-control{
-  margin-bottom: 5px !important; 
-}
-
-/* Geocoded control */
-#geocoder-control {
-  margin-top: -153px;
-  margin-left: 60px;
-  } 
-
-#geocoder-error-default {
-  display: none;
-}
 
 
 /* Styles for Tippy tooltips */
@@ -627,3 +614,35 @@ border-right-color: #14416f;
 
 /* Change marker color */
 img.huechange { filter: hue-rotate(140deg); }
+
+/* Info button styles */
+
+.info-button {
+  background-color: #aaaaaa;
+  background-image: url('../images/info.svg');
+  background-repeat: no-repeat;
+  background-size: 25% auto;
+  background-position: 48% 50%; 
+  height: 14px;
+  border: none;
+  border-radius: 100%;
+  margin-left: 2px;
+  padding: 0;
+  cursor: pointer;
+  width: 14px;
+  vertical-align: text-top;
+}
+
+/* .info-icon {
+  font-size: 11px;
+  font-family: 'Roboto',sans-serif;
+  font-weight:500;
+  line-height: 15px;
+  color: #fff;
+  border-radius: 100%;
+  text-align: center;
+} */
+
+.info-button:hover{
+  background-color: #888888
+}

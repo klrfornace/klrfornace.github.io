@@ -680,7 +680,6 @@
             return t
         },
         printMap: function(t, e) {
-            console.log(t);
             e && (this.options.filename = e),
             this.options.exportOnly || (this._page = window.open("", "_blank", "toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,left=10, top=10, width=200, height=250, visible=none"),
             this._page.document.write(this._createSpinner(this.options.customWindowTitle, this.options.customSpinnerClass, this.options.spinnerBgCOlor))),
@@ -731,7 +730,19 @@
                 i.style.height = e.originalState.mapHeight,
                 e._resizeAndPrintMap(t)
             }).catch(function(t) {
-                console.error("oops, something went wrong!", t)
+                console.error("oops, something went wrong!", t);
+
+                // Reset the map in case of error - KF
+                e._toggleControls(!0),
+                e._hideClasses(!0),
+                e._showClasses(!0),
+                e.outerContainer && (e.originalState.widthWasAuto ? e.mapContainer.style.width = "auto" : e.originalState.widthWasPercentage ? e.mapContainer.style.width = e.originalState.percentageWidth : e.mapContainer.style.width = e.originalState.mapWidth,
+                e.mapContainer.style.height = e.originalState.mapHeight,
+                e._removeOuterContainer(e.mapContainer, e.outerContainer, e.blankDiv),
+                e._map.invalidateSize(),
+                e._map.setView(e.originalState.center),
+                e._map.setZoom(e.originalState.zoom))
+                e._map.fire("easyPrint-error");
             })
         },
         _resizeAndPrintMap: function(t) {
@@ -805,8 +816,8 @@
         },
         _removeOuterContainer: function(t, e, n) {
             e.parentNode && (e.parentNode.insertBefore(t, e),
-            e.parentNode.removeChild(n),
-            e.parentNode.removeChild(e))
+            e.parentNode.removeChild(e)),
+            n && e.parentNode.removeChild(n)
         },
         _addCss: function() {
             var t = document.createElement("style");
