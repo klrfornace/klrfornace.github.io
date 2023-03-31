@@ -1,160 +1,146 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Password Protected</title>
 
-    <title>CRC Sea Level Rise Viewer</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
 
-    <script src="js/config.js"></script>
+        <style>
+            *,
+            *:after,
+            *:before {
+                box-sizing: border-box;
+            }
+            body,
+            html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+                font-weight: 300;
+                font-size: 16px;
+                background: #f2f2f2;
+                color: #2D3737;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100%;
+            }
 
-    <!-- Load Leaflet -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-    crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
-    crossorigin=""></script>
+            .protected {
+                background: #fff;
+                -webkit-box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+                box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+                border-radius: 3px;
+                min-width: 500px;
 
-    <!-- Older leaflet version -->
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-    crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-    crossorigin=""></script>
-     -->
-    <!-- Load Leaflet plugins -->
-    
-    <!-- Leaflet-AJAX -->
-    <script src="js/leaflet.ajax.min.js"></script>
+            }
+            .protected__content {
+                padding: 24px 28px;
+            }
+            .protected__content__heading {
+                font-size: 16px;
+                font-weight: 500;
+                margin: 0 0 12px;
+                line-height: 1;
+            }
+            .protected__alert {
+                display: none;
+                border-bottom: 1px solid transparent;
+                border-radius: 3px 3px 0 0;
+                padding: 12px 14px;
+                color: #a94442;
+                background-color: #f2dede;
+                border-color: #ebccd1;
+            }
+            .protected__content__input {
+                display: block;
+                border: solid 1px #ccc;
+                padding: 12px 14px;
+                -webkit-box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+                box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+                font-size: 16px;
+                width: 100%;
+                border-radius: 3px;
 
-    <!--Load Leaflet.VectorGrid -->
-    <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
-    
-    <!-- Leaflet.StyledLayerControl -->
-    <link rel="stylesheet" href="css/styledLayerControl.css">
-    <script src="js/styledLayerControl.js"></script>
-    
-    <!-- Leaflet-easyPrint -->
-    <script src="js/easyprint_unbundled.js"></script>
-    
-    <!-- Leaflet-Control-Geocoder -->
-    <link rel="stylesheet" href="css/Control.Geocoder.css" />
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+                margin-bottom: 12px;
+            }
+            .protected__content__input:focus {
+                outline: none;
+                border-color: #228843;
+            }
+            .protected__content__btn {
+                background-color: #228843;
+                border-radius: 3px;
+                cursor: pointer;
+                border: none;
+                color: #fff;
+                padding: 12px 14px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+                font-weight: 500;
+                font-size: 16px;
 
-    <!-- Leaflet WMS extension -->
-    <script src="js/L.TileLayer.betterWMS.js"></script>
+            }
+            .protected__content__btn:hover {
+                background-color: #1C6D36;
+            }
 
-    <!-- Leaflet polygon pattern fill extension -->
-    <script src="js/leaflet-polygon.fillPattern.js"></script>
+        </style>
 
-    <!-- Leaflet polygon pattern fill extension (canvas)-->
-    <script src="js/leaflet-polygon.fillPattern-canvas.js"></script>
+    </head>
 
-    <!-- <script src="https://unpkg.com/leaflet.gridlayer.googlemutant@latest/dist/Leaflet.GoogleMutant.js"></script> -->
-    
-    <!-- <link href="css/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link rel="stylesheet" href="css/mapbox-gl-geocoder.css" type="text/css"> -->
-    
-    <!-- Load Esri Leaflet -->
-    <!-- <script src="https://unpkg.com/esri-leaflet@3.0.7/dist/esri-leaflet.js"
-    integrity="sha512-ciMHuVIB6ijbjTyEdmy1lfLtBwt0tEHZGhKVXDzW7v7hXOe+Fo3UA1zfydjCLZ0/vLacHkwSARXB5DmtNaoL/g=="
-    crossorigin=""></script> -->
+    <body>
 
-    <!-- Load Esri Leaflet Vector -->
-    <!-- <script src="https://unpkg.com/esri-leaflet-vector@3.1.2/dist/esri-leaflet-vector.js"
-    integrity="sha512-SnA/TobYvMdLwGPv48bsO+9ROk7kqKu/tI9TelKQsDe+KZL0TUUWml56TZIMGcpHcVctpaU6Mz4bvboUQDuU3w=="
-    crossorigin=""></script> -->
-
-    <!-- Load Esri Leaflet Geocoder -->
-    <!-- <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@3.1.1/dist/esri-leaflet-geocoder.css"
-    integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
-    crossorigin="">
-    <script src="https://unpkg.com/esri-leaflet-geocoder@3.1.1/dist/esri-leaflet-geocoder.js"
-    integrity="sha512-enHceDibjfw6LYtgWU03hke20nVTm+X5CRi9ity06lGQNtC9GkBNl/6LoER6XzSudGiXy++avi1EbIg9Ip4L1w=="
-    crossorigin=""></script> -->
-
-    <!-- Load JQuery -->
-    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
-
-    <!-- <link rel="stylesheet" href="css/leaflet_legend_working.css">
-    <script src="js/leaflet_legend_working.js"></script> -->
-    
-    <!-- Other libraries/stylesheets -->
-    <!-- Load NoUI Slider (https://refreshless.com/nouislider/)-->
-    <link rel="stylesheet" href="css/nouislider.css">
-    <script src="js/nouislider.js"></script>
-
-    <link rel="stylesheet" href="css/tippy-light-border.css">
-    <link rel="stylesheet" href="css/slr.css">
-    <!-- <script src="js/styledLayerControl_subcats_ordered.js"></script> -->
-    
-</head>
-
-<body> 
-    <div id="nav-bar">
-        <h1>CRC Sea Level Rise Viewer - DRAFT</h1>
-    </div>
-    <div id="map-container">
-        <div class="side-panel-container">
-            <div class="header side-panel-header">
-                <img id="slr-icon" src="images/slr_icon5_2.png">
-                <h3>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h3>
+        <div class="protected">
+            <div class="protected__alert" data-id="alert">You entered the wrong password</div>
+            <div class="protected__content">
+                <h1 class="protected__content__heading">You need a password to continue</h1>
+                <input class="protected__content__input" data-id="password" type="password" placeholder="password"/>
+                <button data-id="button" type="button" class="protected__content__btn">Continue</button>
             </div>
-            <div class="side-panel-content">
-                <label class="scenario-select-label" for="scenario-select">SEA LEVEL RISE SCENARIO <button class="info-icon info-button" type="button" id="scenario-select-info" aria-label="more info"></button></label>
-                <select id="scenario-select" class="scenario-select">
-                    <option value="Intermediate-Low">Intermediate Low</option>
-                    <option value="Intermediate" selected>Intermediate</option>
-                    <option value="Intermediate-High">Intermediate High</option>
-                    <option value="High">High</option>
-                </select>
-                <div>
-                    <span class="depth-axis-label">MHHW</span>
-                    <span class="time-axis-label">EXPECTED BY</span>
-                </div>
-                <div class="slider-container">
-                    <!-- slider -->
-                    <div id="depth-slider"></div>
-                </div>
-                <hr>
-                <div class="gauge-info">Timing of sea level rise based on local projections for:</div>
-                <div id="gauge-label">HONOLULU HARBOR/<br>MOKU O LO&#699;E ISLAND</div>
-                    <!-- <div id="gauge-label">MOKU O LO&#699;E ISLAND</div> -->
-            </div>
-            <!-- <div id="gauge-label">Based on projections for Moku O Lo&#699;e tide gauge</div> -->
         </div>
 
-        <!-- Map -->
-         <div id="map" class="map"></div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-sha1/0.6.0/sha1.min.js"></script>
+        <script type="text/javascript">
+            "use strict"
+            var button = document.querySelectorAll('[data-id="button"]')
+            var password = document.querySelectorAll('[data-id="password"]')
 
-         <img id="hatch-gray" style="display:none; width: 8px;" src="images/hatch_darkgray.png">
-         <img id="hatch-red" style="display:none; width: 8px;" src="images/hatch_red.png">
-    </div>
+            function login(secret) {
+                var hash = sha1(secret)
+                var url = hash + "/index.html"
+                var alert = document.querySelectorAll('[data-id="alert"]')
 
-    <!-- Load Tippy and Popper libraries -->
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
+                var request = new XMLHttpRequest()
+                request.open('GET', url, true)
 
-    <!-- Load NOAA SLR projection data -->
-    <script type="text/javascript" src='js/gauge_slr_proj.js'></script>
-    <!-- Get layers -->
-    <script type="text/javascript" src='js/slr_viewer_layers.js'></script>
-    <!-- Create map -->
-    <script type="text/javascript" src='js/slr_map.js'></script>
-    <!-- Create slider -->
-    <script type="text/javascript" src='js/slider.js'></script>
+                request.onload = function () {
+                    if (request.status >= 200 && request.status < 400) {
+                        window.location = url
+                    } else {
+                        parent.location.hash = hash
+                        alert[0].style.display = 'block'
+                        password[0].setAttribute('placeholder', 'Incorrect password')
+                        password[0].value = ''
+                    }
+                }
+                request.onerror = function () {
+                    parent.location.hash = hash
+                    alert[0].style.display = 'block'
+                    password[0].setAttribute('placeholder', 'Incorrect password')
+                    password[0].value = ''
+                }
+                request.send()
+            }
 
+            button[0].addEventListener("click", function () {
+                login(password[0].value)
+            })
 
-</body>
+            document.onkeydown = function (e) {
+                e = e || window.event
+                if (e.keyCode == 13) {
+                    login(password[0].value)
+                }
+            }
+        </script>
+    </body>
 </html>
-
