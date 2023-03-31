@@ -266,8 +266,8 @@ L.easyPrint({
   filename: 'slr_viewer_map',
   hideControlContainer: false,
   exportOnly: true,
-  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
-  showClasses: ['legend-container'],
+  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities','leaflet-control-attribution'], 
+  showClasses: ['legend-container','print-attribution'],
   sizeModes: ['A4Landscape']
 	// sizeModes: ['Current','A4Portrait', 'A4Landscape']
 }).addTo(map);
@@ -517,6 +517,22 @@ function removeErrorControl(){
 }
 map.on('easyPrint-error', () => map.addControl(errorControl));
 
+// Map attribution control for print images
+const printAttribution = L.control({position:'bottomright'});
+printAttribution.onAdd = function(){
+  const attr = L.DomUtil.create('div','print-attribution');
+  const timestamp = new Date().toLocaleString();
+  const currentAttr = document.querySelector('.leaflet-control-attribution').textContent;
+  const attrStr = currentAttr.replace(' Improve this map','').replace('Leaflet | ','');
+  attr.innerHTML = 'Map generated: ' + timestamp + '<br>Imagery ' + attrStr;
+  return attr
+}
+
+// Add to map when print button is pushed
+map.on('easyPrint-start', () => {
+  map.addControl(printAttribution);
+  
+});
 
 // Initialize map with passive flooding layers
 
@@ -572,7 +588,6 @@ function openClosePanel(){
     tabContainer.style.left = '0px';
 
     this.classList.add('panel-closed');
-    console.log(activeDepth);
     const newURL = (activeDepth < 10)? 'images/slr0' + activeDepth + '_open.svg':'images/slr' + activeDepth + '_open.svg';
     this.style.backgroundImage = "url("+ newURL + ")";
 

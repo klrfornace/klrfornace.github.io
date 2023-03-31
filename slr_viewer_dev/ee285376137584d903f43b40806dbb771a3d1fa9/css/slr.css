@@ -646,3 +646,15 @@ img.huechange { filter: hue-rotate(140deg); }
 .info-button:hover{
   background-color: #888888
 }
+
+/* Styles for elements to show on easyPrint image */
+
+.print-attribution{
+  background: rgba(255, 255, 255, 0.8);
+  padding: 5px;
+  display: none;
+}
+
+.leaflet-container .print-attribution{
+  margin-right: 0px;
+}

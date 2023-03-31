@@ -4,8 +4,8 @@ const scenarioSelect = document.getElementById('scenario-select');
 const depths = ['0 ft','1 ft','2 ft','3 ft','4 ft','5 ft','6 ft','7 ft','8 ft','9 ft','10 ft'];
 const maxDepth = 10;
 const ariaDepths = ['0 feet','1 foot','2 feet','3 feet','4 feet','5 feet','6 feet','7 feet','8 feet','9 feet','10 feet'];
-const projYears = [2005, 2040, 2060, 2080, 2100, 2150];
-const baselineYear = 2005;
+const projYears = [2000, 2040, 2060, 2080, 2100, 2150];
+const baselineYear = 2000;
 
 let activeScenario = 'Intermediate';
 let activeGauge = 'MOKUOLOE_ISLAND';
@@ -146,8 +146,8 @@ depthSlider.noUiSlider.on('update', function(value) {
     const depthLabel = document.getElementById("depth-level-label");
     const depthLabelLegend = document.getElementById("legend-depth-label");
     if (parseInt(value) == 0){
-        depthLabel.innerHTML = 'Present level';
-        depthLabelLegend.innerHTML = 'Present level';
+        depthLabel.innerHTML = 'Baseline (2000)';
+        depthLabelLegend.innerHTML = 'Baseline (2000)';
     }
     else {
         depthLabel.innerHTML = '+ '+ depths[parseInt(value)];

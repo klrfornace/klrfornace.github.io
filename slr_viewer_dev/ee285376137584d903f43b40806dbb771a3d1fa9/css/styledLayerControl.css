@@ -317,7 +317,10 @@ div[id^="leaflet-control-accordion-layers"] > button {
 
 #full-menu{
 	border-right: 1px solid #cfcfd0;
+	border-bottom-left-radius: 5px;
 }
+
+
 .radio__input{
 	display: none;
 }
