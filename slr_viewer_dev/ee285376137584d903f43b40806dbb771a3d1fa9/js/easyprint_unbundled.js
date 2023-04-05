@@ -873,9 +873,9 @@
                 e.style.display = "block";
             })
         },
-        _a4PageSize: {
-            height: 715,
-            width: 1045
+        _a4PageSize: { //original: 715,1045
+            height: 800,
+            width: 1170,
         }
     }),
     L.easyPrint = function(t) {

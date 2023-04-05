@@ -82,10 +82,11 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   showGetFeatureInfo: function (err, latlng, content) {
     if (err) { console.log(err); return; } // do nothing if there's an error
     // Otherwise show the content in a popup, or something.
-    // const latlngString = +(Math.round(latlng.lat + "e+4") + "e-4") + 'N, ' + -(Math.round(latlng.lng + "e+4") + "e-4") + 'W';
+    const latlngString = +(Math.round(latlng.lat + "e+4") + "e-4") + ', ' + +(Math.round(latlng.lng + "e+4") + "e-4");
+    const latlngIcon = '<svg viewBox="0 0 42.95 62.04"><g><path d="m21.48,0C11.56,0,0,6.15,0,21.8c0,10.62,16.52,34.09,21.48,40.24,4.41-6.15,21.48-29.06,21.48-40.24C42.95,6.15,31.39,0,21.48,0Zm0,34.35c-6.14,0-11.11-4.97-11.11-11.11s4.97-11.11,11.11-11.11,11.11,4.97,11.11,11.11-4.97,11.11-11.11,11.11Z"/></g></svg>';
     L.popup({ maxWidth: 200})
       .setLatLng(latlng)
-      .setContent(this.wmsParams.queryDisplay(String(content)))
+      .setContent(this.wmsParams.queryDisplay(String(content)) + '<hr><div class="latlng">'+latlngIcon + latlngString + '</div>')
       .openOn(this._map);
   }
 });

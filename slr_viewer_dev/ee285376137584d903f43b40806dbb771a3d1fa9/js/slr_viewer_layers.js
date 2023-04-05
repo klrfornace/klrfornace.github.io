@@ -92,7 +92,7 @@ const passiveWmsOptions = (ft, type) => (
                 ((data) => 
                 data == 11? ('Depth below sea level:<div class="popup-data"> 10+ ft</div>'): 
                 ('Depth below sea level:<div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')),
-    nullValue: 127,
+    nullValue: type === "SCI"? 127:15,
     popupMinZoom: 15,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v3` : `CRC:HI_State_80prob_${ft}ft_${type}_v3`, 
     name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,

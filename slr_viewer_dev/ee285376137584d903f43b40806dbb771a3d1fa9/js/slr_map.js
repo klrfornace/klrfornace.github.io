@@ -152,6 +152,27 @@ map.on('overlayremove', function(e){
 })
 
 
+// Add functionality to show/hide layer control from button in navigation bar. (Layer control initial state is open).
+
+function openCloseLayerControl(){
+  const layerControlContainer = document.querySelector('.leaflet-control-layers');
+  if (this.classList.contains('control-closed')){
+    layerControlContainer.style.display = '';
+    this.classList.remove('control-closed');
+    this.setAttribute('aria-label', 'Close the layer control menu');
+  }
+  else{
+    layerControlContainer.style.display = 'none';
+    this.classList.add('control-closed');
+    this.setAttribute('aria-label', 'Open the layer control menu');
+  }
+}
+
+const layerControlButton = document.querySelector('.layer-control-btn');
+layerControlButton.onclick = openCloseLayerControl;
+
+
+// Layer style adjustments by zoom/basemap
 
  // Change layer styles based on light/dark (satellite) basemaps
 map.on( 'baselayerchange',
@@ -266,7 +287,8 @@ L.easyPrint({
   filename: 'slr_viewer_map',
   hideControlContainer: false,
   exportOnly: true,
-  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities','leaflet-control-attribution'], 
+  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities',
+    'leaflet-control-attribution','logo-control'], 
   showClasses: ['legend-container','print-attribution'],
   sizeModes: ['A4Landscape']
 	// sizeModes: ['Current','A4Portrait', 'A4Landscape']
@@ -405,7 +427,7 @@ function queryTMK(tmk){
         style: {"fill": false, "color": tmkColor},
         onEachFeature: function(feature, layer){
           return layer.bindPopup('<strong>TMK ' + tmk + '</strong><br>Acres: '+ feature.properties.gisacres.toFixed(2) + '<br><br>'
-          + '<a href="javascript:void(0);" onClick="removeTMK('+ tmk +')">Remove shape from map</a>');
+          + '<a href="#" onClick="removeTMK('+ tmk +')">Remove shape from map</a>');
         }
       }).addTo(map);
 
@@ -449,6 +471,14 @@ function removeTMK(tmk){
 function removeAddress(address){
   map.removeLayer(activeAddress[address]);
 }
+
+// Add another baselayer change listener to switch TMK color in case user switches basemap while TMK shapes are already on the map
+map.on('baselayerchange', function() {
+  for (let tmk in activeTMK){
+    const tmkColor = map.hasLayer(mapboxLight)? "black":"#dbdbdb";
+    activeTMK[tmk].setStyle({'color':tmkColor})
+  }
+});
 
 // Set up loading icon control
 const loadingControl = L.control({position: 'middlecenter'});
