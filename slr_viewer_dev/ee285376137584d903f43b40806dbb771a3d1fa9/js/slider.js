@@ -1,5 +1,6 @@
 const depthSlider = document.getElementById('depth-slider');
 const scenarioSelect = document.getElementById('scenario-select');
+const scenarioRadio = document.querySelector('.scenario-radio-group');
 
 const depths = ['0 ft','1 ft','2 ft','3 ft','4 ft','5 ft','6 ft','7 ft','8 ft','9 ft','10 ft'];
 const maxDepth = 10;
@@ -116,12 +117,36 @@ function regenerateSecondaryPips(activeGauge, activeScenario){
     }
 }
 
+// Add functionality to scenario button group
+// Change button styling and regenerate secondary pips when scenario is changed
+const scenarioBtnGroup = document.querySelectorAll('.scenario-button');
+
+for (let button of scenarioBtnGroup){
+    button.onclick = () => {
+        button.classList.add("active-scenario");
+        const otherButton = Array.from(scenarioBtnGroup).find((btn) => btn!=button);
+        otherButton.classList.remove("active-scenario");
+        activeScenario = button.id == "intermediate"? "Intermediate":"Intermediate-High";
+        regenerateSecondaryPips(activeGauge, activeScenario);
+    }
+}
+
 // Regenerate secondary pips when scenario is changed
-scenarioSelect.addEventListener('change',(e) => {
-    const selectedScenario = e.target.value;
-    activeScenario = selectedScenario.split(' ').join('-');
-    regenerateSecondaryPips(activeGauge, activeScenario);
-})
+// scenarioSelect.addEventListener('change',(e) => {
+//     const selectedScenario = e.target.value;
+//     activeScenario = selectedScenario.split(' ').join('-');
+//     regenerateSecondaryPips(activeGauge, activeScenario);
+// })
+
+// scenarioRadio.addEventListener('change',() => {
+//     const inputs = document.getElementsByName('scenario-radio');
+//     for(i = 0; i < inputs.length; i++) {
+//         if(inputs[i].checked){
+//             activeScenario = inputs[i].value;
+//         }
+//     }
+//     regenerateSecondaryPips(activeGauge, activeScenario);
+// })
 
 // Update map and map controls when slider value is updated
 depthSlider.noUiSlider.on('update', function(value) {

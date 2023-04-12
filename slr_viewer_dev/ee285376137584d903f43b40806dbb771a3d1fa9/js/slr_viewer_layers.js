@@ -280,6 +280,11 @@ for (let i = 0; i < 11; i++) {
 };
 
 
+// For future infrastructure layers
+const iconMarkerStyle = {
+  iconSize: [16,16],
+};
+
 //////////  OTHER OVERLAYS  //////////
 
 // Geology Layer: 
@@ -379,7 +384,7 @@ const femaFlood = L.tileLayer.wms(
     // My custom attributes:
     name: 'Flood Hazard Zones',
     pane: 'underlay',
-    legendKey: 'femaflood',
+    legendKey: 'test',
     queryable: true 
   }
 );
@@ -387,8 +392,21 @@ const femaFlood = L.tileLayer.wms(
 const leveeURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27%LEVEE%%27&outFields=*&outSR=4326&f=geojson'
 const floodwayURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27FLOODWAY%27&outFields=*&outSR=4326&f=geojson'
 
-const leveeHatch = new L.GeoJSON.AJAX(leveeURL, {style:{fill:false, weight: 0.000001, opacity: 0.4}, imgId:'hatch-gray'});
-const floodwayHatch = new L.GeoJSON.AJAX(floodwayURL, {style:{fill:false, weight: 0.000001, opacity: 0.67},imgId:'hatch-red'});
+const leveeHatch = new L.GeoJSON.AJAX(leveeURL, 
+  {style:{fill:false, weight: 0.000001, opacity: 0.4}, 
+  imgId:'hatch-gray',
+  legendKey: 'test1',
+  legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Community Plan Area Boundaries',
+  legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
+});
+
+const floodwayHatch = new L.GeoJSON.AJAX(floodwayURL, 
+  {style:{fill:false, weight: 0.000001, opacity: 0.67},
+  imgId:'hatch-red',
+  legendKey: 'test2',
+  legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp; Community Plan Area Boundaries',
+  legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg> &nbsp;',
+});
 
 
 function femaStyle(properties, zoom) {
@@ -828,13 +846,12 @@ const overlayMaps = [
               // ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }
   },
-  { groupName: '<img src="images/flood_outline.svg" class="label-icon">IMPACTS',
+  { groupName: '<img src="images/flood_outline.svg" class="label-icon"> IMPACTS',
     expanded: true,
     layers: {['<span class="layer-label">Flooded Roads</span><div class="legend-panel panel-hidden">'+roads.options.legendEntry+'</div>']:roads,
             ['<span class="layer-label">Stormwater Drainage Failure</span><div class="legend-panel panel-hidden">'+stormwater.options.legendEntry+'</div>']:stormwater,
-            // 'test': testGroup,
             // 'test':{'layer':testGroup,
-            //         'sublayers':{'fema':femaFlood, 'levee': leveeHatch, 'floodway':floodwayHatch}},
+            // 'sublayers':{'fema main':femaFlood, 'levee': leveeHatch, 'floodway':floodwayHatch}},
       }
   },
   { groupName: '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS',
@@ -844,7 +861,7 @@ const overlayMaps = [
               ['<div class="legend-panel-inline panel-hidden">'+ ahupuaa.options.legendSymbol + '</div><span class="layer-label">Ahupua&#699;a Boundaries</span>']: ahupuaa,
               ['<div class="legend-panel-inline panel-hidden">'+ boards.options.legendSymbol + '</div><span class="layer-label">Neighborhood Board Boundaries</span>']: boards,
               ['<div class="legend-panel-inline panel-hidden">'+ dhhl.options.legendSymbol + '</div><span class="layer-label">Hawaiian Home Lands']: dhhl,
-              ['<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel panel-hidden">'+slrxa32.options.legendEntry + '</div>']: slrxa32
+              ['<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel panel-hidden">'+slrxa32.options.legendEntry + '</div>']: slrxa32,
               }},
 ];
 

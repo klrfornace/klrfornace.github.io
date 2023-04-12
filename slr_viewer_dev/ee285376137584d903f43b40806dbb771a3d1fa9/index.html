@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,75,650;8..144,75,700;8..144,100,100;8..144,100,200;8..144,100,300;8..144,100,400;8..144,100,500;8..144,100,600;8..144,100,700;8..144,100,800;8..144,100,900;8..144,100,1000&display=swap" rel="stylesheet">
 
     <script src="js/config.js"></script>
 
@@ -119,13 +120,25 @@
                 <h3>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h3>
             </div>
             <div class="side-panel-content">
-                <label class="scenario-select-label" for="scenario-select">SEA LEVEL RISE SCENARIO <button class="info-button" id="scenario-select-info" aria-label="more info"></button></label>
+                <!-- <label class="scenario-select-label" for="scenario-select">Sea Level Rise Scenario <button class="info-button" id="scenario-select-info" aria-label="more info"></button></label>
                 <div><select id="scenario-select" class="scenario-select">
                     <option value="Intermediate-Low">Intermediate Low</option>
                     <option value="Intermediate" selected>Intermediate</option>
                     <option value="Intermediate-High">Intermediate High</option>
                     <option value="High">High</option>
-                </select></div>
+                </select></div> -->
+                <!-- <div class="scenario-select-label">Sea Level Rise Scenario <button class="info-button" id="scenario-select-info" aria-label="more info"></button></div>
+                <div class="scenario-radio-group">
+                    <input type="radio" class="scenario-radio-input" name="scenario-radio" value="Intermediate" id="inter-input" checked>
+                    <label for="inter-input">Intermediate</label><br>
+                    <input type="radio" class="scenario-radio-input" name="scenario-radio" value="Intermediate-High" id="inter-high-input">
+                    <label for="inter-high-input">Intermediate High</label>
+                </div> -->
+                <div class="scenario-select-label">SEA LEVEL RISE SCENARIO <button class="info-button" id="scenario-select-info" aria-label="more info"></button></div>
+                <div class="scenario-button-grp">
+                    <button class="scenario-button active-scenario" id="intermediate">Intermediate</button>
+                    <button class="scenario-button" id="inter-high">Intermediate High</button>
+                </div>
                 <div>
                     <span class="depth-axis-label">MHHW <button class="info-button" id="mhhw-info" aria-label="more info"></button></span>
                     <span class="time-axis-label">EXPECTED BY</span>
@@ -136,8 +149,9 @@
                 </div>
                 <hr>
                 <div class="gauge-info">Timing of sea level rise based on local projections for:</div>
-                <div id="gauge-label">HONOLULU HARBOR/<br>MOKU O LO&#699;E ISLAND</div>
+                <div id="gauge-label">MOKU O LO&#699;E ISLAND</div>
                     <!-- <div id="gauge-label">MOKU O LO&#699;E ISLAND</div> -->
+                <div class="projection-about">Data source: <br><a href="https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html" target="_blank">2022 Sea Level Rise Technical Report</a></div>
             </div>
         </div>
         <div class="side-panel-tab-container">

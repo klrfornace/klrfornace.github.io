@@ -99,7 +99,15 @@ for (let layer of [devplan, moku, ahupuaa, boards, dhhl, slrxa32]){
   entry.innerHTML = layer.options.legendEntry;
 }
 
-const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',legendDiv);
+// Layer subgroup test entry
+const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
+const test1Entry = L.DomUtil.create('div','legend-test1',testEntry);
+test1Entry.innerHTML = 'test1';
+const test2Entry = L.DomUtil.create('div','legend-test2',testEntry);
+test2Entry.innerHTML = 'test2';
+const test3Entry = L.DomUtil.create('div','legend-test3',testEntry);
+test3Entry.innerHTML = 'test3';
+
 
 // const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
 // const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
@@ -121,9 +129,11 @@ function removeWithTimeout(layer) {
 
 map.on('overlayadd', function addOverlay(e){
     const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
-    // Update legend
+    console.log(legendKey);
 
+    // Update legend
     const entryDiv = document.querySelector('.legend-'+ legendKey);
+    console.log(entryDiv);
     // Remove class to allow display
     entryDiv.classList.remove('legend-entry-hidden');
   
@@ -524,6 +534,7 @@ layerGroups.forEach(grp => {
     layer.on('loading', showLoadingControl);
     layer.on('load', hideLoadingControl);
     layer.on('remove',hideLoadingControl);
+    // layer.on('tileerror', (error) => console.log(error))
   })
 })
 
@@ -576,7 +587,7 @@ passiveLegendEntry.classList.remove('legend-entry-hidden');
 // StyledLayerControl is interfering somehow, but I can't figure out how. -KF
 const infoTooltips = {
   '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>',
-  '#mhhw-info':'Mean Higher High Water (MHHW): The water level at the average highest tide of the day.',
+  '#mhhw-info':'<span style="font-weight:600">Mean Higher High Water (MHHW):</span> The water level at the average highest tide of the day.',
   '#passive-flooding-info':'More info about passive flooding. <br><a href="#">Click here for full details.</a>',
 };
 
