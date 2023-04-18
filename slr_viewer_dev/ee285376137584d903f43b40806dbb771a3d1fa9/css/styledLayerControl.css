@@ -1,5 +1,5 @@
 .ac-container{
-	width: 270px;
+	width: 275px;
 	text-align: left;
 	overflow-y: auto;
 	overflow-x: auto;
@@ -161,7 +161,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 .ac-container-accordion ~ article.ac-large,
 .ac-container input.menu:checked ~ article.ac-large{
 	height: auto; 
-	max-height : 200px; /* increasing from 100px to account for more legend content */
+	max-height : 300px; /* increasing from 100px to account for more legend content */
 	overflow-y: auto;
     line-height: 18px;
 }
@@ -202,7 +202,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	font-size: 13px;
 	line-height:1.5;
 	margin-left: 10px;
-
 }
 
 .bt_delete{
@@ -229,7 +228,8 @@ div[id^="leaflet-control-accordion-layers"] > button {
 }
 
 .active-layer{
-	font-weight: 700;
+	font-weight: 650;
+	font-stretch: 90%;
 } 
 
 .active-layer div.legend-panel,
@@ -244,13 +244,13 @@ div[id^="leaflet-control-accordion-layers"] > button {
 .legend-panel{
 	font-weight: 400;
 	display: none;
-	padding: 5px;
+	padding: 2.5px 5px;
 }
 
 .legend-panel-inline{
 	font-weight: 400;
 	display: none;
-	padding-left: 3px;
+	/* padding-left: 3px; */
 }
 
 #styledLayerControl-utilities{
@@ -265,7 +265,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	font-weight: 700;
 	line-height: 1.5;
 	padding: 0;
-	width: 270px;
+	width: 275px;
 	/* text-align: center;  */
 	/* margin: auto;
 	display: flex;
@@ -293,7 +293,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	margin: auto;
 	padding: 7px 0px;
 	text-align: center;
-	width: 135px;
+	width: 137.5px;
 	/* outline: 1px solid #cfcfd0; */
 }
 
@@ -472,7 +472,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 }
 
 .layer-label{
-	display:table-cell;
 	padding-right: 3px;
 }
 

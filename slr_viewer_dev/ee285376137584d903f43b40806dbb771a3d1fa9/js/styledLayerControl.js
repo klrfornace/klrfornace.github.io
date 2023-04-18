@@ -724,7 +724,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             sublayerContainer.id = id + '_sublayers';
 
             //sublayers-hidden class is used to hide sublayer inputs when layer group is not selected
-            sublayerContainer.className = "sublayers sublayers-hidden"; 
+            sublayerContainer.className = this._map.hasLayer(obj.layer) ? "sublayers":"sublayers sublayers-hidden";
 
             L.DomEvent.on(input, 'click', this._resetSublayers, this);
 
@@ -744,7 +744,13 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 sublayerInput.onclick = function () { me._onSublayerClick( sublayerInput, sublayer, layerGroup, obj ); };
                 
                 const sublayerLabel = L.DomUtil.create('label','',sublayerDiv);
-                sublayerLabel.innerHTML = '<label id="' + sublayerInputId +'-label" for="' + sublayerInputId + '">' + sublayerName + '</label>';
+                sublayerLabel.id = sublayerInputId + '-label';
+                sublayerLabel.setAttribute('for', sublayerInputId);
+                sublayerLabel.innerHTML = sublayerName;
+                
+                if (this._map.hasLayer(sublayer)){
+                    sublayerLabel.classList.add("active-layer");
+                }
             }
             label.append(sublayerContainer);
         }

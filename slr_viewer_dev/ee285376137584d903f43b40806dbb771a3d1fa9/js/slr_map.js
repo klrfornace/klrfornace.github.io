@@ -77,6 +77,7 @@ legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level
 // Set up entries for all layers/layer groups. All entries will initially be hidden.
 
 // Exposure layers
+
 // const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
 const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
 passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>' + passive.options.legendEntry;
@@ -93,21 +94,35 @@ roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+
 const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry legend-entry-hidden',legendDiv);
 stormwaterEntry.innerHTML = stormwater.options.legendEntry;
 
+// Critical facilities sublayers
+const critFacilitiesEntry = L.DomUtil.create('div','legend-critical-facilities legend-entry legend-entry-hidden',legendDiv);
+critFacilitiesEntry.innerHTML = '<span class="legend-subheader">Critical Facilities</span>'
+for (let layer of [hospitals,fireStations,policeStations,schools]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, critFacilitiesEntry);
+  entry.innerHTML = layer.options.legendEntry;
+}
+
+// Wastewater infrastructure sublayers
+const wastewaterEntry = L.DomUtil.create('div','legend-wastewater legend-entry legend-entry-hidden',legendDiv);
+wastewaterEntry.innerHTML = '<span class="legend-subheader">Wastewater Infrastructure</span>'
+for (let layer of [treatmentPlants, pumpStations, cesspools]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, wastewaterEntry);
+  entry.innerHTML = layer.options.legendEntry;
+}
+
+// Electrical infrastructure sublayers
+const electricalEntry = L.DomUtil.create('div','legend-electrical legend-entry legend-entry-hidden',legendDiv);
+electricalEntry.innerHTML = '<span class="legend-subheader">Electrical Infrastructure</span>'
+for (let layer of [substations, transmission]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, electricalEntry);
+  entry.innerHTML = layer.options.legendEntry;
+}
+
 // Other layers
 for (let layer of [devplan, moku, ahupuaa, boards, dhhl, slrxa32]){
   const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
   entry.innerHTML = layer.options.legendEntry;
 }
-
-// Layer subgroup test entry
-const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
-const test1Entry = L.DomUtil.create('div','legend-test1',testEntry);
-test1Entry.innerHTML = 'test1';
-const test2Entry = L.DomUtil.create('div','legend-test2',testEntry);
-test2Entry.innerHTML = 'test2';
-const test3Entry = L.DomUtil.create('div','legend-test3',testEntry);
-test3Entry.innerHTML = 'test3';
-
 
 // const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
 // const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
@@ -129,11 +144,10 @@ function removeWithTimeout(layer) {
 
 map.on('overlayadd', function addOverlay(e){
     const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
-    console.log(legendKey);
 
     // Update legend
     const entryDiv = document.querySelector('.legend-'+ legendKey);
-    console.log(entryDiv);
+
     // Remove class to allow display
     entryDiv.classList.remove('legend-entry-hidden');
   
@@ -157,8 +171,13 @@ map.on('overlayadd', function addOverlay(e){
 map.on('overlayremove', function(e){
   const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
   const entryDiv = document.querySelector('.legend-'+ legendKey);
+
   // Restore class to remove display
   entryDiv.classList.add('legend-entry-hidden');
+
+  // For layers with sublayers, remove hidden class on sublayer elements so all entries will appear in legend if layer is reselected. 
+  // (All sublayers are reset to checked when main layer is removed.)
+  Array.from(entryDiv.children).forEach((child) => child.classList.remove('legend-entry-hidden'));
 })
 
 
@@ -228,21 +247,48 @@ map.on( 'baselayerchange',
 
 map.on('zoomend', function(){
   const currentZoom = map.getZoom();
+  const markerLayers = [hospitals,fireStations,policeStations,schools,pumpStations,treatmentPlants,cesspools,substations];
 
   if (currentZoom < 13){
     stormwaterStyle.weight = 0.25;
     stormwaterStyle.radius = 2;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[0]})));
+    };
+
+    transmission.setStyle({weight: 2});
+
+  }
+  else if (currentZoom < 16){
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[1]})));
+    };
+
+    transmission.setStyle({weight: 2.5});
   }
   else if (currentZoom < 18){
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[2]})));
+    };
+
+    transmission.setStyle({weight: 3});
   }
   else {
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3.5;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[2]})));
+    };
+
+    transmission.setStyle({weight: 3.5});
   }
 })
 

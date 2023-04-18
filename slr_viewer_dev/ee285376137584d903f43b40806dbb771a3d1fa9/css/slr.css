@@ -95,7 +95,9 @@ h3 {
 
 a {
   color:#184e85;
+  /* color: #0078A8; */
 }
+
 #map-container {
     /* top: 50px;
     left: 0px; */
@@ -643,32 +645,74 @@ a {
   margin-right: 5px;
 }
 
-.road-line{
+.stormwater-icon{
   display: inline-block;
-  stroke: none;
-  stroke-miterlimit: 10;
-  width: 16px;
-  height: 19.5px;
-  vertical-align: middle;
-}
-
-.stormwater{
-  display: inline-block;
+  margin-bottom: -1px;
   stroke: none;
   width: 16px;
   vertical-align: middle;
+  margin-right: 3px;
 }
 
 .legend-line{
   display: inline-block;
-  fill: #6e6e6e;
   stroke: none;
   stroke-miterlimit: 10;
-  width: 16px;
+  width: 15px;
   height: 19.5px;
+  padding: 0 0.5px;
+  margin-left: 1px;
+  margin-right: 7px;
+  margin-top: -2px;
   vertical-align: middle;
 }
 
+.admin-line{
+  fill: #6e6e6e;
+}
+
+.road-line{
+  margin-right: 3px;
+}
+
+.electric-line{
+  fill: #f2b701;
+}
+
+.legend-icon{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-left: 1px;
+  margin-right: 7px;
+  margin-top: -2px;
+}
+
+.legend-icon.small-shape{
+  width: 10px;
+  height: 10px;
+  padding: 0 3px;
+  vertical-align: middle;
+}
+
+.legend-icon.hexagon{
+  width: 14px;
+  height: 12px;
+  padding: 0 1px;
+  vertical-align: middle;
+}
+
+.legend-line.tight-layout,
+.legend-icon.tight-layout{
+  margin-left: 0px;
+  margin-right: 4px;
+  margin-top: -3px;
+}
+
+.legend-sublayer{
+  padding: 1px 0;
+}
 .line-dark-basemap{
   fill: #fff;
   stroke: #6e6e6e;
