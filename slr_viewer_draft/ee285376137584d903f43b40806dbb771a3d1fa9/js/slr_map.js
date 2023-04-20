@@ -95,7 +95,7 @@ const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry 
 stormwaterEntry.innerHTML = stormwater.options.legendEntry;
 
 // Other layers
-for (let layer of [devplan, moku, ahupuaa, boards, dhhl, slrxa32]){
+for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32]){
   const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
   entry.innerHTML = layer.options.legendEntry;
 }
