@@ -1,5 +1,12 @@
+.leaflet-touch .leaflet-control-layers {
+	border: none;
+	box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+	margin-right: 10px;
+	margin-top: 10px;
+}
+
 .ac-container{
-	width: 275px;
+	width: 265px;
 	text-align: left;
 	overflow-y: auto;
 	overflow-x: auto;
@@ -7,7 +14,6 @@
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 	/* border-top: 1px solid#b4d2df; */
-
 }
 
 div[id^="leaflet-control-accordion-layers"] > button {
@@ -265,7 +271,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	font-weight: 700;
 	line-height: 1.5;
 	padding: 0;
-	width: 275px;
 	/* text-align: center;  */
 	/* margin: auto;
 	display: flex;
@@ -293,7 +298,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	margin: auto;
 	padding: 7px 0px;
 	text-align: center;
-	width: 137.5px;
+	width: 132.5px;
 	/* outline: 1px solid #cfcfd0; */
 }
 
@@ -462,14 +467,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 /* .leaflet-control-layers-overlays {
     margin-bottom: 2px;
 } */
-
-
-.leaflet-touch .leaflet-control-layers {
-	border: none;
-	box-shadow: 0 0 5px rgb(0 0 0 / 20%);
-	margin-right: 5px;
-	margin-top: 5px;
-}
 
 .layer-label{
 	padding-right: 3px;

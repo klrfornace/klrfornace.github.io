@@ -63,7 +63,58 @@ mapboxLight.addTo(map); // initial basemap
 
 // Add styled layer control to map
 // Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
-layerControl = L.Control.styledLayerControl( basemaps, overlayMaps, {collapsed: false, position:'topright'});
+
+// Add button to show/hide layer control. (Layer control initial state is open).
+const layerControlBtn = L.control({position: 'topright'});
+layerControlBtn.onAdd = function(){
+  const btnContainer = L.DomUtil.create('div','layer-control-btn');
+  const layerButton = L.DomUtil.create('a','leaflet-control-layer', btnContainer);
+  layerButton.role = "button";
+  layerButton.href = '#';
+  layerButton.title = 'Close the layer control menu';
+  layerButton.setAttribute('aria-label','Close the layer menu');
+  layerButton.setAttribute('aria-disable',false);
+  layerButton.innerHTML = '<img src="images/layers_outline.svg"> Layers';
+  layerButton.onclick =  openCloseLayerControl;
+  return btnContainer
+}
+// layerControlBtn.addTo(map);
+
+function openCloseLayerControl(){
+  const layerControlContainer = document.querySelector('.leaflet-control-layers');
+  const layerControlButton = document.querySelector('.layer-control-btn');
+  if (layerControlButton.classList.contains('control-closed')){
+    layerControlContainer.style.display = '';
+    layerControlButton.classList.remove('control-closed');
+    this.setAttribute('title','Close the layer control menu');
+    this.setAttribute('aria-label','Close the layer control menu');
+  }
+  else{
+    layerControlContainer.style.display = 'none';
+    layerControlButton.classList.add('control-closed');
+    this.setAttribute('title', 'Open the layer control menu');
+    this.setAttribute('aria-label', 'Open the layer control menu');
+  }
+}
+
+// Add button show/hide basemap menu
+const basemapControlBtn = L.control({position: 'topright'});
+basemapControlBtn.onAdd = function(){
+  const btnContainer = L.DomUtil.create('div','layer-control-btn basemap-control');
+  const basemapButton = L.DomUtil.create('a','leaflet-control-layer', btnContainer);
+  basemapButton.role = "button";
+  basemapButton.href = '#';
+  basemapButton.title = 'Close the layer control menu';
+  basemapButton.setAttribute('aria-label','Close the layer menu');
+  basemapButton.setAttribute('aria-disable',false);
+  basemapButton.innerHTML = '<img src="images/basemap_black.svg" style="height:18px; margin-top:1px"> Basemaps';
+  // basemapButton.onclick =  openCloseLayerControl;
+  return btnContainer
+}
+// basemapControlBtn.addTo(map);
+
+// Add layer control
+const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
 layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
@@ -119,7 +170,7 @@ for (let layer of [substations, transmission]){
 }
 
 // Other layers
-for (let layer of [devplan, moku, ahupuaa, boards, dhhl, slrxa32]){
+for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32]){
   const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
   entry.innerHTML = layer.options.legendEntry;
 }
@@ -181,27 +232,8 @@ map.on('overlayremove', function(e){
 })
 
 
-// Add functionality to show/hide layer control from button in navigation bar. (Layer control initial state is open).
-
-function openCloseLayerControl(){
-  const layerControlContainer = document.querySelector('.leaflet-control-layers');
-  if (this.classList.contains('control-closed')){
-    layerControlContainer.style.display = '';
-    this.classList.remove('control-closed');
-    this.setAttribute('aria-label', 'Close the layer control menu');
-  }
-  else{
-    layerControlContainer.style.display = 'none';
-    this.classList.add('control-closed');
-    this.setAttribute('aria-label', 'Open the layer control menu');
-  }
-}
-
-const layerControlButton = document.querySelector('.layer-control-btn');
-layerControlButton.onclick = openCloseLayerControl;
-
-
 // Layer style adjustments by zoom/basemap
+
 
  // Change layer styles based on light/dark (satellite) basemaps
 map.on( 'baselayerchange',
@@ -218,7 +250,7 @@ map.on( 'baselayerchange',
       dhhl.setStyle(boundary_style2)
 
       // Also make sure legend styles are correct
-      const entries = document.querySelectorAll('.legend-line');
+      const entries = document.querySelectorAll('.admin-line');
       entries.forEach(entry => {
         entry.classList.remove('line-dark-basemap');
       })
@@ -234,14 +266,13 @@ map.on( 'baselayerchange',
       boards.setStyle( boundary_style );
       dhhl.setStyle(boundary_style2);
 
-      const entries = document.querySelectorAll('.legend-line');
+      const entries = document.querySelectorAll('.admin-line');
       entries.forEach(entry => {
         entry.classList.add('line-dark-basemap');
       })
     }
   }
 );
-
 
 // Change styles based on map zoom level
 
@@ -261,20 +292,13 @@ map.on('zoomend', function(){
     transmission.setStyle({weight: 2});
 
   }
-  else if (currentZoom < 16){
-    for(let layer of markerLayers){
-      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[1]})));
-    };
-
-    transmission.setStyle({weight: 2.5});
-  }
   else if (currentZoom < 18){
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
 
     for(let layer of markerLayers){
-      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[2]})));
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[1]})));
     };
 
     transmission.setStyle({weight: 3});

@@ -281,26 +281,6 @@ for (let i = 0; i < 11; i++) {
     stormwaterLayers[i] = new L.GeoJSON.AJAX(stormwaterWFS, stormwaterOptions(i));
 };
 
-// Set up icons for marker layers
-
-// For infrastructure layers with symbol icons
-const symbolIcon = L.Icon.extend({
-  options: {
-      iconSize: [16,16], //initial small size
-  }
-});
-
-const hospitalIcon = new symbolIcon({iconUrl:"images/hospital_maroon.svg"});
-const fireStationIcon = new symbolIcon({iconUrl:"images/fire_maroon.svg"});
-const policeStationIcon = new symbolIcon({iconUrl:"images/police_maroon.svg"});
-const schoolIcon = new symbolIcon({iconUrl:"images/school_maroon.svg"});
-const pumpStationIcon = new symbolIcon({iconUrl:"images/pump_station.svg"});
-const wastewaterIcon = new symbolIcon({iconUrl:"images/wastewater.svg"});
-
-// Shape icons
-const hexagonIcon = L.icon({iconSize:[12,14], iconUrl: "images/hexagon.svg"})
-const diamondIcon = L.icon({iconSize:[6,6], iconUrl: "images/diamond.svg"})
-
 // Critical Facilities
 
 const hospitals = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Ahospitals__and_clinics_kp'), {
@@ -360,13 +340,26 @@ const treatmentPlants = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Asewer_-_treatment_pl
   legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon" src="images/wastewater.svg"></img>Treatment Plants</div>'
 });
 
-const cesspools = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aonsite_sewage_disposal_systems_oahu_kp'), {
+const cesspools = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aosds_dots_w_tracts_clean_atts_kp'), {
   pointToLayer: (feature, latlng) => (L.marker(latlng, {icon: L.icon({iconSize:[6,6], iconUrl: "images/diamond.svg"})})),
   iconUrl:"images/diamond.svg",
   iconSizes:[[6,6],[9,9],[12,12]],
   legendKey:'cesspool',
   legendSymbol: '<img class="legend-sublayer legend-icon small-shape tight-layout" src="images/diamond.svg"></img>',
-  legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon small-shape" src="images/diamond.svg"></img>Onsite Sewage Disposal Systems</div>'
+  legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon small-shape" src="images/diamond.svg"></img>Cesspools</div>'
+});
+
+const sewerStyle = {
+  color: '#c76113',
+  weight: 1,
+  opacity: 0.75
+};
+
+const sewerMains = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_sewer_main_kp'), {
+  style: sewerStyle,
+  legendKey:'sewer-main',
+  legendSymbol: '<svg class="legend-line sewer-line tight-layout" style="margin-top:0px" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3.5"/></g></svg>',
+  legendEntry: '<svg class="legend-line sewer-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3.5"/></g></svg>Sewer Mains'
 });
 
 // Electrical infrastructure
@@ -393,10 +386,6 @@ const transmission = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Atransmission_lines_hi_h
   legendEntry: '<svg class="legend-line electric-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="7"/></g></svg>Transmission Lines'
 });
 
-
-
-// This query selects all features within a very simplified Koʻolaupoko shape (9 vertices). Do not use for features very close to the border!
-// const kpQuery = 'where=&objectIds=&time=&geometry=%7B"rings"%3A%5B+%5B+%5B+-157.838262923124034%2C+21.534481631405697+%5D%2C+%5B+-157.69974152614185%2C+21.482555721318882+%5D%2C+%5B+-157.634196499835554%2C+21.311528644628648+%5D%2C+%5B+-157.659888531751847%2C+21.307570808542344+%5D%2C+%5B+-157.6793092802871%2C+21.317936343589309+%5D%2C+%5B+-157.712081793440234%2C+21.316617134307968+%5D%2C+%5B+-157.782390339935802%2C+21.336836837159314+%5D%2C+%5B+-157.87365268559148%2C+21.442462728879143+%5D%2C+%5B+-157.897691551576088%2C+21.501284947370134+%5D%2C+%5B+-157.838262923124034%2C+21.534481631405697+%5D+%5D+%5D%2C+"spatialReference"+%3A+%7B"wkid"+%3A+4326%7D%7D&geometryType=esriGeometryPolygon&inSR=&spatialRel=esriSpatialRelIntersects&resultType=none&distance=0.0&units=esriSRUnit_Meter&relationParam=&returnGeodetic=false&outFields=*&returnGeometry=true&f=geojson'
 
 //////////  OTHER OVERLAYS  //////////
 
@@ -649,7 +638,7 @@ const devplan = new L.GeoJSON.AJAX(devplanURL,
       pane: 'admin-boundaries',
       legendKey: 'devplan',
       legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
-      legendSymbol: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
+      legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
       loadStatus: 'loading'}
   );
 
@@ -850,6 +839,20 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
   }
 );
 
+const setbackStyle = {
+  color: '#e55913',
+  weight: 2,
+  opacity: 1,
+  dashArray: '3,5',
+};
+
+const oahuSetback = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_70yr_rate_plus_60ft'), {
+  style: setbackStyle,
+  legendKey:'setback',
+  legendSymbol: '<svg class="legend-line setback-line tight-layout" viewBox="0 0 31.74 5.74"><g><path d="m31.74,5.74h-4.74V0h4.74v5.74Zm-8.74,0h-5V0h5v5.74Zm-9,0h-5V0h5v5.74Zm-9,0H0V0h5v5.74Z"/></g></svg>',
+  legendEntry: '<svg class="legend-line setback-line" viewBox="0 0 31.74 5.74"><g><path d="m31.74,5.74h-4.74V0h4.74v5.74Zm-8.74,0h-5V0h5v5.74Zm-9,0h-5V0h5v5.74Zm-9,0H0V0h5v5.74Z"/></g></svg>O<span class="okina">&#699;</span>ahu Shoreline Setback'
+});
+
 
 //////////  LAYER GROUPS  //////////
 
@@ -870,7 +873,7 @@ const roads = L.layerGroup(roadLayers[0],{
 });
 const stormwater = L.layerGroup(stormwaterLayers[0],{
   legendKey:'stormwater',
-  legendEntry:'<svg class="stormwater-icon" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg>Stormwater structures below sea level</div>'
+  legendEntry:'<div class="long-legend-wrapper"><div><svg class="stormwater-icon" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg></div><div>Stormwater structures below sea level</div>'
 });
 const compFlood = L.layerGroup(compFloodLayers[0],{
   legendKey:'comp-flood',
@@ -915,7 +918,8 @@ const criticalFacilities = L.layerGroup([hospitals, fireStations, policeStations
 const wastewater = L.layerGroup([treatmentPlants, pumpStations, cesspools], 
   options = {
     legendKey:'wastewater',
-    attribution: 'Data &copy; <a href="https://honolulu-cchnl.opendata.arcgis.com/" target="_blank">City & County of Honolulu GIS</a>'
+    attribution: 'Data &copy; <a href="https://honolulu-cchnl.opendata.arcgis.com/" target="_blank">City & County of Honolulu GIS</a>, '
+    + '<a href="https://seagrant.soest.hawaii.edu/cesspools-tool/" target="_blank">Hawai#699;i Cesspool Prioritization Tool</a>'
 });
 
 const electrical = L.layerGroup([substations, transmission], 
@@ -952,6 +956,13 @@ const basemaps = [
   }
 ];
 
+const basemapsSimple = {
+  'Grayscale': mapboxLight,
+  // 'Streets': mapboxStreets,
+  'Satellite': mapboxSatelliteStreets,
+  'Satellite: no labels': mapboxSatellite,
+};
+
 // Create overlay layer object for layer control
 // For all layers that change with depth, use L.LayerGroup initialized with any layer instead of individual layer. This allows for switching of layers 
 // within the group as depth changes while keeping connection between layerGroup/_leaflet_id and checkbox input intact. Note this seems to cause assigned
@@ -985,7 +996,8 @@ const overlayMaps = [
         'sublayers':{
               ['<div class="legend-panel-inline">'+ treatmentPlants.options.legendSymbol + '</div><span class="layer-label">Treatment Plants</span>']:treatmentPlants, 
               ['<div class="legend-panel-inline">'+ pumpStations.options.legendSymbol + '</div><span class="layer-label">Pump Stations</span>']: pumpStations, 
-              ['<div class="legend-panel-inline">'+ cesspools.options.legendSymbol + '</div><span class="layer-label">Onsite Sewage Disposal Systems</span>']: cesspools, 
+              // ['<div class="legend-panel-inline">'+ sewerMains.options.legendSymbol + '</div><span class="layer-label">Sewer Mains</span>']: sewerMains, 
+              ['<div class="legend-panel-inline">'+ cesspools.options.legendSymbol + '</div><span class="layer-label">Cesspools</span>']: cesspools, 
         }},
         'Electrical Infrastructure':{'layer':electrical,
         'sublayers':{
@@ -998,9 +1010,10 @@ const overlayMaps = [
     expanded: true,
     layers: {['<div class="legend-panel-inline">'+ devplan.options.legendSymbol + '</div><span class="layer-label">Community Plan Area Boundaries</span>']: devplan,
               ['<div class="legend-panel-inline">'+ moku.options.legendSymbol + '</div><span class="layer-label">Moku Boundaries</span>']: moku,
-              ['<div class="legend-panel-inline">'+ ahupuaa.options.legendSymbol + '</div><span class="layer-label">Ahupua&#699;a Boundaries</span>']: ahupuaa,
+              ['<div class="legend-panel-inline">'+ ahupuaa.options.legendSymbol + '</div><span class="layer-label">Ahupua<span class="okina">&#699;</span>a Boundaries</span>']: ahupuaa,
               ['<div class="legend-panel-inline">'+ boards.options.legendSymbol + '</div><span class="layer-label">Neighborhood Board Boundaries</span>']: boards,
               ['<div class="legend-panel-inline">'+ dhhl.options.legendSymbol + '</div><span class="layer-label">Hawaiian Home Lands']: dhhl,
+              ['<div class="legend-panel-inline">'+ oahuSetback.options.legendSymbol + '</div><span class="layer-label">O<span class="okina">&#699;</span>ahu Shoreline Setback']: oahuSetback,
               ['<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel">'+slrxa32.options.legendEntry + '</div>']: slrxa32,
               }},
 ];
@@ -1013,7 +1026,7 @@ const overlayMaps = [
 
 // '<span class="layer-label">Stormwater infrastructure failure</span><div class="legend-panel panel-hidden"><svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level</div>':stormwater
 
-
+// <span class="okina">&#699;</span>
 
 
 

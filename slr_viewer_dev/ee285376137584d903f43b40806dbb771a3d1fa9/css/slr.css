@@ -39,7 +39,7 @@ body {
   padding: 7.5px 15px 7.5px 10px;
 }
 
-.layer-control-btn{
+/* .layer-control-btn{
   height: 40px;
   width: 40px;
   background-color: rgba(255, 255, 255, 0.35);
@@ -50,20 +50,59 @@ body {
   border: none;
   border-radius: 100%;
   cursor: pointer;
+} */
+
+.layer-control-btn{
+  height: 32px;
+  width: auto;
+  background-color: #f4f4f4;
+  border-radius: 4px;
+  display: inline-block;
+  cursor: pointer;
+  border: 0px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+}
+
+.layer-control-btn a{
+  font-family: "Roboto Flex",sans-serif; 
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
+  line-height: 32px;
+  padding: 0 10px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  color: black;
+}
+
+.layer-control-btn img{
+  height: 20px;
+  float: left;
+  padding: 6px 10px 6px 0px;
 }
 
 .layer-control-btn:hover, 
 .layer-control-btn:focus-visible{
-  background-color: rgba(255, 255, 255, 0.55);
+  /* background-color: rgba(255,255,255,0.55); */
+  background-color: #e7e7e7;
 }
 
 .layer-control-btn.control-closed{
-  background-color: rgba(255, 255, 255, 0);
+  /* background-color:rgba(255,255,255,0); */
+  background-color: #fff;
 }
 
 .layer-control-btn.control-closed:hover,
 .layer-control-btn.control-closed:focus-visible{
-  background-color: rgba(255, 255, 255, 0.35);
+  /* background-color: rgba(255,255,255,0.35)*/
+  background-color: #f4f4f4;
+}
+
+.layer-control-btn.basemap-control{
+  margin-right: 112px;
+  margin-top: -32px;
+  background-color: #fff;
 }
 
 hr {
@@ -96,6 +135,11 @@ h3 {
 a {
   color:#184e85;
   /* color: #0078A8; */
+}
+
+/* Roboto Flex styles ʻokina oddly - switch to Roboto as workaround */
+.okina{
+  font-family:'Roboto',sans-serif;
 }
 
 #map-container {
@@ -535,6 +579,27 @@ a {
   display: none;
 }
 
+/* Change default control styles */
+.leaflet-touch .leaflet-bar {
+  border: 0px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+}
+
+.leaflet-touch .leaflet-bar a:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+.leaflet-touch .leaflet-bar a:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.leaflet-touch .leaflet-bar a {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
 /* To overrule leaflet class added later when legend control is expanded/hidden*/
 #ac-container.legend-container-hidden form{
   display: none;
@@ -543,7 +608,7 @@ a {
 /* Loading icon control */
 .loading-control {
   background: #fff;
-  border-radius: 5px;
+  border-radius: 4px;
   padding: 5px 5px 0px 5px;
 }
 
@@ -579,9 +644,16 @@ a {
   opacity: 60%;
 }
 /* Geocoded control */
+
+.leaflet-control-geocoder-form input{
+  width: 236px;
+  font-family: 'Roboto Flex', sans-serif;
+}
+
 #geocoder-control {
-  margin-top: -153px;
-  margin-left: 285px;
+  height: 32px;
+  margin-top: -149px;
+  margin-left: 280px;
   transition: margin-left 0.3s linear;
   } 
 
@@ -601,10 +673,10 @@ a {
 }
 
 #geocoder-control.side-panel-closed{
-  margin-left: 60px;
+  margin-left: 55px;
 }
 
-/* Legend control styles */
+/* Legend/layer control styles */
 .legend-container{
   background: #fff;
   /* background-clip: padding-box; */
@@ -646,12 +718,11 @@ a {
 }
 
 .stormwater-icon{
-  display: inline-block;
   margin-bottom: -1px;
   stroke: none;
   width: 16px;
   vertical-align: middle;
-  margin-right: 3px;
+  margin-right: 5px;
 }
 
 .legend-line{
@@ -677,6 +748,16 @@ a {
 
 .electric-line{
   fill: #f2b701;
+}
+
+.sewer-line{
+  fill:#c76113;
+  opacity: 0.75;
+  margin-top: 0px;
+}
+
+.setback-line{
+  fill: #e55913;
 }
 
 .legend-icon{
@@ -713,6 +794,7 @@ a {
 .legend-sublayer{
   padding: 1px 0;
 }
+
 .line-dark-basemap{
   fill: #fff;
   stroke: #6e6e6e;
@@ -724,12 +806,14 @@ a {
   margin-right: 8px;
 }
 
+.long-legend-wrapper{
+  display: flex;
+}
+
 .leaflet-control-home{
   background-image: url('../images/home.svg');
   background-size: 16px 16px;
 }
-
-
 
 /* Styles for Tippy tooltips */
 
