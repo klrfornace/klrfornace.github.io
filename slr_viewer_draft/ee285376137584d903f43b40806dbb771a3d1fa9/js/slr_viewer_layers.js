@@ -110,14 +110,14 @@ const waveWmsOptions = (ft) => (
     format:'image/png', 
     transparent: true,
     opacity: 0.67,
-    errorTileUrl: 'https://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
+    // errorTileUrl: 'https://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
     nullValue: -999,
     popupMinZoom: 15,
-    layers: (ft < 10) ? `CRC:puc_wave_0${ft}ft` : `CRC:puc_wave_${ft}ft`, 
+    layers: (ft < 10) ? `CRC:Waikiki_annual_wave_OsWkh1_0${ft}ft` : `CRC:Waikiki_annual_wave_OsWkh1_${ft}ft`, 
     name: (ft < 10) ? `Annual wave 0${ft}ft` : `Annual wave ${ft}ft`,
   }
 ) 
@@ -817,7 +817,7 @@ const overlayMaps = [
     groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding</span><div class="legend-panel panel-hidden">'+ passive.options.legendEntry + '</div>']:passive, 
-              // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
+              ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
               // ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }
   },
