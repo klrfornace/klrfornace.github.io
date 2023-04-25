@@ -61,63 +61,60 @@ mapboxLight.addTo(map); // initial basemap
 
 //////// LAYER CONTROL AND LEGEND ////////
 
-// Add styled layer control to map
-// Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
+// Add basemap control and styled layer control for overlays to map
+// Overlay control based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
 
 // Add button to show/hide layer control. (Layer control initial state is open).
-const layerControlBtn = L.control({position: 'topright'});
-layerControlBtn.onAdd = function(){
-  const btnContainer = L.DomUtil.create('div','layer-control-btn');
-  const layerButton = L.DomUtil.create('a','leaflet-control-layer', btnContainer);
-  layerButton.role = "button";
-  layerButton.href = '#';
-  layerButton.title = 'Close the layer control menu';
-  layerButton.setAttribute('aria-label','Close the layer menu');
-  layerButton.setAttribute('aria-disable',false);
-  layerButton.innerHTML = '<img src="images/layers_outline.svg"> Layers';
-  layerButton.onclick =  openCloseLayerControl;
-  return btnContainer
-}
+// const layerControlBtn = L.control({position: 'topright'});
+// layerControlBtn.onAdd = function(){
+//   const btnContainer = L.DomUtil.create('div','layer-control-btn');
+//   const layerButton = L.DomUtil.create('a','', btnContainer);
+//   layerButton.id = 'overlay-control-btn';
+//   layerButton.role = "button";
+//   layerButton.href = '#';
+//   layerButton.title = 'Close the layer control menu';
+//   layerButton.setAttribute('aria-label','Close the layer menu');
+//   layerButton.setAttribute('aria-disable',false);
+//   layerButton.innerHTML = '<img src="images/layers_outline.svg"> Layers';
+//   layerButton.onclick =  openCloseLayerControl;
+//   return btnContainer
+// }
 // layerControlBtn.addTo(map);
 
-function openCloseLayerControl(){
-  const layerControlContainer = document.querySelector('.leaflet-control-layers');
-  const layerControlButton = document.querySelector('.layer-control-btn');
-  if (layerControlButton.classList.contains('control-closed')){
-    layerControlContainer.style.display = '';
-    layerControlButton.classList.remove('control-closed');
-    this.setAttribute('title','Close the layer control menu');
-    this.setAttribute('aria-label','Close the layer control menu');
-  }
-  else{
-    layerControlContainer.style.display = 'none';
-    layerControlButton.classList.add('control-closed');
-    this.setAttribute('title', 'Open the layer control menu');
-    this.setAttribute('aria-label', 'Open the layer control menu');
-  }
-}
-
 // Add button show/hide basemap menu
-const basemapControlBtn = L.control({position: 'topright'});
-basemapControlBtn.onAdd = function(){
-  const btnContainer = L.DomUtil.create('div','layer-control-btn basemap-control');
-  const basemapButton = L.DomUtil.create('a','leaflet-control-layer', btnContainer);
-  basemapButton.role = "button";
-  basemapButton.href = '#';
-  basemapButton.title = 'Close the layer control menu';
-  basemapButton.setAttribute('aria-label','Close the layer menu');
-  basemapButton.setAttribute('aria-disable',false);
-  basemapButton.innerHTML = '<img src="images/basemap_black.svg" style="height:18px; margin-top:1px"> Basemaps';
-  // basemapButton.onclick =  openCloseLayerControl;
-  return btnContainer
-}
+// const basemapControlBtn = L.control({position: 'topright'});
+// basemapControlBtn.onAdd = function(){
+//   const btnContainer = L.DomUtil.create('div','layer-control-btn basemap-control control-closed'); //initial state is control-closed
+//   const basemapButton = L.DomUtil.create('a','', btnContainer);
+//   basemapButton.id = 'basemap-control-btn';
+//   basemapButton.role = "button";
+//   basemapButton.href = '#';
+//   basemapButton.title = 'Close the layer control menu';
+//   basemapButton.setAttribute('aria-label','Close the layer menu');
+//   basemapButton.setAttribute('aria-disable',false);
+//   basemapButton.innerHTML = '<img src="images/basemap_black.svg" style="height:18px; margin-top:1px"> Basemaps';
+//   basemapButton.onclick =  openCloseLayerControl;
+//   return btnContainer
+// }
 // basemapControlBtn.addTo(map);
 
-// Add layer control
+// Button functionality
+// 
+
+// Add basemap control
+// const basemapControl =  L.control.layers(basemapsSimple, null, {collapsed: false, position:'topright'});
+// basemapControl.addTo(map);
+// basemapControl.getContainer().id = 'basemapControl';
+
+// Set initial display (none):
+// basemapControl.getContainer().style.display = 'none';
+
+// Add overlay layer control
 const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
-layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
+layerControl.getContainer().id = 'styledLayerControl'; 
+
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
@@ -685,7 +682,7 @@ function openClosePanel(){
     tabContainer.style.left = '225px';
 
     this.classList.remove('panel-closed');
-    this.style.backgroundImage = "url(images/close2.svg)";
+    this.style.backgroundImage = "url(images/close_left.svg)";
 
     this.setAttribute('aria-label', 'Close the sea level slider panel');
 
@@ -711,38 +708,13 @@ function openClosePanel(){
   }
 }
 
-// function openPanel(){
-//   const panel = document.querySelector('.side-panel-container');
-//   panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
-//   const panelControl = document.querySelector('.panel-control');
-//   panelControl.classList.add('side-panel-open');
-// }
-
 // Add functionality to close button
 const closeButton = document.querySelector('.side-panel-tab');
 closeButton.onclick = openClosePanel;
 
-// const sidePanelControl = L.control({position:'topleft'})
-// sidePanelControl.onAdd = function() {
-//   const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
-//   tab.id = 'slr-tab-container';
-//   const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
-//   tabButton.id = 'slr-tab-button';
-//   tabButton.role = "button";
-//   tabButton.href = '#';
-//   tabButton.title = 'Open sea level slider';
-//   tabButton.setAttribute('aria-label','Displayed sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
-//   tabButton.setAttribute('aria-disable',false);
-//   tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
-//   tabButton.onclick = openPanel;
+// Append tab button to layer control
+// const layerControlTabContainer = L.DomUtil.create('div','layer-control-tab-container',layerControl.getContainer());
+// layerControl.getContainer().insertBefore(layerControlTabContainer, document.querySelector('.control-wrapper'));
 
-//   tab.setAttribute('aria-haspopup', true);
-//   if (!L.Browser.touch) {
-//       L.DomEvent.disableClickPropagation(tab);
-//       L.DomEvent.on(tab, 'wheel', L.DomEvent.stopPropagation);
-//   } else {
-//       L.DomEvent.on(tab, 'click', L.DomEvent.stopPropagation);
-//   }
-//   return tab
-// }
-// sidePanelControl.addTo(map);
+// const layerControlTab = L.DomUtil.create('a','layer-control-tab',layerControlTabContainer);
+// layerControlTab.innerHTML = "LAYERS";

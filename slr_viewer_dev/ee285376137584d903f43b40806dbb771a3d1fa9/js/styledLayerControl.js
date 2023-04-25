@@ -210,6 +210,18 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             me._map.dragging.enable();
           })
         // end insert
+        
+        // Insert top accordion to close whole container
+        const layerAccordionContainer = L.DomUtil.create('div','layers-accordion-container',container);
+        const layerAccordionBtn = L.DomUtil.create('button','layers-accordion-btn',layerAccordionContainer);
+
+        layerAccordionBtn.type = "button";
+        layerAccordionBtn.innerHTML = 'LAYERS';
+        layerAccordionBtn.setAttribute('aria-expanded',true); // initial state is expanded
+        L.DomEvent.on(layerAccordionBtn, 'click', this._closeContainer, this);
+
+        // Insert wrapper to tie container and utilities divs together
+        const controlWrapper = L.DomUtil.create('div','control-wrapper',container);
 
         var section = document.createElement('section');
         section.className = 'ac-container ' + className + '-list';
@@ -246,18 +258,18 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 // Create hidden layers button in case user clicks "hide" on expanded list:
                 // -jmaurer
 
-                var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-                link.href = '#';
-                link.title = 'Show the layer menu';
-                L.DomEvent
-                  .on(link, 'click', L.DomEvent.stop)
-                  .on(link, 'click', this._expand, this);
+                // var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+                // link.href = '#';
+                // link.title = 'Show the layer menu';
+                // L.DomEvent
+                //   .on(link, 'click', L.DomEvent.stop)
+                //   .on(link, 'click', this._expand, this);
         }
 
         this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
         this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
 
-        container.appendChild(section);
+        controlWrapper.appendChild(section);
 
         // process options of ac-container css class - to options.container_width and options.container_maxHeight
         for (var c = 0; c < (containers = container.getElementsByClassName('ac-container')).length; c++) {
@@ -272,13 +284,13 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         }
 
         // Insert div to hold simple legend (created separately) - KF
-        L.DomUtil.create('div','legend-container legend-container-hidden', container);
+        L.DomUtil.create('div','legend-container legend-container-hidden', controlWrapper);
 
         // Add layer utilities for expanding, collapsing, and clearing all
         // layers (-jmaurer):
         // replacing with simple legend/full interactive menu toggle - KF
 
-        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',container);
+        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',controlWrapper);
         utilities.id = 'styledLayerControl-utilities';
 
         // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
@@ -314,7 +326,6 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 }
             }
         }
-
         // radioToggle.innerHTML = '<input class="radio__input" type="radio" name="legend-toggle" value="full-menu" id="full-menu-radio" checked>'+
         // '<label for="full-menu-radio" role="button" tabindex="0" aria-pressed="true" class="radio__label" title="Show full layer menu">Full layer menu</label>'+
         // '<input class="radio__input" type="radio" name="legend-toggle" value="simple-legend" id="simple-legend-radio">'+
@@ -811,6 +822,14 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
           }
     },
 
+    // alternative to collapse function to use max-height transition
+    _closeContainer: function(e){
+        const button = e.target.tagName.toLowerCase() === 'button'? e.target: e.target.parentElement; //make sure button is selected
+        const expanded = button.getAttribute('aria-expanded');
+        expanded === 'true' ? button.setAttribute('aria-expanded', 'false') : button.setAttribute('aria-expanded', 'true');
+
+        button.parentElement.classList.toggle('layer-control-hidden');
+    },
     // _expand: function() {
     //     L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
     // },

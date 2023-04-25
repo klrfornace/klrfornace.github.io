@@ -52,59 +52,6 @@ body {
   cursor: pointer;
 } */
 
-.layer-control-btn{
-  height: 32px;
-  width: auto;
-  background-color: #f4f4f4;
-  border-radius: 4px;
-  display: inline-block;
-  cursor: pointer;
-  border: 0px;
-  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
-}
-
-.layer-control-btn a{
-  font-family: "Roboto Flex",sans-serif; 
-  font-size: 14px;
-  font-weight: 500;
-  display: inline-block;
-  line-height: 32px;
-  padding: 0 10px;
-  text-align: center;
-  text-decoration: none;
-  color: #333;
-  color: black;
-}
-
-.layer-control-btn img{
-  height: 20px;
-  float: left;
-  padding: 6px 10px 6px 0px;
-}
-
-.layer-control-btn:hover, 
-.layer-control-btn:focus-visible{
-  /* background-color: rgba(255,255,255,0.55); */
-  background-color: #e7e7e7;
-}
-
-.layer-control-btn.control-closed{
-  /* background-color:rgba(255,255,255,0); */
-  background-color: #fff;
-}
-
-.layer-control-btn.control-closed:hover,
-.layer-control-btn.control-closed:focus-visible{
-  /* background-color: rgba(255,255,255,0.35)*/
-  background-color: #f4f4f4;
-}
-
-.layer-control-btn.basemap-control{
-  margin-right: 112px;
-  margin-top: -32px;
-  background-color: #fff;
-}
-
 hr {
   border: 0;
   border-top: 1px solid #e6e7e8;
@@ -528,7 +475,7 @@ a {
 
 .side-panel-tab{
   background-color:#dcf0f7;
-  background-image: url('../images/close2.svg');
+  background-image: url('../images/close_left.svg');
   background-position: 45% center;
   background-repeat: no-repeat;
   background-size: 45%;
@@ -542,18 +489,61 @@ a {
   left: 0px; */
 }
 
+/* Layer control open/close tab */
+
+.layer-control-tab-container{
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: transparent;
+  /* position:absolute; 
+  left: calc(50% - 25px); */
+  left: 10px;
+  z-index:9999;
+  display: block;
+  clip-path: inset(-8px -8px -8px -8px);
+  /* transition: top 0.3s linear; */
+}
+
+.layer-control-tab{
+  background-color:#dcf0f7;
+  /* background-image: url('../images/close_up.svg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 10% 100%; */
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+  color: #14416f;
+	font-family: 'Roboto Flex', 'Arial Narrow', Arial, sans-serif;
+	font-weight: 700;
+	font-size: 19px;
+	font-stretch: 75%;
+  cursor: pointer;
+  display: block;
+  position:relative;
+  /* left: calc(50% - 25px); */
+  width: 265px;
+  height: 34x;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+/* Shared tab styles */
+
+.layer-control-tab:hover,
 .side-panel-tab:hover{
 	background-color: #c9eaf8;
 }
 
+.layer-control-tab.control-closed,
 .side-panel-tab.panel-closed{
+  /* background-color: #fff; */
   background-size: 80%;
   width: 75px;
 }
-.side-panel-close:hover{
-  opacity: 100%
-}
 
+/* .layer-control-tab.control-closed:hover,
+.side-panel-tab.panel-closed:hover{
+  background-color: #e7e7e7;
+} */
 
 /* Styles for Leaflet controls */
 
@@ -598,6 +588,79 @@ a {
   width: 32px;
   height: 32px;
   line-height: 32px;
+}
+
+/* Basemap/overlay control buttons*/
+
+.layer-control-btn{
+  height: 32px;
+  width: auto;
+  background-color: #f4f4f4;
+  background-color: #fff;
+  border-radius: 4px;
+  display: inline-block;
+  cursor: pointer;
+  border: 0px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+}
+
+.layer-control-btn a{
+  font-family: "Roboto Flex",sans-serif; 
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
+  line-height: 32px;
+  padding: 0 10px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  color: black;
+}
+
+.layer-control-btn img{
+  height: 20px;
+  float: left;
+  padding: 6px 10px 6px 0px;
+}
+
+.layer-control-btn:hover, 
+.layer-control-btn:focus-visible{
+  /* background-color: rgba(255,255,255,0.55); */
+  background-color: #e7e7e7;
+  background-color: #fff;
+}
+
+.layer-control-btn.control-closed{
+  /* background-color:rgba(255,255,255,0); */
+  background-color: #fff;
+}
+
+.layer-control-btn.control-closed:hover,
+.layer-control-btn.control-closed:focus-visible{
+  /* background-color: rgba(255,255,255,0.35)*/
+  background-color: #f4f4f4;
+  background-color: #fff;
+}
+
+.layer-control-btn.basemap-control{
+  margin-right: 112px;
+  margin-top: -32px;
+}
+
+/* Basemap control */
+
+#basemapControl{
+  margin-right: 112px;
+}
+
+#basemapControl .leaflet-control-layers-base{
+  padding: 8px 10px;
+}
+
+#basemapControl .leaflet-control-layers-base label{
+  line-height: 18px;
+  font-family:'Roboto Flex',san-serif;
+  font-size: 13px;
 }
 
 /* To overrule leaflet class added later when legend control is expanded/hidden*/
@@ -681,7 +744,9 @@ a {
   background: #fff;
   /* background-clip: padding-box; */
   /* border: 2px solid rgba(0,0,0,0.2); */
-  border-radius: 4px;
+  /* border-top-left-radius: 5px;
+	border-top-right-radius: 5px; */
+  /* border-bottom: 0.5px solid #d8d8d9; */
   box-shadow: 0 0 3px rgba(0,0,0,0.2);
   font-family:'Roboto Flex',sans-serif;
   font-size: 13px;

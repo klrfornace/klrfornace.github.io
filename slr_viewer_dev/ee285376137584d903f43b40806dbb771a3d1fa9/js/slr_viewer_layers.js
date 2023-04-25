@@ -919,7 +919,7 @@ const wastewater = L.layerGroup([treatmentPlants, pumpStations, cesspools],
   options = {
     legendKey:'wastewater',
     attribution: 'Data &copy; <a href="https://honolulu-cchnl.opendata.arcgis.com/" target="_blank">City & County of Honolulu GIS</a>, '
-    + '<a href="https://seagrant.soest.hawaii.edu/cesspools-tool/" target="_blank">Hawai#699;i Cesspool Prioritization Tool</a>'
+    + '<a href="https://seagrant.soest.hawaii.edu/cesspools-tool/" target="_blank">Hawai<span class="okina">&#699;</span>i Cesspool Prioritization Tool</a>'
 });
 
 const electrical = L.layerGroup([substations, transmission], 
@@ -942,10 +942,12 @@ ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.lo
 
 ///////// LAYER CONTROL OBJECTS //////////
 
+// const accordionHighlight = '<svg class="accordion-highlight" viewBox="0 0 5 32"><g><rect x="0" y="0" width="5" height="32"/></g></svg>'
 // Create basemap layer object for layer control
 const basemaps = [
   {
-    groupName: '<img src="images/basemap.svg" class="label-icon"> BASEMAPS',
+    // '<img src="images/basemap.svg" class="label-icon"> Basemaps'
+    groupName: 'BASEMAPS',
     expanded: false, 
     layers: {
       'Grayscale': mapboxLight,
@@ -973,14 +975,16 @@ const basemapsSimple = {
 
 const overlayMaps = [
   {
-    groupName: '<img src="images/wave.svg" class="label-icon"> EXPOSURE', 
+    // '<img src="images/wave.svg" class="label-icon"> Exposure', 
+    groupName: 'EXPOSURE', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding </span><button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button><div class="legend-panel">'+ passive.options.legendEntry + '</div>']:passive, 
               // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
               // ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }
   },
-  { groupName: '<img src="images/flood_outline.svg" class="label-icon"> IMPACTS',
+  // '<img src="images/flood_outline.svg" class="label-icon"> Impacts',
+  { groupName: 'IMPACTS',
     expanded: true,
     layers: {
       ['<span class="layer-label">Flooded Roads</span><div class="legend-panel">'+roads.options.legendEntry+'</div>']:roads,
@@ -1006,7 +1010,8 @@ const overlayMaps = [
         }},
     },
   },
-  { groupName: '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS',
+  //'<img src="images/other.svg" class="label-icon"> Other Overlays',
+  { groupName: 'OTHER OVERLAYS',
     expanded: true,
     layers: {['<div class="legend-panel-inline">'+ devplan.options.legendSymbol + '</div><span class="layer-label">Community Plan Area Boundaries</span>']: devplan,
               ['<div class="legend-panel-inline">'+ moku.options.legendSymbol + '</div><span class="layer-label">Moku Boundaries</span>']: moku,
@@ -1018,15 +1023,11 @@ const overlayMaps = [
               }},
 ];
 
-
-
-// '<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"></div>':wave
-
-// '<span class="layer-label">Wave Inundation</span><details id="wave-options"><summary>More options</summary>test</details>': waveinun,
-
-// '<span class="layer-label">Stormwater infrastructure failure</span><div class="legend-panel panel-hidden"><svg class="stormwater" viewBox="0 0 33.19 33.19"><g><g><circle style="fill: #ec297b; stroke: #fff; stroke-width:1px" cx="16.59" cy="12.59" r="7.07"/></svg> &nbsp;Stormwater structures below sea level</div>':stormwater
-
 // <span class="okina">&#699;</span>
 
 
 
+// '<img src="images/basemap.svg" class="label-icon"> BASEMAPS'
+// '<img src="images/wave.svg" class="label-icon"> EXPOSURE'
+// '<img src="images/flood_outline.svg" class="label-icon"> IMPACTS'
+// '<img src="images/other.svg" class="label-icon"> OTHER OVERLAYS'
