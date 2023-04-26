@@ -6,12 +6,17 @@
 }
 
 #styledLayerControl{
-	background-color: transparent;
+	background-color: #fff;
 	box-shadow: 0 0 5px rgb(0 0 0 / 20%);
 	width: 260px;
 	border-radius: 5px;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
+	/* transition:  width 0.3s linear; */
+}
+
+#styledLayerControl.layer-control-hidden{
+	width: 45px;
 }
 .ac-container{
 	background: #fff;
@@ -26,51 +31,93 @@
 	width: 100%;
 	max-height: calc(100vh - 55px);
 	overflow: hidden;
-	-webkit-transition: max-height 0.3s ease-out;
+	/* -webkit-transition: max-height 0.3s ease-out;
 	-moz-transition: max-height 0.3s ease-out;
 	-o-transition: max-height 0.3s ease-out;
 	-ms-transition: max-height 0.3s ease-out;
-	transition:  max-height 0.3s ease-out, visibility 0.3s;
+	transition:  max-height 0.3s ease-out, visibility 0.3s; */
 }
 
-.layers-accordion-btn{
+.layers-accordion-btn,
+.layer-control-bar{
 	background: #dcf0f7;
+	/* background:rgba(220,240,247,0.5); */
 	box-sizing: border-box;
 	border: 0px;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 	color: #14416f;
-	font-family: 'Roboto Flex', 'Arial Narrow', Arial, sans-serif;
+	/* font-family: 'Roboto Flex', 'Arial Narrow', Arial, sans-serif;
 	font-weight: 700;
 	font-size: 19px;
 	font-stretch: 75%;
-	letter-spacing: 0.25px;
-	padding: 0px 15px;
+	letter-spacing: 0.25px; */
+	/* padding: 0 13.5px 0 5px; */
 	position: relative;
 	z-index: 20;
 	display: block;
-	line-height: 38px;
-	height: 36px;
-	cursor: pointer;
+	/* line-height: 38px; */
+	height: 16px;
+	overflow:hidden;
+	/* cursor: pointer; */
 	width: 100%;
-	text-align: left;
+	text-align: center;
 }
 
-.layers-accordion-btn:hover,
+.layer-control-close{
+	/* height: 14px;
+	width: 14px;
+	background: #aaaaaa;
+	border-radius: 100%; */
+	color: #14416f !important;
+	/* color: #fff !important; */
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 12px;
+	text-decoration: none;
+	cursor: pointer;
+	position:absolute; 
+	padding: 1px 0;
+	/* opacity: 50%; */
+	top: 1px;
+	right:15px;
+  }
+
+  .layer-control-close:hover{
+	opacity: 100%
+  }
+/* .layers-accordion-btn::before{
+	content: '';
+	float: left;
+	height: 36px;
+	width: 36px;
+	background-image: url('../images/layers_blue.svg');
+	background-size: 65%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	margin-right: 2px;
+} */
+
+/* .layers-accordion-btn:hover,
 .layers-accordion-btn:focus-visible{
 	background: #c9eaf8;
-}
+} */
 .layers-accordion-container.layer-control-hidden + .control-wrapper{
-	max-height: 0px;
-	visibility: hidden;
-	/* display: none; */
+	/* max-height: 0px;
+	visibility: hidden; */
+	display: none;
 }
 
 .layers-accordion-container.layer-control-hidden .layers-accordion-btn{
 	border-radius: 5px;
+	height: 45px;
+	background-image: url('../images/layers_blue.svg');
+	background-size: 32px 32px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
 }
 
-.layers-accordion-btn:after{
+/* .layers-accordion-btn:after{
 	content: '';
 	height: 36px;
 	width: 18px;
@@ -82,8 +129,8 @@
 	font-size: 18px;
 	font-family:'Roboto Flex',sans-serif;
 	font-weight: 700; */
-	float: right;
-}
+	/* float: right; */
+/*} */
 
 .layers-accordion-container.layer-control-hidden .layers-accordion-btn:after{
 	background-image: url('../images/double_arrow_down.svg');
@@ -91,14 +138,15 @@
 
 div[id^="leaflet-control-accordion-layers"] > button {
 	font-family: 'Roboto Flex', 'Arial Narrow', Arial, sans-serif;
-	font-weight: 600;
-	font-size: 15px;
+	font-weight: 650;
+	font-size: 17px;
 	/* font-stretch: 75%; */
-	padding: 8px 15px;
+	padding: 0 15px 0 10px;
 	position: relative;
 	z-index: 20;
 	display: block;
 	height: 32px;
+	line-height: 32px;
 	cursor: pointer;
 	/* color: #777; */
 	/* text-shadow: 1px 1px 1px rgba(255,255,255,0.8); */
@@ -116,18 +164,22 @@ div[id^="leaflet-control-accordion-layers"] > button {
 .ac-container input.menu + label{
 	box-sizing: border-box;
 	border-top: 0.5px solid #d8d8d9;
+	border-top: 0.5px solid rgba(20,65,111,0.15);
 	border-right: 0;
 	border-left: 0;
 	border-bottom: 0;
 	/* background: #c9eaf8; */
-	background:rgba(220,240,247,0);
+	background:rgba(220,240,247,0.5);
+	background: #f0f9fc;
+	/* background: #dcf0f7; */
 	/* color: #184e85; */
 	color: #333;
+	color: #14416f;
 }
 
-#leaflet-control-accordion-layers-0 .ac-container-accordion{
+/* #leaflet-control-accordion-layers-0 .ac-container-accordion{
 	border-top: 0;
-}
+} */
 /* .ac-container-accordion.accordion-content-hidden{
 	background: #fff;
 } */
@@ -136,7 +188,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	height: 20px;
 	float: left;
 	margin-right: 5px;
-	padding: 4px 0;
+	padding: 6px 0;
 }
 
 .ac-container-accordion:after,
@@ -144,10 +196,11 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	content: '';
 	height: 15px;
 	width: 15px;
-	background-image: url('../images/arrow_up_blk.svg');
+	background-image: url('../images/arrow_up_blue.svg');
 	background-size: 14px 14px;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
+	padding: 8px 0;
 	/* color:#333;
 	font-size: 18px;
 	font-family:'Roboto Flex',sans-serif;
@@ -159,12 +212,13 @@ div[id^="leaflet-control-accordion-layers"] > button {
 
 .ac-container-accordion.accordion-content-hidden:after,
 .ac-container input.menu + label:after{
-	background-image: url('../images/arrow_down_blk.svg');
+	background-image: url('../images/arrow_down_blue.svg');
 }
 
 .ac-container-accordion:hover,
 .ac-container input.menu + label:hover{
 	background: rgba(220,240,247,0.8);
+	background: rgba(199,231,242,0.8);
 	/* text-shadow: 0px 1px 1px rgba(255,255,255, 0.6);
 	box-shadow:
 		0px 0px 0px 1px rgba(155,155,155,0.3),
@@ -217,12 +271,13 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	-moz-transition: max-height 0.3s ease-out;
 	-o-transition:  max-height 0.3s ease-out;
 	-ms-transition: max-height 0.3s ease-out;
-	transition:  max-height 0.3s ease-out, visibility 0.3s;
+	transition:  max-height 0.3s linear, visibility 0.3s;
 }
 
 .ac-container-accordion ~ article.ac-large{
 	height: auto; 
-	max-height : 300px; /* increasing from 100px to account for more legend content */
+	/* max-height : 300px; increasing from 100px to account for more legend content */
+	max-height: calc(100vh - 55px); /* change to height of map to prevent double scroll bars */
 	overflow-y: auto;
     line-height: 18px;
 }

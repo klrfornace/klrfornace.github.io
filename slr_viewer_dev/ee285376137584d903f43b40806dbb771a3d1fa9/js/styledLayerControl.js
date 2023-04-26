@@ -211,12 +211,20 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
           })
         // end insert
         
-        // Insert top accordion to close whole container
+        // Insert top section with close button
+        // const topBar = L.DomUtil.create('div','layer-control-bar',container);
+        // const closeBtn = L.DomUtil.create('a','layer-control-close',topBar);
+        // closeBtn.setAttribute('role','button');
+        // closeBtn.setAttribute('href','#');
+        // closeBtn.setAttribute('aria-label','Close layer menu');
+        // closeBtn.innerHTML = '<span aria-hidden="true">&#10006;</span>';
+
         const layerAccordionContainer = L.DomUtil.create('div','layers-accordion-container',container);
         const layerAccordionBtn = L.DomUtil.create('button','layers-accordion-btn',layerAccordionContainer);
 
         layerAccordionBtn.type = "button";
-        layerAccordionBtn.innerHTML = 'LAYERS';
+        // layerAccordionBtn.innerHTML = '<img class="layer-control-close" src="images/close_up.svg">';
+        // layerAccordionBtn.innerHTML = '';
         layerAccordionBtn.setAttribute('aria-expanded',true); // initial state is expanded
         L.DomEvent.on(layerAccordionBtn, 'click', this._closeContainer, this);
 
@@ -829,6 +837,10 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         expanded === 'true' ? button.setAttribute('aria-expanded', 'false') : button.setAttribute('aria-expanded', 'true');
 
         button.parentElement.classList.toggle('layer-control-hidden');
+
+        // Also toggle class on container to control width
+        const control = document.getElementById('styledLayerControl');
+        control.classList.toggle('layer-control-hidden');
     },
     // _expand: function() {
     //     L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');

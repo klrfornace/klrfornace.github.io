@@ -947,7 +947,7 @@ ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.lo
 const basemaps = [
   {
     // '<img src="images/basemap.svg" class="label-icon"> Basemaps'
-    groupName: 'BASEMAPS',
+    groupName: '<img src="images/basemap.svg" class="label-icon">BASEMAPS',
     expanded: false, 
     layers: {
       'Grayscale': mapboxLight,
@@ -976,7 +976,7 @@ const basemapsSimple = {
 const overlayMaps = [
   {
     // '<img src="images/wave.svg" class="label-icon"> Exposure', 
-    groupName: 'EXPOSURE', 
+    groupName: '<img src="images/wave.svg" class="label-icon">EXPOSURE', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding </span><button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button><div class="legend-panel">'+ passive.options.legendEntry + '</div>']:passive, 
               // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
@@ -984,7 +984,7 @@ const overlayMaps = [
       }
   },
   // '<img src="images/flood_outline.svg" class="label-icon"> Impacts',
-  { groupName: 'IMPACTS',
+  { groupName: '<img src="images/flood_outline.svg" class="label-icon">IMPACTS',
     expanded: true,
     layers: {
       ['<span class="layer-label">Flooded Roads</span><div class="legend-panel">'+roads.options.legendEntry+'</div>']:roads,
@@ -1011,7 +1011,7 @@ const overlayMaps = [
     },
   },
   //'<img src="images/other.svg" class="label-icon"> Other Overlays',
-  { groupName: 'OTHER OVERLAYS',
+  { groupName: '<img src="images/other.svg" class="label-icon">OTHER OVERLAYS',
     expanded: true,
     layers: {['<div class="legend-panel-inline">'+ devplan.options.legendSymbol + '</div><span class="layer-label">Community Plan Area Boundaries</span>']: devplan,
               ['<div class="legend-panel-inline">'+ moku.options.legendSymbol + '</div><span class="layer-label">Moku Boundaries</span>']: moku,
