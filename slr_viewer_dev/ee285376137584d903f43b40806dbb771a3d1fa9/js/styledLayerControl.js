@@ -4,9 +4,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         position: 'topright',
         autoZIndex: true,
         group_togglers: {
-            show: false,
+            show: true,
             labelAll: 'All',
-            labelNone: 'None'
+            labelNone: 'Unselect all'
         },
         groupDeleteLabel: 'Delete the group'
     },
@@ -161,14 +161,16 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                         if (select) {
                             this._map.addLayer(this._layers[layer].layer);
                         } else {
-                            this._map.removeLayer(this._layers[layer].layer);
+                            if (this._map.hasLayer(this._layers[layer].layer)){
+                                this._map.removeLayer(this._layers[layer].layer);
+                            }
                         }
                     }
                 }
                 break;
             }
         }
-        this._update();
+        // this._update();
     },
 
 
@@ -210,6 +212,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             me._map.dragging.enable();
           })
         // end insert
+        
+        // Insert wrapper to tie container and utilities divs together
+        const controlWrapper = L.DomUtil.create('div','control-wrapper',container);
 
         var section = document.createElement('section');
         section.className = 'ac-container ' + className + '-list';
@@ -219,66 +224,69 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         section.appendChild(form);
 
-        if (this.options.collapsed) {
-            if (!L.Browser.android) {
-                L.DomEvent
-                    .on(container, 'mouseover', this._expand, this)
-                    .on(container, 'mouseout', this._collapse, this);
-            }
-            var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-            link.href = '#';
-            link.title = 'Layers';
+        // if (this.options.collapsed) {
+        //     if (!L.Browser.android) {
+        //         L.DomEvent
+        //             .on(container, 'mouseover', this._expand, this)
+        //             .on(container, 'mouseout', this._collapse, this);
+        //     }
+        //     var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+        //     link.href = '#';
+        //     link.title = 'Layers';
 
-            if (L.Browser.touch) {
-                L.DomEvent
-                    .on(link, 'click', L.DomEvent.stop)
-                    .on(link, 'click', this._expand, this);
-            } else {
-                L.DomEvent.on(link, 'focus', this._expand, this);
-            }
+        //     if (L.Browser.touch) {
+        //         L.DomEvent
+        //             .on(link, 'click', L.DomEvent.stop)
+        //             .on(link, 'click', this._expand, this);
+        //     } else {
+        //         L.DomEvent.on(link, 'focus', this._expand, this);
+        //     }
 
-            this._map.on('click', this._collapse, this);
-            // TODO keyboard accessibility
+        //     this._map.on('click', this._collapse, this);
+        //     // TODO keyboard accessibility
 
-        } else {
-            this._expand();
+        // } else {
+        //     this._expand();
 
-                // Create hidden layers button in case user clicks "hide" on expanded list:
-                // -jmaurer
+        //         // Create hidden layers button in case user clicks "hide" on expanded list:
+        //         // -jmaurer
 
-                var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-                link.href = '#';
-                link.title = 'Show the layer menu';
-                L.DomEvent
-                  .on(link, 'click', L.DomEvent.stop)
-                  .on(link, 'click', this._expand, this);
-        }
+        //         var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+        //         link.href = '#';
+        //         link.title = 'Show the layer menu';
+        //         L.DomEvent
+        //           .on(link, 'click', L.DomEvent.stop)
+        //           .on(link, 'click', this._expand, this);
+        // }
 
         this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
         this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
 
-        container.appendChild(section);
+        controlWrapper.appendChild(section);
+        
+        // Insert div to hold simple legend (created separately) - KF
+        const legendContainer = L.DomUtil.create('div','legend-container legend-container-hidden', controlWrapper);
 
         // process options of ac-container css class - to options.container_width and options.container_maxHeight
         for (var c = 0; c < (containers = container.getElementsByClassName('ac-container')).length; c++) {
-            if (this.options.container_width) {
-                containers[c].style.width = this.options.container_width;
-            }
+            // if (this.options.container_width) {
+            //     containers[c].style.width = this.options.container_width;
+            // }
 
             // set the max-height of control to y value of map object
-            // Adding extra 15px to account for button group at button -KF
-            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : (this._map.getSize().y - 90);
+            // Top and bottom margins -> 20px, utilities section -> 29px, attribution control (2 lines) -> 34px
+            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : (this._map.getSize().y - 83);
             containers[c].style.maxHeight = this._default_maxHeight + 'px';
+
+            // Also set max-height of legend container
+            legendContainer.style.maxHeight = this._default_maxHeight + 'px';
         }
-
-        // Insert div to hold simple legend (created separately) - KF
-        L.DomUtil.create('div','legend-container legend-container-hidden', container);
-
+        
         // Add layer utilities for expanding, collapsing, and clearing all
         // layers (-jmaurer):
         // replacing with simple legend/full interactive menu toggle - KF
 
-        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',container);
+        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',controlWrapper);
         utilities.id = 'styledLayerControl-utilities';
 
         // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
@@ -315,39 +323,6 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             }
         }
 
-        // radioToggle.innerHTML = '<input class="radio__input" type="radio" name="legend-toggle" value="full-menu" id="full-menu-radio" checked>'+
-        // '<label for="full-menu-radio" role="button" tabindex="0" aria-pressed="true" class="radio__label" title="Show full layer menu">Full layer menu</label>'+
-        // '<input class="radio__input" type="radio" name="legend-toggle" value="simple-legend" id="simple-legend-radio">'+
-        // '<label for="simple-legend-radio" role="button" tabindex="0" aria-pressed="false" class="radio__label" title="Show simple map legend">Simple legend</label>';
-
-        // var clear_all = document.createElement('a');
-        // var clear_all_text = document.createTextNode('Clear all');
-        // clear_all.appendChild(clear_all_text);
-        // clear_all.href = 'javascript:void(0)';
-        // var me = this; // create closure
-        // clear_all.onclick = function () { me._clearAll(); };
-        // utilities.appendChild(clear_all);
-
-        // var spacer = document.createElement('span');
-        // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
-        // utilities.appendChild(spacer);
-
-        // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
-
-        // hide_menu.innerHTML = '<svg viewBox="0 0 30.56 30.28"><g><path d="M26.06,30.28H4.5c-2.48,0-4.5-2.02-4.5-4.5V4.5C0,2.02,2.02,0,4.5,0H26.06c2.48,0,4.5,2.02,4.5,4.5V25.78c0,2.48-2.02,4.5-4.5,4.5ZM4.5,3c-.83,0-1.5,.67-1.5,1.5V25.78c0,.83,.67,1.5,1.5,1.5H26.06c.83,0,1.5-.67,1.5-1.5V4.5c0-.83-.67-1.5-1.5-1.5H4.5Z"/><g><rect x="19.41" y="5.94" width="6.99" height="3.13" transform="translate(1.4 18.4) rotate(-45)"/><polygon points="18 5.46 15.46 14.96 24.96 12.41 18 5.46"/></g><g><rect x="4.15" y="21.2" width="6.99" height="3.13" transform="translate(-13.86 12.08) rotate(-45)"/><polygon points="12.55 24.82 15.1 15.32 5.6 17.87 12.55 24.82"/></g></g></svg>';
-        // hide_menu.setAttribute('aria-label','Hide layer control window');
-        // var closure = this; // create closure
-        // hide_menu.onclick = function () { closure._collapse(); };
-        // utilities.appendChild(hide_menu);
-
-        // var spacer = document.createElement('span');
-        // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
-        // utilities.appendChild(spacer);
-
-        // var legendToggle = L.DomUtil.create('button','legend-toggle',utilities);
-        // legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-        // legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
-
         window.onresize = this._on_resize_window.bind(this);
 
     },
@@ -356,14 +331,17 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // listen to resize of screen to reajust de maxHeight of container
         for (var c = 0; c < containers.length; c++) {
             // input the new value to height
-            // adjusted height factor to account for button group - KF
+            // Total offset: 83px (margins, utilties, attribution control) + 55px (nav bar)
+            const newHeight = (window.innerHeight - 138) + "px";
+            containers[c].style.maxHeight = newHeight;
 
-            containers[c].style.maxHeight = (window.innerHeight - 110) < this._removePxToInt(this._default_maxHeight) ? 
-            (window.innerHeight - 110) + "px" : 
-            this._default_maxHeight = this._removePxToInt(this._default_maxHeight) + "px"; // This line had bug (wasn't actually setting new default max height) - KF
+            this._default_maxHeight = newHeight + "px"; // This line had bug (wasn't actually setting new default max height) - KF
 
             // add resizing to min width based on window width
         }
+
+        const legendContainer = document.querySelector('legend-container');
+        legendContainer.style.maxHeight = newHeight;
     },
 
     // remove the px from a css value and convert to a int
@@ -626,50 +604,39 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             
             // Create wrapper around checkbox items with padding set to allow for smooth transition of article element
             const wrapperDiv = L.DomUtil.create('div', 'wrapper', accordionGroup);
-            wrapperDiv.appendChild(label);
 
-            // Hide overflow-y during transition
-            accordionGroup.addEventListener('transitionstart', ()=> accordionGroup.style.overflowY = 'hidden');
-            accordionGroup.addEventListener('transitionend', ()=> accordionGroup.style.overflowY = 'auto');
-            
-            // process options of ac-large css class - to options.group_maxHeight property
-            if (this.options.group_maxHeight) {
-                article.style.maxHeight = this.options.group_maxHeight;
-            }
 
-            // Link to toggle all layers
+            // Link to toggle all layers (moved to top of container - KF)
             if (obj.overlay && this.options.group_togglers.show) {
-
                 // Toggler container
-                var togglerContainer = L.DomUtil.create('div', 'group-toggle-container', groupContainer);
+                var togglerContainer = L.DomUtil.create('div', 'group-toggle-container', wrapperDiv);
 
                 // Link All
-                var linkAll = L.DomUtil.create('a', 'group-toggle-all', togglerContainer);
-                linkAll.href = '#';
-                linkAll.title = this.options.group_togglers.labelAll;
-                linkAll.innerHTML = this.options.group_togglers.labelAll;
-                linkAll.setAttribute("data-group-name", obj.group.name);
+                // var linkAll = L.DomUtil.create('a', 'group-toggle-all', togglerContainer);
+                // linkAll.href = '#';
+                // linkAll.title = this.options.group_togglers.labelAll;
+                // linkAll.innerHTML = this.options.group_togglers.labelAll;
+                // linkAll.setAttribute("data-group-name", obj.group.name);
 
-                if (L.Browser.touch) {
-                    L.DomEvent
-                        .on(linkAll, 'click', L.DomEvent.stop)
-                        .on(linkAll, 'click', this._onSelectGroup, this);
-                } else {
-                    L.DomEvent
-                        .on(linkAll, 'click', L.DomEvent.stop)
-                        .on(linkAll, 'focus', this._onSelectGroup, this);
-                }
+                // if (L.Browser.touch) {
+                //     L.DomEvent
+                //         .on(linkAll, 'click', L.DomEvent.stop)
+                //         .on(linkAll, 'click', this._onSelectGroup, this);
+                // } else {
+                //     L.DomEvent
+                //         .on(linkAll, 'click', L.DomEvent.stop)
+                //         .on(linkAll, 'focus', this._onSelectGroup, this);
+                // }
 
-                // Separator
-                var separator = L.DomUtil.create('span', 'group-toggle-divider', togglerContainer);
-                separator.innerHTML = ' / ';
+                // // Separator
+                // var separator = L.DomUtil.create('span', 'group-toggle-divider', togglerContainer);
+                // separator.innerHTML = ' / ';
 
-                // Link none
-                var linkNone = L.DomUtil.create('a', 'group-toggle-none', togglerContainer);
-                linkNone.href = '#';
-                linkNone.title = this.options.group_togglers.labelNone;
+                // Link none (switch to button - KF)
+                var linkNone = L.DomUtil.create('button', 'group-toggle-none', togglerContainer);
                 linkNone.innerHTML = this.options.group_togglers.labelNone;
                 linkNone.setAttribute("data-group-name", obj.group.name);
+                linkNone.setAttribute('type','button');
 
                 if (L.Browser.touch) {
                     L.DomEvent
@@ -707,6 +674,18 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 }
 
             }
+            
+            wrapperDiv.appendChild(label);
+            
+            // Hide overflow-y during transition
+            accordionGroup.addEventListener('transitionstart', ()=> accordionGroup.style.overflowY = 'hidden');
+            accordionGroup.addEventListener('transitionend', ()=> accordionGroup.style.overflowY = 'auto');
+            
+            // process options of ac-large css class - to options.group_maxHeight property
+            if (this.options.group_maxHeight) {
+                article.style.maxHeight = this.options.group_maxHeight;
+            }
+
 
             container.appendChild(groupContainer);
 
@@ -781,8 +760,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         this.selectGroup(e.target.getAttribute("data-group-name"));
     },
 
+    // Switch to John's clear all function instead of using unselectGroup, which causes whole container to redraw
     _onUnSelectGroup: function(e) {
-        this.unSelectGroup(e.target.getAttribute("data-group-name"));
+        this._clearAll(e.target.getAttribute("data-group-name"));
     },
 
     _onRemoveGroup: function(e) {

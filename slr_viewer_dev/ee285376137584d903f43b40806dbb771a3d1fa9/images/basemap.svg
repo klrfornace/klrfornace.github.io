@@ -6,7 +6,7 @@
         stroke: #184e85;
         stroke-linecap: round;
         stroke-miterlimit: 10;
-        stroke-width: 1.83px;
+        stroke-width: 2px;
       }
 
       .cls-1, .cls-2 {

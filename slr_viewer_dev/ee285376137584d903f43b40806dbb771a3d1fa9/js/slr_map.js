@@ -121,7 +121,8 @@ layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-const legendDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
+const legendOuterDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
+const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDiv);
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 

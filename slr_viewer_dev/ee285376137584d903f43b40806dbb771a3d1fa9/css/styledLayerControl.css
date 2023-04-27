@@ -5,8 +5,17 @@
 	margin-top: 10px;
 }
 
+#styledLayerControl{
+	background-color: #fff;
+	box-shadow: 0 0 5px rgb(0 0 0 / 20%);
+	width: 260px;
+	border-radius: 5px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
 .ac-container{
-	width: 265px;
+	width: 100%;
 	text-align: left;
 	overflow-y: auto;
 	overflow-x: auto;
@@ -16,49 +25,40 @@
 	/* border-top: 1px solid#b4d2df; */
 }
 
+.control-wrapper{
+	width: 100%;
+	max-height: calc(100vh - 55px);
+	overflow: hidden;
+	/* -webkit-transition: max-height 0.3s ease-out;
+	-moz-transition: max-height 0.3s ease-out;
+	-o-transition: max-height 0.3s ease-out;
+	-ms-transition: max-height 0.3s ease-out;
+	transition:  max-height 0.3s ease-out, visibility 0.3s; */
+}
+
 div[id^="leaflet-control-accordion-layers"] > button {
 	font-family: 'Roboto Flex', 'Arial Narrow', Arial, sans-serif;
 	font-weight: 700;
-	font-size: 19px;
+	font-size: 17px;
 	font-stretch: 75%;
-	padding: 3px 15px 3px 10px;
+	padding: 0 15px 0 10px;
 	position: relative;
 	z-index: 20;
 	display: block;
-	height: 36px;
+	height: 34px;
 	cursor: pointer;
-	/* color: #777; */
-	/* text-shadow: 1px 1px 1px rgba(255,255,255,0.8); */
-	line-height: 29px;
-
-	/* background: #ffffff;
-	background: -moz-linear-gradient(top, #ffffff 1%, #eaeaea 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#ffffff), color-stop(100%,#eaeaea));
-	background: -webkit-linear-gradient(top, #ffffff 1%,#eaeaea 100%);
-	background: -o-linear-gradient(top, #ffffff 1%,#eaeaea 100%);
-	background: -ms-linear-gradient(top, #ffffff 1%,#eaeaea 100%);
-	background: linear-gradient(top, #ffffff 1%,#eaeaea 100%); */
-	/* filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea',GradientType=0 );
-	box-shadow:
-		0px 0px 0px 1px rgba(155,155,155,0.3),
-		1px 0px 0px 0px rgba(255,255,255,0.9) inset,
-		0px 2px 2px rgba(0,0,0,0.1); */
-    /* box-sizing: content-box; */
+	line-height: 34px;
     cursor:pointer;
 	overflow: hidden;
     width: 100%;
 	text-align: left;
     margin: 0;
 }
-/* div[id^="leaflet-control-accordion-layers"] > label:hover {
-	background: #fff;
-} */
 
-.ac-container-accordion,
-.ac-container input.menu + label{
+.ac-container-accordion{
 	box-sizing: border-box;
-	border-top: 0.5px solid #c7e7f2;
-	border-bottom: 0.5px solid #dcf0f7;
+	border-top: 0.5px solid rgba(20,65,111,0.15);
+	border-bottom: 0;
 	border-left: 0px;
 	border-right: 0px;
 	background: #c9eaf8;
@@ -74,37 +74,34 @@ div[id^="leaflet-control-accordion-layers"] > button {
 		0px 2px 2px rgba(0,0,0,0.1); */
 }
 
+#leaflet-control-accordion-layers-0 .ac-container-accordion{
+	border-top: 0;
+}
+
 .label-icon{
-	height: 22px;
+	height: 23px;
 	float: left;
 	margin-right: 5px;
-	padding: 3px 0;
+	padding: 5px 0;
 }
 
 .ac-container-accordion:after,
 .ac-container input.menu:checked + label:after{
-	content: '\2013';
-	color: #184e85;
-	font-size: 18px;
-	font-family:'Roboto Flex',sans-serif;
-	font-weight: 700;
+	content: '';
+	height: 15px;
+	width: 15px;
+	background-image: url('../images/arrow_up.svg');
+	background-size: 14px 14px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	padding: 9px 0;
 	float: right;
-	margin-left: 5px;
-}
-
-.ac-container-accordion.accordion-content-hidden{
-	border-bottom: 0.5px solid #dcf0f7;
+	opacity: 75%;
 }
 
 .ac-container-accordion.accordion-content-hidden:after,
 .ac-container input.menu + label:after{
-	content: '+';
-	color: #184e85;
-	font-size: 18px;
-	font-family:'Roboto Flex',sans-serif;
-	font-weight: 500;
-	float: right;
-	margin-left: 5px;
+	background-image: url('../images/arrow_down.svg');
 }
 
 .ac-container-accordion:hover,
@@ -117,17 +114,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 		0px 2px 2px rgba(0,0,0,0.1); */
 }
 
-.ac-container input.menu + div[id^="leaflet-control-accordion-layers"] > label:after{
-	content: '-';
-	position: absolute;
-	width: 24px;
-	height: 24px;
-	right: 13px;
-	top: 7px;
-	/* background: transparent url(images/arrow_down.png) no-repeat center center; */
-}
-
-
 .ac-container input.menu{
 	display: none;
 }
@@ -136,10 +122,11 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	max-height: 0px;
 	padding: 0px;
 	/* display: none; */
+	visibility: hidden
 }
 
 .ac-container article{
-	background: rgba(255, 255, 255, 0.5);
+	/* background: rgba(255, 255, 255, 0.5); */
 	/* margin-top: -2px; */
 	overflow: hidden;
 	max-height: 0px;
@@ -148,32 +135,23 @@ div[id^="leaflet-control-accordion-layers"] > button {
     line-height: 0px;
 	position: relative;
 	z-index: 10;
-	-webkit-transition: max-height 0.3s ease-out;
+	/* -webkit-transition: max-height 0.3s ease-out;
 	-moz-transition: max-height 0.3s ease-out;
 	-o-transition: max-height 0.3s ease-out;
 	-ms-transition: max-height 0.3s ease-out;
-	transition:  max-height 0.3s ease-out;
-}
-
-.ac-container input.menu:checked ~ article,
-.ac-container-accordion ~ article{
-	-webkit-transition: max-height 0.3s ease-out;
-	-moz-transition: max-height 0.3s ease-out;
-	-o-transition:  max-height 0.3s ease-out;
-	-ms-transition: max-height 0.3s ease-out;
-	transition:  max-height 0.3s ease-out
+	transition:  max-height 0.3s ease-out; */
 }
 
 .ac-container-accordion ~ article.ac-large,
 .ac-container input.menu:checked ~ article.ac-large{
 	height: auto; 
-	max-height : 300px; /* increasing from 100px to account for more legend content */
+	max-height : calc(100vh - 55px); /* increasing to map height to prevent double scroll bar */
 	overflow-y: auto;
     line-height: 18px;
 }
 
 .wrapper{
-	padding: 8px 0;
+	padding: 4px 0 8px 0;
 }
 
 .ac-container article label {
@@ -183,24 +161,39 @@ div[id^="leaflet-control-accordion-layers"] > button {
 }
 
 .ac-container .group-toggle-container {
-    text-align: right;
-    margin-right: 3px;
-    line-height: 0px;
-    display: none;
-    height: 20px;
+	padding: 0 10px 2px 10px;
+    /* display: none; */
 }
 
-.ac-container input.menu:checked ~ .group-toggle-container {
+.group-toggle-container button{
+	border: 0px;
+	border-radius: 5px;
+	background: rgba(20,65,111,0);
+	color: #184e85;
+	font-size: 11px;
+	font-family: 'Roboto Flex',sans-serif;
+	font-weight: 600;
+	line-height: 1;
+	padding: 3px 6px;
+	cursor: pointer;
+
+}
+
+.group-toggle-container button:hover,
+.group-toggle-container button:focus-visible{
+	background: rgba(20,65,111,0.12);
+}
+
+/* .ac-container input.menu:checked ~ .group-toggle-container {
     display: block;
 	line-height: 1em;
-}
+} */
 
 .menu-item-radio{
 	font-family: 'Roboto Flex', Arial, sans-serif;
 	font-size: 13px;
 	line-height:1.5;
 	margin-left: 10px;
-
 }
 
 .menu-item-checkbox{
@@ -298,7 +291,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	margin: auto;
 	padding: 7px 0px;
 	text-align: center;
-	width: 132.5px;
+	width: 130px;
 	/* outline: 1px solid #cfcfd0; */
 }
 
@@ -334,37 +327,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	border-bottom-right-radius: 5px;
 }
 
-/* .radio__input{
-	display: none;
-}
-
-.radio__input:checked + .radio__label{
-	background: #f7f7f7;
-	color: #2d2d2d;
-	font-weight: 500;
-	outline: 1px solid #cfcfd0;
-}
-.radio__label{
-	color: #5b5b5b;
-	cursor: pointer;
-	font-weight: 400;
-	margin: auto;
-	padding: 4px 0px;
-	text-align: center;
-	width: 135px;
-}
-
-.radio__label:hover{
-	background: #d3d3d4;
-	color: #2474c6;
-} */
-
-/* #styledLayerControl-utilities button{
-	cursor: pointer;
-	font-family: 'Roboto',sans-serif;
-	font-weight: 500;
-} */
-
 #styledLayerControl-utilities .close-btn{
 	height: 24px;
 	/* width: 24px; */
@@ -375,70 +337,6 @@ div[id^="leaflet-control-accordion-layers"] > button {
 .sublayers-hidden{
 	display: none;
 }
-
-/* #styledLayerControl-utilities svg{
-	display: inline-block;
-	vertical-align: middle;
-}
-
-.close-btn{
-	background: none;
-	border: none;
-}
-
-.close-btn:hover{
-	background: none;
-	color: #2474c6;
-}
-
-.close-btn svg{
-	height: 14px;
-	width: 14px;
-	fill: #868686;
-	stroke: #868686;
-	stroke-width: 3px;
-}
-
-.close-btn:hover svg{
-	fill: #2474c6;
-}
-
-.legend-toggle svg{
-	height: 14px;
-	width: 14px;
-	fill: #184e85;
-}
-
-.legend-toggle{
-	border: none;
-	border-radius: 3px;
-	color: #184e85;
-} */
-
-/* .legend-toggle:hover svg{
-	fill: #2474c6;
-}
-
-.legend-toggle:hover{
-	color: #2474c6;
-} */
-
-/* #styledLayerControl-utilities button:hover svg{
-	fill: #2474c6;
-} */
-
-/* #styledLayerControl-utilities button:hover{
-	background: none;
-	color: #2474c6;
-} */
-
-/* #styledLayerControl-utilities a{
-	color: #184e85;
-
-} */
-/* #styledLayerControl-utilities a:hover{
-	color: #2474c6;
-} */
 
 .leaflet-touch .leaflet-control-layers-toggle{
     background-clip: padding-box;
