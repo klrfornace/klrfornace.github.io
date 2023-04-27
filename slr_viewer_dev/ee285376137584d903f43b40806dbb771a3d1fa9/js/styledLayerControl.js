@@ -879,6 +879,12 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             }
 
             input.checked = false;
+
+            // Close any sublayers
+            const sublayers = document.getElementById('ac_layer_input_' + input.layerId + '_sublayers');
+            if (sublayers){
+                sublayers.classList.add('sublayers-hidden');
+            }
         }
         this._onInputClick();
     },

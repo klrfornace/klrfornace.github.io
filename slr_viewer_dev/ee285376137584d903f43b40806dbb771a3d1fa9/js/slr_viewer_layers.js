@@ -919,7 +919,7 @@ const wastewater = L.layerGroup([treatmentPlants, pumpStations, cesspools],
   options = {
     legendKey:'wastewater',
     attribution: 'Data &copy; <a href="https://honolulu-cchnl.opendata.arcgis.com/" target="_blank">City & County of Honolulu GIS</a>, '
-    + '<a href="https://seagrant.soest.hawaii.edu/cesspools-tool/" target="_blank">Hawai#699;i Cesspool Prioritization Tool</a>'
+    + '<a href="https://seagrant.soest.hawaii.edu/cesspools-tool/" target="_blank">Hawai<span class="okina">&#699;</span>i Cesspool Prioritization Tool</a>'
 });
 
 const electrical = L.layerGroup([substations, transmission], 
