@@ -64,60 +64,34 @@ mapboxLight.addTo(map); // initial basemap
 // Add styled layer control to map
 // Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
 
-// Add button to show/hide layer control. (Layer control initial state is open).
-const layerControlBtn = L.control({position: 'topright'});
-layerControlBtn.onAdd = function(){
-  const btnContainer = L.DomUtil.create('div','layer-control-btn');
-  const layerButton = L.DomUtil.create('a','leaflet-control-layer', btnContainer);
-  layerButton.role = "button";
-  layerButton.href = '#';
-  layerButton.title = 'Close the layer control menu';
-  layerButton.setAttribute('aria-label','Close the layer menu');
-  layerButton.setAttribute('aria-disable',false);
-  layerButton.innerHTML = '<img src="images/layers_outline.svg"> Layers';
-  layerButton.onclick =  openCloseLayerControl;
-  return btnContainer
-}
-// layerControlBtn.addTo(map);
-
-function openCloseLayerControl(){
-  const layerControlContainer = document.querySelector('.leaflet-control-layers');
-  const layerControlButton = document.querySelector('.layer-control-btn');
-  if (layerControlButton.classList.contains('control-closed')){
-    layerControlContainer.style.display = '';
-    layerControlButton.classList.remove('control-closed');
-    this.setAttribute('title','Close the layer control menu');
-    this.setAttribute('aria-label','Close the layer control menu');
-  }
-  else{
-    layerControlContainer.style.display = 'none';
-    layerControlButton.classList.add('control-closed');
-    this.setAttribute('title', 'Open the layer control menu');
-    this.setAttribute('aria-label', 'Open the layer control menu');
-  }
-}
-
-// Add button show/hide basemap menu
-const basemapControlBtn = L.control({position: 'topright'});
-basemapControlBtn.onAdd = function(){
-  const btnContainer = L.DomUtil.create('div','layer-control-btn basemap-control');
-  const basemapButton = L.DomUtil.create('a','leaflet-control-layer', btnContainer);
-  basemapButton.role = "button";
-  basemapButton.href = '#';
-  basemapButton.title = 'Close the layer control menu';
-  basemapButton.setAttribute('aria-label','Close the layer menu');
-  basemapButton.setAttribute('aria-disable',false);
-  basemapButton.innerHTML = '<img src="images/basemap_black.svg" style="height:18px; margin-top:1px"> Basemaps';
-  // basemapButton.onclick =  openCloseLayerControl;
-  return btnContainer
-}
-// basemapControlBtn.addTo(map);
-
-// Add layer control
 const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
-layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
+layerControl.getContainer().id = 'layerControl'; // set id for navigation, style
+
+// Add functionality to nav bar link to open/close layer control
+function openCloseLayerControl(){
+  const layerControlContainer = document.querySelector('.leaflet-control-layers');
+  const layerControlToggle = document.querySelector('.layer-control-toggle');
+  if (layerControlToggle.classList.contains('control-closed')){
+    layerControlContainer.style.display = '';
+    layerControlToggle.classList.remove('control-closed');
+    this.setAttribute('title','Close the layer menu');
+    this.setAttribute('aria-label','Close the layer menu');
+    this.setAttribute('href','#layerControl') // This directs keyboard navigators to layer control container when it is toggled open
+  }
+  else{
+    layerControlContainer.style.display = 'none';
+    layerControlToggle.classList.add('control-closed');
+    this.setAttribute('title', 'Open the layer menu');
+    this.setAttribute('aria-label', 'Open the layer menu');
+    this.setAttribute('href','#'); // Set link back when menu is closed since there is nowhere to navigate to
+  }
+}
+
+const layerControlToggle = document.querySelector('.layer-control-toggle a');
+layerControlToggle.onclick = openCloseLayerControl;
+
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 

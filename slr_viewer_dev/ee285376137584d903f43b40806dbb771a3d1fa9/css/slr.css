@@ -10,9 +10,9 @@ body {
   /* position: fixed;
   top: 0px;
   left: 0px; */
-  height: 55px;
+  height: 50px;
   background-color: #14416f;
-  color: #fff;
+  color: #fbfdfe;
 }
 
 .nav-bar-menu{
@@ -31,12 +31,7 @@ body {
 .nav-bar-item{
   float: right;
   text-align: center;
-  padding: 10px 10px;
-}
-
-.nav-bar-item-btn{
-  float: right;
-  padding: 7.5px 15px 7.5px 10px;
+  padding: 7.5px 10px;
 }
 
 /* .layer-control-btn{
@@ -52,57 +47,43 @@ body {
   cursor: pointer;
 } */
 
-.layer-control-btn{
-  height: 32px;
+.layer-control-toggle{
+  background-color: rgba(255,255,255,0.2); 
+  height: 35px;
   width: auto;
-  background-color: #f4f4f4;
   border-radius: 4px;
   display: inline-block;
   cursor: pointer;
-  border: 0px;
-  box-shadow: 0 0 5px rgb(0 0 0 / 20%);
 }
 
-.layer-control-btn a{
+.layer-control-toggle a{
   font-family: "Roboto Flex",sans-serif; 
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 400;
   display: inline-block;
-  line-height: 32px;
+  letter-spacing: 0.5px;
+  line-height: 35px;
   padding: 0 10px;
   text-align: center;
   text-decoration: none;
-  color: #333;
-  color: black;
+  color: #fbfdfe;
 }
 
-.layer-control-btn img{
-  height: 20px;
+.layer-control-toggle img{
+  height: 18px;
   float: left;
-  padding: 6px 10px 6px 0px;
+  padding: 8px 8px 9px 0px;
 }
 
-.layer-control-btn:hover, 
-.layer-control-btn:focus-visible{
-  /* background-color: rgba(255,255,255,0.55); */
-  background-color: #e7e7e7;
+.layer-control-toggle:hover,
+.layer-control-toggle:focus-visible,
+.layer-control-toggle.control-closed:hover,
+.layer-control-toggle.control-closed:focus-visible{
+    background-color: rgba(255,255,255,0.4); 
 }
 
-.layer-control-btn.control-closed{
-  /* background-color:rgba(255,255,255,0); */
-  background-color: #fff;
-}
-
-.layer-control-btn.control-closed:hover,
-.layer-control-btn.control-closed:focus-visible{
-  /* background-color: rgba(255,255,255,0.35)*/
-  background-color: #f4f4f4;
-}
-
-.layer-control-btn.basemap-control{
-  margin-right: 112px;
-  margin-top: -32px;
-  background-color: #fff;
+.layer-control-toggle.control-closed{
+  background-color:rgba(255,255,255,0);
 }
 
 hr {
@@ -113,7 +94,7 @@ hr {
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 600;
   padding: 0;
   margin: 0;
@@ -122,7 +103,7 @@ h1 {
   letter-spacing: 0.5px;
 }
 
-h3 {
+h2 {
   font-size:21px;
   font-family: 'Roboto Flex', 'Arial Narrow', Arial, sans-serif;
   font-weight: 700;
@@ -149,7 +130,7 @@ a {
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: stretch; */
-    height: calc(100vh - 55px);
+    height: calc(100vh - 50px);
     width: 100%;
     position: relative;
     /* height: calc(95vh - 50px); */

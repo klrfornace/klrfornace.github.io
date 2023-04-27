@@ -5,7 +5,7 @@
 	margin-top: 10px;
 }
 
-#styledLayerControl{
+#layerControl{
 	background-color: #fff;
 	box-shadow: 0 0 5px rgb(0 0 0 / 20%);
 	width: 260px;
@@ -27,7 +27,7 @@
 
 .control-wrapper{
 	width: 100%;
-	max-height: calc(100vh - 55px);
+	max-height: calc(100vh - 50px);
 	overflow: hidden;
 	/* -webkit-transition: max-height 0.3s ease-out;
 	-moz-transition: max-height 0.3s ease-out;

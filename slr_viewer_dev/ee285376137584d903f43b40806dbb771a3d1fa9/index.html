@@ -107,8 +107,11 @@
     <div id="nav-bar">
         <div class="nav-bar-menu">
             <div class="nav-bar-title"><h1>CRC Sea Level Rise Viewer - DRAFT</h1></div>
-            <div class="nav-bar-item-btn">
-                <!-- <button class="layer-control-btn" aria-label="Close the layer control menu"></button> -->
+            <div class="nav-bar-item">
+                <div class="layer-control-toggle">
+                    <a role="button" href="#" title="Close the layer menu" aria-label="Close the layer menu"><img src="images/layers_outline.svg"> Layers</a>
+                </div>
+                <div id="layer-control-placeholder"></div>
             </div>
             <div class="nav-bar-item"></div>
         </div>
@@ -117,7 +120,7 @@
         <div class="side-panel-container">
             <div class="header side-panel-header">
                 <img id="slr-icon" src="images/slr_icon5_2.png">
-                <h3>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h3>
+                <h2>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h2>
             </div>
             <div class="side-panel-content">
                 <!-- <label class="scenario-select-label" for="scenario-select">Sea Level Rise Scenario <button class="info-button" id="scenario-select-info" aria-label="more info"></button></label>

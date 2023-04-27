@@ -331,8 +331,8 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // listen to resize of screen to reajust de maxHeight of container
         for (var c = 0; c < containers.length; c++) {
             // input the new value to height
-            // Total offset: 83px (margins, utilties, attribution control) + 55px (nav bar)
-            const newHeight = (window.innerHeight - 138) + "px";
+            // Total offset: 83px (margins, utilties, attribution control) + 50px (nav bar)
+            const newHeight = (window.innerHeight - 133) + "px";
             containers[c].style.maxHeight = newHeight;
 
             this._default_maxHeight = newHeight + "px"; // This line had bug (wasn't actually setting new default max height) - KF
@@ -341,7 +341,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         }
 
         const legendContainer = document.querySelector('legend-container');
-        legendContainer.style.maxHeight = newHeight;
+        if (legendContainer){
+            legendContainer.style.maxHeight = newHeight;
+        }
     },
 
     // remove the px from a css value and convert to a int

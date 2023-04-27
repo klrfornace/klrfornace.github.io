@@ -4,9 +4,9 @@
     <style>
       .cls-1 {
         fill: none;
-        stroke: #000;
+        stroke: #fbfdfe;
         stroke-miterlimit: 10;
-        stroke-width: 4px;
+        stroke-width: 4.5px;
       }
     </style>
   </defs>
