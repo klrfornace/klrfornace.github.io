@@ -16,6 +16,13 @@ const mapboxLight = L.tileLayer(mapboxURL, mapboxOptions('mapbox/light-v10'));
 const mapboxSatellite = L.tileLayer(mapboxURL, mapboxOptions('mapbox/satellite-v9'));
 const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/satellite-streets-v11'));
 
+// const test = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' + (L.Browser.retina ? '@2x.png' : '.png'), {
+//    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+//    subdomains: 'abcd',
+//    maxZoom: 20,
+//    minZoom: 0
+//  });
+
 // const mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
 //   attribution:  '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
 //   id: 'mapbox/streets-v11',
@@ -945,7 +952,7 @@ ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.lo
 // Create basemap layer object for layer control
 const basemaps = [
   {
-    groupName: '<img src="images/basemap.svg" class="label-icon">BASEMAPS',
+    groupName: '<h3><img src="images/basemap.svg" class="label-icon">BASEMAPS</h3>',
     expanded: false, 
     layers: {
       'Grayscale': mapboxLight,
@@ -973,14 +980,14 @@ const basemapsSimple = {
 
 const overlayMaps = [
   {
-    groupName: '<img src="images/wave.svg" class="label-icon">EXPOSURE', 
+    groupName: '<h3><img src="images/wave.svg" class="label-icon">EXPOSURE</h3>', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding</span><button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button><div class="legend-panel">'+ passive.options.legendEntry + '</div>']:passive, 
               // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
               // ['<span class="layer-label">Compound Flooding Scenario<br>(December 2021 Kona storm)</span><div class="legend-panel panel-hidden">'+ compFlood.options.legendEntry + '</div>']:compFlood
       }
   },
-  { groupName: '<img src="images/flood_outline.svg" class="label-icon">IMPACTS',
+  { groupName: '<h3><img src="images/flood_outline.svg" class="label-icon">IMPACTS</h3>',
     expanded: true,
     layers: {
       ['<span class="layer-label">Flooded Roads</span><div class="legend-panel">'+roads.options.legendEntry+'</div>']:roads,
@@ -1006,7 +1013,7 @@ const overlayMaps = [
         }},
     },
   },
-  { groupName: '<img src="images/other.svg" class="label-icon">OTHER OVERLAYS',
+  { groupName: '<h3><img src="images/other.svg" class="label-icon">OTHER OVERLAYS</h3>',
     expanded: true,
     layers: {['<div class="legend-panel-inline">'+ devplan.options.legendSymbol + '</div><span class="layer-label">Community Plan Area Boundaries</span>']: devplan,
               ['<div class="legend-panel-inline">'+ moku.options.legendSymbol + '</div><span class="layer-label">Moku Boundaries</span>']: moku,
