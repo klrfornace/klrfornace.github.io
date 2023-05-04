@@ -617,7 +617,7 @@ printAttribution.onAdd = function(){
 // Add to map when print button is pushed
 map.on('easyPrint-start', () => {
   map.addControl(printAttribution);
-  
+  console.log(printAttribution);
 });
 
 // Initialize map with passive flooding layers

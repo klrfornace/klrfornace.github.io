@@ -102,7 +102,7 @@ const passiveWmsOptions = (ft, type) => (
                 data == 11? ('Depth below sea level:<div class="popup-data"> 10+ ft</div>'): 
                 ('Depth below sea level:<div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')),
     nullValue: type === "SCI"? 127:15,
-    popupMinZoom: 15,
+    popupMinZoom: 12,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v3` : `CRC:HI_State_80prob_${ft}ft_${type}_v3`, 
     name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,
   }
@@ -132,7 +132,7 @@ const waveWmsOptions = (ft) => (
     queryable: true,
     queryProperty: 'GRAY_INDEX',
     nullValue: -999,
-    popupMinZoom: 15,
+    popupMinZoom: 12,
     layers: (ft < 10) ? `CRC:puc_wave_0${ft}ft` : `CRC:puc_wave_${ft}ft`, 
     name: (ft < 10) ? `Annual wave 0${ft}ft` : `Annual wave ${ft}ft`,
   }
@@ -157,7 +157,7 @@ for (let i = 0; i < 11; i++) {
       maxZoom: 19,
       queryable: true,
       nullValue: -999,
-      popupMinZoom: 15,
+      popupMinZoom: 12,
       layers: (ft < 10) ? `CRC:compound_flooding_prelim_0${ft}ft` : `CRC:compound_flooding_prelim_${ft}ft`, 
       name: (ft < 10) ? `Kona storm scenario 0${ft}ft` : `Kona storm scenario ${ft}ft`,
     }
