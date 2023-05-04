@@ -291,16 +291,17 @@ map.on('zoomend', function(){
   }
 })
 
-// Close tooltips for admin boundary layers at high zooms 
-// Also adjust cursor based on if clickable tile layers are present
-
 map.on('zoomend', function() {
+  // Close tooltips for admin boundary layers at high zooms 
   const tooltips = document.querySelectorAll('.leaflet-tooltip');
-  if (map.getZoom() < zoomThreshold) {
-    tooltips.forEach((tooltip) => tooltip.style.display = "block");
+  const tooltipStyle = map.getZoom() < adminZoomThreshold ? "block":"none";
+  tooltips.forEach((tooltip) => tooltip.style.display = tooltipStyle);
+
+  // Also adjust cursor based on if clickable tile layers are present
+  if (map.getZoom() < floodZoomThreshold){
     L.DomUtil.removeClass(map._container,'pointer-cursor');
-  } else { 
-    tooltips.forEach((tooltip) => tooltip.style.display = "none");
+  }
+  else{
     queryableWMSLayers.forEach(layer => {
       if (map.hasLayer(layer)) {
         L.DomUtil.addClass(map._container,'pointer-cursor');

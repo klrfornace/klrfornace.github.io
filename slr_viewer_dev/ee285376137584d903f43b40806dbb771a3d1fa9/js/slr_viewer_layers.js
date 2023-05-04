@@ -82,6 +82,9 @@ const crcgeoWFS = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/CRC/
 
 //////// EXPOSURE LAYERS ////////
 
+// Threshold for clicking on flood layers to show pop-ups
+const floodZoomThreshold = 12;
+
 const passiveWmsOptions = (ft, type) => (
   {
     tiled:true, 
@@ -102,7 +105,7 @@ const passiveWmsOptions = (ft, type) => (
                 data == 11? ('Depth below sea level:<div class="popup-data"> 10+ ft</div>'): 
                 ('Depth below sea level:<div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')),
     nullValue: type === "SCI"? 127:15,
-    popupMinZoom: 12,
+    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v3` : `CRC:HI_State_80prob_${ft}ft_${type}_v3`, 
     name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,
   }
@@ -132,7 +135,7 @@ const waveWmsOptions = (ft) => (
     queryable: true,
     queryProperty: 'GRAY_INDEX',
     nullValue: -999,
-    popupMinZoom: 12,
+    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:puc_wave_0${ft}ft` : `CRC:puc_wave_${ft}ft`, 
     name: (ft < 10) ? `Annual wave 0${ft}ft` : `Annual wave ${ft}ft`,
   }
@@ -157,7 +160,7 @@ for (let i = 0; i < 11; i++) {
       maxZoom: 19,
       queryable: true,
       nullValue: -999,
-      popupMinZoom: 12,
+      popupMinZoom: floodZoomThreshold,
       layers: (ft < 10) ? `CRC:compound_flooding_prelim_0${ft}ft` : `CRC:compound_flooding_prelim_${ft}ft`, 
       name: (ft < 10) ? `Kona storm scenario 0${ft}ft` : `Kona storm scenario ${ft}ft`,
     }
@@ -596,10 +599,10 @@ const boundary_highlight_style = {
   };
 
 
-const zoomThreshold = 15; // Click and pan behavior will only be active below this zoom level.
+const adminZoomThreshold = 15; // Click and pan behavior will only be active below this zoom level.
 
 function highlightBoundaries ( e ) {
-  if (map.getZoom() < zoomThreshold) {
+  if (map.getZoom() < adminZoomThreshold) {
     let layer = e.target;
     layer.setStyle( boundary_highlight_style );
     if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
@@ -621,7 +624,7 @@ const devplan = new L.GeoJSON.AJAX(devplanURL,
             click: function(e){
               const tooltip = layer.getTooltip();
               map.closeTooltip(tooltip)
-              if (map.getZoom() < zoomThreshold) {
+              if (map.getZoom() < adminZoomThreshold) {
                 map.fitBounds( layer.getBounds())
                 // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
                 // L.popup({ maxWidth: 200})
@@ -667,7 +670,7 @@ const ahupuaa = new L.GeoJSON.AJAX(ahupuaaURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < zoomThreshold) {
+            if (map.getZoom() < adminZoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
@@ -721,7 +724,7 @@ const moku = new L.GeoJSON.AJAX(mokuURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < zoomThreshold) {
+            if (map.getZoom() < adminZoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
@@ -772,7 +775,7 @@ const boards = new L.GeoJSON.AJAX(boardURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < zoomThreshold) {
+            if (map.getZoom() < adminZoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
@@ -815,7 +818,7 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < zoomThreshold) {
+            if (map.getZoom() < adminZoomThreshold) {
               map.fitBounds( layer.getBounds())
 
               // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
