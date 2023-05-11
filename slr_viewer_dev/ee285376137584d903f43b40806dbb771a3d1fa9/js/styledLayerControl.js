@@ -497,6 +497,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             input.type = 'checkbox';
             input.className = 'leaflet-control-layers-selector';
             input.defaultChecked = checked;
+            input.setAttribute('group-id', obj.group.id)
 
             label.className = "menu-item-checkbox";
             input.id = id;
@@ -512,6 +513,8 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         input.layerId = L.Util.stamp(obj.layer);
 
         L.DomEvent.on(input, 'click', this._onInputClick, this);
+
+        // L.DomEvent.on(input, 'click', this._checkInputStatus, this);
 
         var name = document.createElement('div');
         name.style.display = 'inline';
@@ -638,7 +641,8 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 var linkNone = L.DomUtil.create('button', 'group-toggle-none', togglerContainer);
                 linkNone.innerHTML = this.options.group_togglers.labelNone;
                 linkNone.setAttribute("data-group-name", obj.group.name);
-                linkNone.setAttribute('type','button');
+                linkNone.setAttribute("type","button");
+                linkNone.setAttribute("id", "group-toggle-" + obj.group.id);
 
                 if (L.Browser.touch) {
                     L.DomEvent
@@ -694,7 +698,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             this._domGroups[obj.group.id] = groupContainer;
         } else {
 
-            groupContainer.getElementsByClassName('wrapper')[0].appendChild(label); // add checkbox items to wrapper
+            groupContainer.querySelector('.wrapper').appendChild(label); // add checkbox items to wrapper
         }
 
         // KF addition
@@ -891,6 +895,34 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         this._onInputClick();
     },
     
+    // Check all inputs in a group and style Unselect All button
+    // _checkInputStatus : function(e){
+    //     const groupId = e.target.getAttribute("group-id");
+    //     const groupToggle = document.getElementById("group-toggle-" + groupId);
+
+    //     if (groupToggle){
+    //         const groupInputs = document.getElementById("leaflet-control-accordion-article-" + groupId).getElementsByTagName("input");
+    //         let anyChecked = false;
+
+    //         // Check if any layers (not sublayers) are selected
+    //         for (i = 0; i < groupInputs.length; i++) {
+    //             if (groupInputs[i].checked && !groupInputs[i].id.includes('sublayer')){
+    //                 anyChecked = true;
+    //             };
+    //         }
+
+    //         if (anyChecked){
+    //             groupToggle.parentElement.classList.add("toggle-active");
+    //         }
+    //         else{
+    //             groupToggle.parentElement.classList.remove("toggle-active");
+
+    //         }
+    //     }
+
+
+
+    // },
 
 });
 

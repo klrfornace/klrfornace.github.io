@@ -145,7 +145,7 @@ for (let layer of [substations, transmission]){
 }
 
 // Other layers
-for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32]){
+for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32, tmk_bounds]){
   const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
   entry.innerHTML = layer.options.legendEntry;
 }
@@ -253,7 +253,7 @@ map.on( 'baselayerchange',
 
 map.on('zoomend', function(){
   const currentZoom = map.getZoom();
-  const markerLayers = [hospitals,fireStations,policeStations,schools,pumpStations,treatmentPlants,cesspools,substations];
+  const markerLayers = [hospitals,fireStations,policeStations,schools,pumpStations,treatmentPlants,substations];
 
   if (currentZoom < 13){
     stormwaterStyle.weight = 0.25;
@@ -293,11 +293,11 @@ map.on('zoomend', function(){
 
 map.on('zoomend', function() {
   // Close tooltips for admin boundary layers at high zooms 
-  const tooltips = document.querySelectorAll('.leaflet-tooltip');
-  const tooltipStyle = map.getZoom() < adminZoomThreshold ? "block":"none";
-  tooltips.forEach((tooltip) => tooltip.style.display = tooltipStyle);
+  // const tooltips = document.querySelectorAll('.leaflet-tooltip');
+  // const tooltipStyle = map.getZoom() < adminZoomThreshold ? "block":"none";
+  // tooltips.forEach((tooltip) => tooltip.style.display = tooltipStyle);
 
-  // Also adjust cursor based on if clickable tile layers are present
+  // Adjust cursor based on if clickable tile layers are present
   if (map.getZoom() < floodZoomThreshold){
     L.DomUtil.removeClass(map._container,'pointer-cursor');
   }

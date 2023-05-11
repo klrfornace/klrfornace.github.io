@@ -215,7 +215,15 @@ for (let i = 0; i < 11; i++) {
         name: (i < 10) ? `Flooded roads 0${i}ft_${layer}` : `Flooded roads ${i}ft_${layer}`,
         pane: 'mvt-line'
       }
-      roadLayers[layer][i] = L.vectorGrid.protobuf(roadURL, roadTileOptions);
+      roadLayers[layer][i] = L.vectorGrid.protobuf(roadURL, roadTileOptions)
+        .on('click', function(e){ // Attach event listeners to open pop-ups for all features
+          L.popup()
+					.setContent(e.layer.properties.fullname)
+					.setLatLng(e.latlng)
+					.openOn(map);
+
+          L.DomEvent.stop(e); // This stops pop-ups from lower layers (e.g. flood layers) opening at this point.
+        })
   }
 }
 
@@ -350,14 +358,36 @@ const treatmentPlants = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Asewer_-_treatment_pl
   legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon" src="images/wastewater.svg"></img>Treatment Plants</div>'
 });
 
-const cesspools = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aosds_dots_w_tracts_clean_atts_kp'), {
-  pointToLayer: (feature, latlng) => (L.marker(latlng, {icon: L.icon({iconSize:[6,6], iconUrl: "images/diamond.svg"})})),
-  iconUrl:"images/diamond.svg",
-  iconSizes:[[6,6],[9,9],[12,12]],
+// WFS method was too laggy for the large number of features so loading cesspool points as vector tiles
+const cesspoolURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/CRC%3Aosds_dots_w_tracts_clean_atts_kp@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+
+function cesspoolStyle(properties, zoom) {
+  const iconSize = (zoom < 13) ? [6,6]:
+            (zoom < 18) ? [9,9]: [12,12];
+  return {
+      icon: L.icon({iconSize: iconSize, iconUrl: "images/diamond.svg"})
+  }
+};
+
+const cesspoolTileOptions = {
+  vectorTileLayerStyles: {'osds_dots_w_tracts_clean_atts_kp': cesspoolStyle},
+  interactive: false,	//set to false now since there are no pop-ups
   legendKey:'cesspool',
   legendSymbol: '<img class="legend-sublayer legend-icon small-shape tight-layout" src="images/diamond.svg"></img>',
   legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon small-shape" src="images/diamond.svg"></img>Cesspools</div>'
-});
+}
+
+const cesspools = L.vectorGrid.protobuf(cesspoolURL, cesspoolTileOptions);
+
+// Original WFS method
+// const cesspools = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aosds_dots_w_tracts_clean_atts_kp'), {
+//   pointToLayer: (feature, latlng) => (L.marker(latlng, {icon: L.icon({iconSize:[6,6], iconUrl: "images/diamond.svg"})})),
+//   iconUrl:"images/diamond.svg",
+//   iconSizes:[[6,6],[9,9],[12,12]],
+//   legendKey:'cesspool',
+//   legendSymbol: '<img class="legend-sublayer legend-icon small-shape tight-layout" src="images/diamond.svg"></img>',
+//   legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon small-shape" src="images/diamond.svg"></img>Cesspools</div>'
+// });
 
 const sewerStyle = {
   color: '#c76113',
@@ -365,6 +395,7 @@ const sewerStyle = {
   opacity: 0.75
 };
 
+// This layer will also have to be converted to vector tiles if it is added to viewer
 const sewerMains = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_sewer_main_kp'), {
   style: sewerStyle,
   legendKey:'sewer-main',
@@ -583,7 +614,7 @@ const slrxa32 = L.tileLayer.wms(
 // General boundary styles and functions for admin boundary layers
 
 const boundary_style = {
-    weight: 1,
+    weight: 1.5,
     color: '#6e6e6e',
     opacity: 1.0,
     fill: 0.000001,
@@ -599,16 +630,25 @@ const boundary_highlight_style = {
   };
 
 
-const adminZoomThreshold = 15; // Click and pan behavior will only be active below this zoom level.
+// const adminZoomThreshold = 15; 
 
 function highlightBoundaries ( e ) {
-  if (map.getZoom() < adminZoomThreshold) {
+  // if (map.getZoom() < adminZoomThreshold) {
     let layer = e.target;
     layer.setStyle( boundary_highlight_style );
     if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
-  }
+  // }
   }
 
+// For converting names returned in all caps
+function toTitleCase(str) {
+    return str.replace(
+      /\w\S*/g,
+      function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      }
+    );
+}
 // Development / Community Plan Areas (Districts):
 
 const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?where=&text=&objectIds=&time=&geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=4326&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&f=geojson';
@@ -616,7 +656,7 @@ const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZonin
 const devplan = new L.GeoJSON.AJAX(devplanURL, 
   {style: boundary_style,
       onEachFeature: function ( feature, layer ) {
-        layer.bindTooltip( '<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true, permanent: false } );
+        layer.bindTooltip( '<strong>' + toTitleCase(feature.properties.district) + '</strong>', { direction: 'left', sticky: true, permanent: false } );
         layer.on(
           {
             mouseover: highlightBoundaries,
@@ -624,14 +664,15 @@ const devplan = new L.GeoJSON.AJAX(devplanURL,
             click: function(e){
               const tooltip = layer.getTooltip();
               map.closeTooltip(tooltip)
-              if (map.getZoom() < adminZoomThreshold) {
-                map.fitBounds( layer.getBounds())
+              // if (map.getZoom() < adminZoomThreshold) {
+              //   map.fitBounds( layer.getBounds())
                 // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
                 // L.popup({ maxWidth: 200})
                 // .setLatLng(e.latlng)
                 // .setContent('<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } )
                 // .openOn(map);
-              }}
+              //}
+            }
 
             // Zoom to clicked polygon if no other clickable overlays are
             // expecting a pop-up window:
@@ -649,8 +690,8 @@ const devplan = new L.GeoJSON.AJAX(devplanURL,
       legendKey: 'devplan',
       legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
       legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-      loadStatus: 'loading'}
-  );
+      loadStatus: 'loading'
+    });
 
 // Ahupuaʻa boundaries:
 
@@ -670,15 +711,16 @@ const ahupuaa = new L.GeoJSON.AJAX(ahupuaaURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < adminZoomThreshold) {
-              map.fitBounds( layer.getBounds())
+            // if (map.getZoom() < adminZoomThreshold) {
+            //   map.fitBounds( layer.getBounds())
 
-              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              // L.popup({ maxWidth: 200})
-              // .setLatLng(e.latlng)
-              // .setContent('<strong>' + ahupuaa_name + '</strong>', { direction: 'left', sticky: true } )
-              // .openOn(map);
-            }}
+            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+            //   // L.popup({ maxWidth: 200})
+            //   // .setLatLng(e.latlng)
+            //   // .setContent('<strong>' + ahupuaa_name + '</strong>', { direction: 'left', sticky: true } )
+            //   // .openOn(map);
+            // }
+          }
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
 
@@ -696,8 +738,8 @@ const ahupuaa = new L.GeoJSON.AJAX(ahupuaaURL,
     legendKey: 'ahupuaa',
     legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Ahupua&#699;a Boundaries',
     legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-    loadStatus: 'loading'}
-);
+    loadStatus: 'loading'
+  });
 
 // Moku boundaries:
 
@@ -724,15 +766,16 @@ const moku = new L.GeoJSON.AJAX(mokuURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < adminZoomThreshold) {
-              map.fitBounds( layer.getBounds())
+            // if (map.getZoom() < adminZoomThreshold) {
+            //   map.fitBounds( layer.getBounds())
 
-              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              // L.popup({ maxWidth: 200})
-              // .setLatLng(e.latlng)
-              // .setContent('<strong>' + moku_name + '</strong>', { direction: 'left', sticky: true } )
-              // .openOn(map);
-            }}
+            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+            //   // L.popup({ maxWidth: 200})
+            //   // .setLatLng(e.latlng)
+            //   // .setContent('<strong>' + moku_name + '</strong>', { direction: 'left', sticky: true } )
+            //   // .openOn(map);
+            // }
+          }
 
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
@@ -751,8 +794,8 @@ const moku = new L.GeoJSON.AJAX(mokuURL,
     legendKey: 'moku',
     legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Moku Boundaries',
     legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-    loadStatus: 'loading'}
-);
+    loadStatus: 'loading'
+  });
 
 // Oʻahu Neighborhood Boards
 
@@ -775,15 +818,16 @@ const boards = new L.GeoJSON.AJAX(boardURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < adminZoomThreshold) {
-              map.fitBounds( layer.getBounds())
+            // if (map.getZoom() < adminZoomThreshold) {
+            //   map.fitBounds( layer.getBounds())
 
-              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              // L.popup({ maxWidth: 200})
-              // .setLatLng(e.latlng)
-              // .setContent('<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>', { direction: 'left', sticky: true } )
-              // .openOn(map);
-            }}
+            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+            //   // L.popup({ maxWidth: 200})
+            //   // .setLatLng(e.latlng)
+            //   // .setContent('<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>', { direction: 'left', sticky: true } )
+            //   // .openOn(map);
+            // }
+          }
         }
       );
     },
@@ -818,15 +862,16 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            if (map.getZoom() < adminZoomThreshold) {
-              map.fitBounds( layer.getBounds())
+            // if (map.getZoom() < adminZoomThreshold) {
+            //   map.fitBounds( layer.getBounds())
 
-              // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-              // L.popup({ maxWidth: 200})
-              // .setLatLng(e.latlng)
-              // .setContent('<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"), { direction: 'left', sticky: true } )
-              // .openOn(map);
-            }}
+            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
+            //   // L.popup({ maxWidth: 200})
+            //   // .setLatLng(e.latlng)
+            //   // .setContent('<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"), { direction: 'left', sticky: true } )
+            //   // .openOn(map);
+            // }
+          }
 
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
@@ -848,6 +893,40 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
     loadStatus: 'loading'
   }
 );
+
+// TMK boundaries (Oʻahu parcels: layer id 7, statewide: layer id 1)
+
+const tmk_bounds = L.tileLayer.wms(
+  'https://geodata.hawaii.gov/arcgis/services/ParcelsZoning/MapServer/WMSServer',
+  {
+    async: true,
+    layers: '7',
+    version: '1.1.1',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.75,
+    // errorTileUrl: '/images/map_tile_error.png',
+    attribution: 'Data &copy; <a href="https://geoportal.hawaii.gov/" target="_blank">Hawai<span class="okina">&#699;</span>i Statewide GIS Program</a>',
+    bounds: L.latLngBounds( L.latLng( 18.9106432386012, -160.247059539488 ), L.latLng( 22.2353669223379, -154.806693600261 ) ),
+    maxZoom: 20,
+    // My custom attributes:
+    name: 'TMK Parcels',
+    queryable: true,
+    legendKey:'tmk',
+  }
+);
+
+// Add legend options separately since they were interfering with ArcGIS WMS call
+tmk_bounds.options.legendEntry ='<svg class="legend-line tmk-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3"/></g></svg>TMK Parcels';
+tmk_bounds.options.legendSymbol ='<svg class="legend-line tmk-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3"/></g></svg>';
+
+// TMK parcel boundaries
+
+// GeoJSON call for KP parcels only - exceeds record limit (1000)
+// const tmkUrlKP = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/25/query?where=county+LIKE+%27Honolulu%27+and+zone+LIKE+%274%27&outFields=*&f=geojson';
+
+
+// Oʻahu shoreline setback (2023)
 
 const setbackStyle = {
   color: '#e55913',
@@ -943,7 +1022,7 @@ const queryableWMSLayers = [passive, wave, femaFlood, geology];
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
-const wmsSingleLayers = [femaFlood, slrxa32];
+const wmsSingleLayers = [femaFlood, slrxa32, tmk_bounds];
 const unconnectedLayers = [land_use_districts, geology, soils];
 
 // Add event listener to GeoJSON AJAX layers to catch data:loaded event.
@@ -966,24 +1045,14 @@ const basemaps = [
   }
 ];
 
-const basemapsSimple = {
-  'Grayscale': mapboxLight,
-  // 'Streets': mapboxStreets,
-  'Satellite': mapboxSatelliteStreets,
-  'Satellite: no labels': mapboxSatellite,
-};
-
 // Create overlay layer object for layer control
 // For all layers that change with depth, use L.LayerGroup initialized with any layer instead of individual layer. This allows for switching of layers 
 // within the group as depth changes while keeping connection between layerGroup/_leaflet_id and checkbox input intact. Note this seems to cause assigned
 // z indexes (from styledLayerControl) to go haywire, so it's safest to use map panes if layer order is critical. 
 // For groups of sublayers added to map together but with individual sublayer controls, enter layer as object like:
 //      layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2}}
-
-
 const overlayMaps = [
-  {
-    groupName: '<h3><img src="images/wave.svg" class="label-icon">EXPOSURE</h3>', 
+  { groupName: '<h3><img src="images/wave.svg" class="label-icon">EXPOSURE</h3>', 
     expanded: true,
      layers: {['<span class="layer-label">Passive Flooding</span><button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button><div class="legend-panel">'+ passive.options.legendEntry + '</div>']:passive, 
               // ['<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">'+ wave.options.legendEntry + '</div>']:wave,
@@ -1025,9 +1094,9 @@ const overlayMaps = [
               ['<div class="legend-panel-inline">'+ dhhl.options.legendSymbol + '</div><span class="layer-label">Hawaiian Home Lands']: dhhl,
               ['<div class="legend-panel-inline">'+ oahuSetback.options.legendSymbol + '</div><span class="layer-label">O<span class="okina">&#699;</span>ahu Shoreline Setback']: oahuSetback,
               ['<span class="layer-label">Sea Level Rise Exposure Area (2017)</span><div class="legend-panel">'+slrxa32.options.legendEntry + '</div>']: slrxa32,
+              ['<div class="legend-panel-inline">'+ tmk_bounds.options.legendSymbol + '</div><span class="layer-label">TMK Parcels']: tmk_bounds,
               }},
 ];
-
 
 
 // '<span class="layer-label">Annual High Wave-Driven Flooding</span><div class="legend-panel panel-hidden">Water depth<br><img src="images/water_colorbar.svg" style="width:220px; height:17px; margin-bottom:5px;"></div>':wave

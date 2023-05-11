@@ -163,14 +163,13 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	border: 0px;
 	border-radius: 5px;
 	background: rgba(20,65,111,0);
-	color: #184e85;
+	color: #14416f;
 	font-size: 11px;
 	font-family: 'Roboto Flex',sans-serif;
 	font-weight: 600;
 	line-height: 1;
 	padding: 3px 6px;
 	cursor: pointer;
-
 }
 
 .group-toggle-container button:hover,
