@@ -633,12 +633,12 @@
                     height: this._a4PageSize.height,
                     width: this._a4PageSize.width,
                     name: this.options.defaultSizeTitles.A4Landscape,
-                    className: "A4Landscape page"
+                    className: "A4Landscape"
                 } : "A4Portrait" === t ? {
                     height: this._a4PageSize.width,
                     width: this._a4PageSize.height,
                     name: this.options.defaultSizeTitles.A4Portrait,
-                    className: "A4Portrait page"
+                    className: "A4Portrait"
                 } : t
             }, this);
             var t = L.DomUtil.create("div", "leaflet-control-easyPrint leaflet-bar leaflet-control");
@@ -680,7 +680,6 @@
             return t
         },
         printMap: function(t, e) {
-            console.log(t);
             e && (this.options.filename = e),
             this.options.exportOnly || (this._page = window.open("", "_blank", "toolbar=no,status=no,menubar=no,scrollbars=no,resizable=no,left=10, top=10, width=200, height=250, visible=none"),
             this._page.document.write(this._createSpinner(this.options.customWindowTitle, this.options.customSpinnerClass, this.options.spinnerBgCOlor))),
@@ -692,10 +691,10 @@
                 zoom: this._map.getZoom(),
                 center: this._map.getCenter()
             },
-            "auto" === this.originalState.mapWidth ? (this.originalState.mapWidth = this._map.getSize().x + "px",
+            "" === this.originalState.mapWidth ? (this.originalState.mapWidth = this._map.getSize().x + "px",
             this.originalState.widthWasAuto = !0) : this.originalState.mapWidth.includes("%") && (this.originalState.percentageWidth = this.originalState.mapWidth,
-            this.originalState.widthWasPercentage = !0,
-            this.originalState.mapWidth = this._map.getSize().x + "px"),
+            this.originalState.widthWasPercentage = !0, this.originalState.mapWidth = this._map.getSize().x + "px"),
+
             this._map.fire("easyPrint-start", {
                 event: t
             }),
@@ -709,7 +708,7 @@
             n = n.replace('leaflet-control-easyPrint-button-export ',''); // For single button option -KF
             if (n ==="CurrentSize")
                 return this._printOpertion(n);
-            this.outerContainer = this._createOuterContainer(this.mapContainer),
+            this.outerContainer = this._createOuterContainer(this.mapContainer), 
             this.originalState.widthWasAuto && (this.outerContainer.style.width = this.originalState.mapWidth),
             this._createImagePlaceholder(n)
         },
@@ -731,7 +730,19 @@
                 i.style.height = e.originalState.mapHeight,
                 e._resizeAndPrintMap(t)
             }).catch(function(t) {
-                console.error("oops, something went wrong!", t)
+                console.error("oops, something went wrong!", t);
+
+                // Reset the map in case of error - KF
+                e._toggleControls(!0),
+                e._hideClasses(!0),
+                e._showClasses(!0),
+                e.outerContainer && (e.originalState.widthWasAuto ? e.mapContainer.style.width = "" : e.originalState.widthWasPercentage ? e.mapContainer.style.width = e.originalState.percentageWidth : e.mapContainer.style.width = e.originalState.mapWidth,
+                e.mapContainer.style.height = e.originalState.mapHeight,
+                e._removeOuterContainer(e.mapContainer, e.outerContainer, e.blankDiv),
+                e._map.invalidateSize(),
+                e._map.setView(e.originalState.center),
+                e._map.setZoom(e.originalState.zoom))
+                e._map.fire("easyPrint-error");
             })
         },
         _resizeAndPrintMap: function(t) {
@@ -768,7 +779,7 @@
                 e._toggleControls(!0),
                 e._hideClasses(!0),
                 e._showClasses(!0),
-                e.outerContainer && (e.originalState.widthWasAuto ? e.mapContainer.style.width = "auto" : e.originalState.widthWasPercentage ? e.mapContainer.style.width = e.originalState.percentageWidth : e.mapContainer.style.width = e.originalState.mapWidth,
+                e.outerContainer && (e.originalState.widthWasAuto ? e.mapContainer.style.width = "" : e.originalState.widthWasPercentage ? e.mapContainer.style.width = e.originalState.percentageWidth : e.mapContainer.style.width = e.originalState.mapWidth,
                 e.mapContainer.style.height = e.originalState.mapHeight,
                 e._removeOuterContainer(e.mapContainer, e.outerContainer, e.blankDiv),
                 e._map.invalidateSize(),
@@ -804,8 +815,8 @@
             e
         },
         _removeOuterContainer: function(t, e, n) {
-            e.parentNode && (e.parentNode.insertBefore(t, e),
-            e.parentNode.removeChild(n),
+            e.parentNode && (e.parentNode.insertBefore(t,e), 
+            n && e.parentNode.removeChild(n), 
             e.parentNode.removeChild(e))
         },
         _addCss: function() {
@@ -862,9 +873,9 @@
                 e.style.display = "block";
             })
         },
-        _a4PageSize: {
-            height: 715,
-            width: 1045
+        _a4PageSize: { //original: 715,1045
+            height: 800,
+            width: 1170,
         }
     }),
     L.easyPrint = function(t) {

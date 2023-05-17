@@ -4,9 +4,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         position: 'topright',
         autoZIndex: true,
         group_togglers: {
-            show: false,
+            show: true,
             labelAll: 'All',
-            labelNone: 'None'
+            labelNone: 'Unselect all'
         },
         groupDeleteLabel: 'Delete the group'
     },
@@ -135,13 +135,13 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
     selectLayer: function(layer) {
         this._map.addLayer(layer);
-        this._update();
+        this._update(); 
         this._toggleLayerLabelClass();
     },
 
     unSelectLayer: function(layer) {
         this._map.removeLayer(layer);
-        this._update();
+        this._update(); 
         this._toggleLayerLabelClass();
     },
 
@@ -161,14 +161,16 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                         if (select) {
                             this._map.addLayer(this._layers[layer].layer);
                         } else {
-                            this._map.removeLayer(this._layers[layer].layer);
+                            if (this._map.hasLayer(this._layers[layer].layer)){
+                                this._map.removeLayer(this._layers[layer].layer);
+                            }
                         }
                     }
                 }
                 break;
             }
         }
-        this._update();
+        // this._update();
     },
 
 
@@ -210,6 +212,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             me._map.dragging.enable();
           })
         // end insert
+        
+        // Insert wrapper to tie container and utilities divs together
+        const controlWrapper = L.DomUtil.create('div','control-wrapper',container);
 
         var section = document.createElement('section');
         section.className = 'ac-container ' + className + '-list';
@@ -219,65 +224,69 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         section.appendChild(form);
 
-        if (this.options.collapsed) {
-            if (!L.Browser.android) {
-                L.DomEvent
-                    .on(container, 'mouseover', this._expand, this)
-                    .on(container, 'mouseout', this._collapse, this);
-            }
-            var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-            link.href = '#';
-            link.title = 'Layers';
+        // if (this.options.collapsed) {
+        //     if (!L.Browser.android) {
+        //         L.DomEvent
+        //             .on(container, 'mouseover', this._expand, this)
+        //             .on(container, 'mouseout', this._collapse, this);
+        //     }
+        //     var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+        //     link.href = '#';
+        //     link.title = 'Layers';
 
-            if (L.Browser.touch) {
-                L.DomEvent
-                    .on(link, 'click', L.DomEvent.stop)
-                    .on(link, 'click', this._expand, this);
-            } else {
-                L.DomEvent.on(link, 'focus', this._expand, this);
-            }
+        //     if (L.Browser.touch) {
+        //         L.DomEvent
+        //             .on(link, 'click', L.DomEvent.stop)
+        //             .on(link, 'click', this._expand, this);
+        //     } else {
+        //         L.DomEvent.on(link, 'focus', this._expand, this);
+        //     }
 
-            this._map.on('click', this._collapse, this);
-            // TODO keyboard accessibility
+        //     this._map.on('click', this._collapse, this);
+        //     // TODO keyboard accessibility
 
-        } else {
-            this._expand();
+        // } else {
+        //     this._expand();
 
-                // Create hidden layers button in case user clicks "hide" on expanded list:
-                // -jmaurer
+        //         // Create hidden layers button in case user clicks "hide" on expanded list:
+        //         // -jmaurer
 
-                var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
-                link.href = '#';
-                link.title = 'Show the layer menu';
-                L.DomEvent
-                  .on(link, 'click', L.DomEvent.stop)
-                  .on(link, 'click', this._expand, this);
-        }
+        //         var link = this._layersLink = L.DomUtil.create('a', className + '-toggle', container);
+        //         link.href = '#';
+        //         link.title = 'Show the layer menu';
+        //         L.DomEvent
+        //           .on(link, 'click', L.DomEvent.stop)
+        //           .on(link, 'click', this._expand, this);
+        // }
 
         this._baseLayersList = L.DomUtil.create('div', className + '-base', form);
         this._overlaysList = L.DomUtil.create('div', className + '-overlays', form);
 
-        container.appendChild(section);
+        controlWrapper.appendChild(section);
+        
+        // Insert div to hold simple legend (created separately) - KF
+        const legendContainer = L.DomUtil.create('div','legend-container legend-container-hidden', controlWrapper);
 
         // process options of ac-container css class - to options.container_width and options.container_maxHeight
         for (var c = 0; c < (containers = container.getElementsByClassName('ac-container')).length; c++) {
-            if (this.options.container_width) {
-                containers[c].style.width = this.options.container_width;
-            }
+            // if (this.options.container_width) {
+            //     containers[c].style.width = this.options.container_width;
+            // }
 
             // set the max-height of control to y value of map object
-            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : (this._map.getSize().y - 70);
-            containers[c].style.maxHeight = this._default_maxHeight;
+            // Top and bottom margins -> 20px, utilities section -> 29px, attribution control (2 lines) -> 34px
+            this._default_maxHeight = this.options.container_maxHeight ? this.options.container_maxHeight : (this._map.getSize().y - 83);
+            containers[c].style.maxHeight = this._default_maxHeight + 'px';
+
+            // Also set max-height of legend container
+            legendContainer.style.maxHeight = this._default_maxHeight + 'px';
         }
-
-        // Insert div to hold simple legend (created separately) - KF
-        L.DomUtil.create('div','legend-container legend-container-hidden', container);
-
+        
         // Add layer utilities for expanding, collapsing, and clearing all
         // layers (-jmaurer):
         // replacing with simple legend/full interactive menu toggle - KF
 
-        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',container);
+        const utilities = L.DomUtil.create('div','styledLayerControl-utilities',controlWrapper);
         utilities.id = 'styledLayerControl-utilities';
 
         // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
@@ -314,41 +323,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             }
         }
 
-        // radioToggle.innerHTML = '<input class="radio__input" type="radio" name="legend-toggle" value="full-menu" id="full-menu-radio" checked>'+
-        // '<label for="full-menu-radio" role="button" tabindex="0" aria-pressed="true" class="radio__label" title="Show full layer menu">Full layer menu</label>'+
-        // '<input class="radio__input" type="radio" name="legend-toggle" value="simple-legend" id="simple-legend-radio">'+
-        // '<label for="simple-legend-radio" role="button" tabindex="0" aria-pressed="false" class="radio__label" title="Show simple map legend">Simple legend</label>';
-
-        // var clear_all = document.createElement('a');
-        // var clear_all_text = document.createTextNode('Clear all');
-        // clear_all.appendChild(clear_all_text);
-        // clear_all.href = 'javascript:void(0)';
-        // var me = this; // create closure
-        // clear_all.onclick = function () { me._clearAll(); };
-        // utilities.appendChild(clear_all);
-
-        // var spacer = document.createElement('span');
-        // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
-        // utilities.appendChild(spacer);
-
-        // var hide_menu = L.DomUtil.create('button','close-btn',utilities)
-
-        // hide_menu.innerHTML = '<svg viewBox="0 0 30.56 30.28"><g><path d="M26.06,30.28H4.5c-2.48,0-4.5-2.02-4.5-4.5V4.5C0,2.02,2.02,0,4.5,0H26.06c2.48,0,4.5,2.02,4.5,4.5V25.78c0,2.48-2.02,4.5-4.5,4.5ZM4.5,3c-.83,0-1.5,.67-1.5,1.5V25.78c0,.83,.67,1.5,1.5,1.5H26.06c.83,0,1.5-.67,1.5-1.5V4.5c0-.83-.67-1.5-1.5-1.5H4.5Z"/><g><rect x="19.41" y="5.94" width="6.99" height="3.13" transform="translate(1.4 18.4) rotate(-45)"/><polygon points="18 5.46 15.46 14.96 24.96 12.41 18 5.46"/></g><g><rect x="4.15" y="21.2" width="6.99" height="3.13" transform="translate(-13.86 12.08) rotate(-45)"/><polygon points="12.55 24.82 15.1 15.32 5.6 17.87 12.55 24.82"/></g></g></svg>';
-        // hide_menu.setAttribute('aria-label','Hide layer control window');
-        // var closure = this; // create closure
-        // hide_menu.onclick = function () { closure._collapse(); };
-        // utilities.appendChild(hide_menu);
-
-        // var spacer = document.createElement('span');
-        // spacer.innerHTML = ' &nbsp;&#149;&nbsp; ';
-        // utilities.appendChild(spacer);
-
-        // var legendToggle = L.DomUtil.create('button','legend-toggle',utilities);
-        // legendToggle.innerHTML = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-        // legendToggle.setAttribute('aria-label','Switch between simple legend and full menu');
-
-
-        // window.onresize = this._on_resize_window.bind(this);
+        window.onresize = this._on_resize_window.bind(this);
 
     },
 
@@ -356,9 +331,18 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         // listen to resize of screen to reajust de maxHeight of container
         for (var c = 0; c < containers.length; c++) {
             // input the new value to height
-            containers[c].style.maxHeight = (window.innerHeight - 90) < this._removePxToInt(this._default_maxHeight) ? (window.innerHeight - 90) + "px" : this._removePxToInt(this._default_maxHeight) + "px";
-            
+            // Total offset: 83px (margins, utilties, attribution control) + 50px (nav bar)
+            const newHeight = (window.innerHeight - 133) + "px";
+            containers[c].style.maxHeight = newHeight;
+
+            this._default_maxHeight = newHeight + "px"; // This line had bug (wasn't actually setting new default max height) - KF
+
             // add resizing to min width based on window width
+        }
+
+        const legendContainer = document.querySelector('legend-container');
+        if (legendContainer){
+            legendContainer.style.maxHeight = newHeight;
         }
     },
 
@@ -513,6 +497,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             input.type = 'checkbox';
             input.className = 'leaflet-control-layers-selector';
             input.defaultChecked = checked;
+            input.setAttribute('group-id', obj.group.id)
 
             label.className = "menu-item-checkbox";
             input.id = id;
@@ -529,9 +514,46 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
 
         L.DomEvent.on(input, 'click', this._onInputClick, this);
 
-        var name = document.createElement('label');
-        //KF modified
-        name.innerHTML = '<label id="' + id +'-label" for="' + id + '">' + obj.name + '</label>';
+        // L.DomEvent.on(input, 'click', this._checkInputStatus, this);
+
+        var name = document.createElement('div');
+        name.style.display = 'inline';
+
+        // This is a very complicated way of dealing with multiple elements within a label. For all elements up to element with class "layer-label",
+        // keep in the label. For other elements (e.g., info button, hidden panel, etc.), append after the label.
+        if (obj.name.includes('layer-label')){
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(obj.name, 'text/html');
+            const labelSpan = htmlDoc.querySelector('.layer-label');
+
+            // Get previous siblings - this will be INCLUDED in label
+            let prevSibling = labelSpan.previousElementSibling;
+            const prevSiblings = [];
+            while (prevSibling){
+                prevSiblings.push(prevSibling);
+                prevSibling = prevSibling.prevElementSibling;
+            }
+
+            // Get next siblings - this will be appended OUTSIDE of label
+            let nextSibling = labelSpan.nextElementSibling;
+            const nextSiblings = [];
+            while (nextSibling){
+                nextSiblings.push(nextSibling);
+                nextSibling = nextSibling.nextElementSibling;
+            }
+
+            const nameLabel = L.DomUtil.create('label','',name);
+            nameLabel.setAttribute('id',id +'-label');
+            nameLabel.setAttribute('for', id);
+
+            prevSiblings.forEach((el) => nameLabel.appendChild(el));
+            nameLabel.appendChild(labelSpan);
+            nextSiblings.forEach((el) => name.append(el));
+        }
+        else{
+            name.innerHTML = '<label id="' + id +'-label" for="' + id + '">' + obj.name + '</label>';
+        }
+
         // name.innerHTML = '<label for="' + id + '">' + obj.name + '</label>';
 
         label.appendChild(input);
@@ -578,76 +600,49 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             const accordionButton = L.DomUtil.create('button','ac-container-accordion ' + s_expanded, groupContainer);
             accordionButton.type = "button";
             accordionButton.innerHTML = obj.group.name;
+            accordionButton.setAttribute('aria-expanded',obj.group.expanded);
             L.DomEvent.on(accordionButton, 'click', this._toggleAccordion, this);
-
-            const accordionGroup = L.DomUtil.create('article', 'ac-large', groupContainer);
-            accordionGroup.appendChild(label);
-
-
-            // // verify if group is expanded
-            // var s_expanded = obj.group.expanded ? ' checked = "true" ' : '';
-
-            // // verify if type is exclusive
-            // var s_type_exclusive = this.options.exclusive ? ' type="radio" ' : ' type="checkbox" ';
-
-            // inputElement = '<input id="ac' + obj.group.id + '" name="accordion-1" class="menu" ' + s_expanded + s_type_exclusive + '/>';
-            // inputLabel = '<label for="ac' + obj.group.id + '">' + obj.group.name + '</label>';
-
-            // article = document.createElement('article');
-            // article.className = 'ac-large'
             
-            // KF insert for transition - doesn't work
+            const accordionGroup = L.DomUtil.create('article', 'ac-large', groupContainer);
+            accordionGroup.setAttribute('id','leaflet-control-accordion-article-' + obj.group.id);
+            accordionButton.setAttribute('aria-controls', 'leaflet-control-accordion-article-' + obj.group.id);
+            
+            // Create wrapper around checkbox items with padding set to allow for smooth transition of article element
+            const wrapperDiv = L.DomUtil.create('div', 'wrapper', accordionGroup);
 
-            // let transitionDiv = document.createElement('div');
-            // transitionDiv.className = 'ac-large-transition';
-            // article.appendChild(transitionDiv);
-            // transitionDiv.appendChild(label);
-            // end insert
 
-            // article.appendChild(label);
-
-            // process options of ac-large css class - to options.group_maxHeight property
-            if (this.options.group_maxHeight) {
-                article.style.maxHeight = this.options.group_maxHeight;
-            }
-
-            // groupContainer.innerHTML = inputElement + inputLabel;
-
-            // groupContainer.appendChild(article);
-
-            // Link to toggle all layers
+            // Link to toggle all layers (moved to top of container - KF)
             if (obj.overlay && this.options.group_togglers.show) {
-
                 // Toggler container
-                var togglerContainer = L.DomUtil.create('div', 'group-toggle-container', groupContainer);
+                var togglerContainer = L.DomUtil.create('div', 'group-toggle-container', wrapperDiv);
 
                 // Link All
-                var linkAll = L.DomUtil.create('a', 'group-toggle-all', togglerContainer);
-                linkAll.href = '#';
-                linkAll.title = this.options.group_togglers.labelAll;
-                linkAll.innerHTML = this.options.group_togglers.labelAll;
-                linkAll.setAttribute("data-group-name", obj.group.name);
+                // var linkAll = L.DomUtil.create('a', 'group-toggle-all', togglerContainer);
+                // linkAll.href = '#';
+                // linkAll.title = this.options.group_togglers.labelAll;
+                // linkAll.innerHTML = this.options.group_togglers.labelAll;
+                // linkAll.setAttribute("data-group-name", obj.group.name);
 
-                if (L.Browser.touch) {
-                    L.DomEvent
-                        .on(linkAll, 'click', L.DomEvent.stop)
-                        .on(linkAll, 'click', this._onSelectGroup, this);
-                } else {
-                    L.DomEvent
-                        .on(linkAll, 'click', L.DomEvent.stop)
-                        .on(linkAll, 'focus', this._onSelectGroup, this);
-                }
+                // if (L.Browser.touch) {
+                //     L.DomEvent
+                //         .on(linkAll, 'click', L.DomEvent.stop)
+                //         .on(linkAll, 'click', this._onSelectGroup, this);
+                // } else {
+                //     L.DomEvent
+                //         .on(linkAll, 'click', L.DomEvent.stop)
+                //         .on(linkAll, 'focus', this._onSelectGroup, this);
+                // }
 
-                // Separator
-                var separator = L.DomUtil.create('span', 'group-toggle-divider', togglerContainer);
-                separator.innerHTML = ' / ';
+                // // Separator
+                // var separator = L.DomUtil.create('span', 'group-toggle-divider', togglerContainer);
+                // separator.innerHTML = ' / ';
 
-                // Link none
-                var linkNone = L.DomUtil.create('a', 'group-toggle-none', togglerContainer);
-                linkNone.href = '#';
-                linkNone.title = this.options.group_togglers.labelNone;
+                // Link none (switch to button - KF)
+                var linkNone = L.DomUtil.create('button', 'group-toggle-none', togglerContainer);
                 linkNone.innerHTML = this.options.group_togglers.labelNone;
                 linkNone.setAttribute("data-group-name", obj.group.name);
+                linkNone.setAttribute("type","button");
+                linkNone.setAttribute("id", "group-toggle-" + obj.group.id);
 
                 if (L.Browser.touch) {
                     L.DomEvent
@@ -685,13 +680,25 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 }
 
             }
+            
+            wrapperDiv.appendChild(label);
+            
+            // Hide overflow-y during transition
+            accordionGroup.addEventListener('transitionstart', ()=> accordionGroup.style.overflowY = 'hidden');
+            accordionGroup.addEventListener('transitionend', ()=> accordionGroup.style.overflowY = 'auto');
+            
+            // process options of ac-large css class - to options.group_maxHeight property
+            if (this.options.group_maxHeight) {
+                article.style.maxHeight = this.options.group_maxHeight;
+            }
+
 
             container.appendChild(groupContainer);
 
             this._domGroups[obj.group.id] = groupContainer;
         } else {
 
-            groupContainer.getElementsByTagName('article')[0].appendChild(label);
+            groupContainer.querySelector('.wrapper').appendChild(label); // add checkbox items to wrapper
         }
 
         // KF addition
@@ -702,7 +709,7 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             sublayerContainer.id = id + '_sublayers';
 
             //sublayers-hidden class is used to hide sublayer inputs when layer group is not selected
-            sublayerContainer.className = "sublayers sublayers-hidden"; 
+            sublayerContainer.className = this._map.hasLayer(obj.layer) ? "sublayers":"sublayers sublayers-hidden";
 
             L.DomEvent.on(input, 'click', this._resetSublayers, this);
 
@@ -722,7 +729,13 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
                 sublayerInput.onclick = function () { me._onSublayerClick( sublayerInput, sublayer, layerGroup, obj ); };
                 
                 const sublayerLabel = L.DomUtil.create('label','',sublayerDiv);
-                sublayerLabel.innerHTML = '<label id="' + sublayerInputId +'-label" for="' + sublayerInputId + '">' + sublayerName + '</label>';
+                sublayerLabel.id = sublayerInputId + '-label';
+                sublayerLabel.setAttribute('for', sublayerInputId);
+                sublayerLabel.innerHTML = sublayerName;
+                
+                if (this._map.hasLayer(sublayer)){
+                    sublayerLabel.classList.add("active-layer");
+                }
             }
             label.append(sublayerContainer);
         }
@@ -753,8 +766,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         this.selectGroup(e.target.getAttribute("data-group-name"));
     },
 
+    // Switch to John's clear all function instead of using unselectGroup, which causes whole container to redraw
     _onUnSelectGroup: function(e) {
-        this.unSelectGroup(e.target.getAttribute("data-group-name"));
+        this._clearAll(e.target.getAttribute("data-group-name"));
     },
 
     _onRemoveGroup: function(e) {
@@ -842,7 +856,11 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
    },
 
     _toggleAccordion: function(e){
-        e.target.classList.toggle('accordion-content-hidden');
+        const button = e.target.tagName.toLowerCase() === 'button'? e.target: e.target.parentElement; //make sure button is selected (not image)
+        const expanded = button.getAttribute('aria-expanded');
+        expanded === 'true' ? button.setAttribute('aria-expanded', 'false') : button.setAttribute('aria-expanded', 'true');
+
+        button.classList.toggle('accordion-content-hidden');
     },
 
     /* jmaurer; groupName optional: */ 
@@ -867,10 +885,44 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             }
 
             input.checked = false;
+
+            // Close any sublayers
+            const sublayers = document.getElementById('ac_layer_input_' + input.layerId + '_sublayers');
+            if (sublayers){
+                sublayers.classList.add('sublayers-hidden');
+            }
         }
         this._onInputClick();
     },
     
+    // Check all inputs in a group and style Unselect All button
+    // _checkInputStatus : function(e){
+    //     const groupId = e.target.getAttribute("group-id");
+    //     const groupToggle = document.getElementById("group-toggle-" + groupId);
+
+    //     if (groupToggle){
+    //         const groupInputs = document.getElementById("leaflet-control-accordion-article-" + groupId).getElementsByTagName("input");
+    //         let anyChecked = false;
+
+    //         // Check if any layers (not sublayers) are selected
+    //         for (i = 0; i < groupInputs.length; i++) {
+    //             if (groupInputs[i].checked && !groupInputs[i].id.includes('sublayer')){
+    //                 anyChecked = true;
+    //             };
+    //         }
+
+    //         if (anyChecked){
+    //             groupToggle.parentElement.classList.add("toggle-active");
+    //         }
+    //         else{
+    //             groupToggle.parentElement.classList.remove("toggle-active");
+
+    //         }
+    //     }
+
+
+
+    // },
 
 });
 

@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,75,650;8..144,75,700;8..144,90,650;8..144,100,100;8..144,100,200;8..144,100,300;8..144,100,400;8..144,100,500;8..144,100,600;8..144,100,700;8..144,100,800;8..144,100,900;8..144,100,1000&display=swap" rel="stylesheet">
+
 
     <script src="js/config.js"></script>
 
@@ -102,24 +104,45 @@
 
 <body> 
     <div id="nav-bar">
-        <h1>CRC Sea Level Rise Viewer - DRAFT</h1>
+        <div class="nav-bar-menu">
+            <div class="nav-bar-title"><h1>CRC Sea Level Rise Viewer - DRAFT</h1></div>
+            <div class="nav-bar-item">
+                <div class="layer-control-toggle">
+                    <a role="button" href="#" title="Close the layer menu" aria-label="Close the layer menu"><img src="images/layers_outline.svg"> Layers</a>
+                </div>
+                <!-- <div id="layer-control-placeholder"></div> -->
+            </div>
+            <div class="nav-bar-item"></div>
+        </div>
     </div>
     <div id="map-container">
         <div class="side-panel-container">
             <div class="header side-panel-header">
                 <img id="slr-icon" src="images/slr_icon5_2.png">
-                <h3>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h3>
+                <h2>SEA LEVEL:<br><span id="depth-level-label">Present level</span></h2>
             </div>
             <div class="side-panel-content">
-                <label class="scenario-select-label" for="scenario-select">SEA LEVEL RISE SCENARIO <button class="info-icon info-button" type="button" id="scenario-select-info" aria-label="more info"></button></label>
-                <select id="scenario-select" class="scenario-select">
+                <!-- <label class="scenario-select-label" for="scenario-select">Sea Level Rise Scenario <button class="info-button" id="scenario-select-info" aria-label="more info"></button></label>
+                <div><select id="scenario-select" class="scenario-select">
                     <option value="Intermediate-Low">Intermediate Low</option>
                     <option value="Intermediate" selected>Intermediate</option>
                     <option value="Intermediate-High">Intermediate High</option>
                     <option value="High">High</option>
-                </select>
+                </select></div> -->
+                <!-- <div class="scenario-select-label">Sea Level Rise Scenario <button class="info-button" id="scenario-select-info" aria-label="more info"></button></div>
+                <div class="scenario-radio-group">
+                    <input type="radio" class="scenario-radio-input" name="scenario-radio" value="Intermediate" id="inter-input" checked>
+                    <label for="inter-input">Intermediate</label><br>
+                    <input type="radio" class="scenario-radio-input" name="scenario-radio" value="Intermediate-High" id="inter-high-input">
+                    <label for="inter-high-input">Intermediate High</label>
+                </div> -->
+                <div class="scenario-select-label">SEA LEVEL RISE SCENARIO <button class="info-button" id="scenario-select-info" aria-label="more info"></button></div>
+                <div class="scenario-button-grp">
+                    <button class="scenario-button active-scenario" id="intermediate">Intermediate</button>
+                    <button class="scenario-button" id="inter-high">Intermediate High</button>
+                </div>
                 <div>
-                    <span class="depth-axis-label">MHHW</span>
+                    <span class="depth-axis-label">MHHW <button class="info-button" id="mhhw-info" aria-label="more info"></button></span>
                     <span class="time-axis-label">EXPECTED BY</span>
                 </div>
                 <div class="slider-container">
@@ -128,12 +151,14 @@
                 </div>
                 <hr>
                 <div class="gauge-info">Timing of sea level rise based on local projections for:</div>
-                <div id="gauge-label">HONOLULU HARBOR/<br>MOKU O LO&#699;E ISLAND</div>
+                <div id="gauge-label">MOKU O LO<span class="okina">&#699;</span>E ISLAND</div>
                     <!-- <div id="gauge-label">MOKU O LO&#699;E ISLAND</div> -->
+                <div class="projection-about">Data source: <br><a href="https://oceanservice.noaa.gov/hazards/sealevelrise/sealevelrise-tech-report.html" target="_blank">2022 Sea Level Rise Technical Report</a></div>
             </div>
-            <!-- <div id="gauge-label">Based on projections for Moku O Lo&#699;e tide gauge</div> -->
         </div>
-
+        <div class="side-panel-tab-container">
+            <a class="side-panel-tab" role="button" href="#" aria-label="Close sea level slider panel"></a>
+        </div>
         <!-- Map -->
          <div id="map" class="map"></div>
 
@@ -146,7 +171,7 @@
     <script src="https://unpkg.com/tippy.js@6"></script>
 
     <!-- Load NOAA SLR projection data -->
-    <script type="text/javascript" src='js/gauge_slr_proj.js'></script>
+    <script type="text/javascript" src='js/gauge_slr_proj_2000.js'></script>
     <!-- Get layers -->
     <script type="text/javascript" src='js/slr_viewer_layers.js'></script>
     <!-- Create map -->

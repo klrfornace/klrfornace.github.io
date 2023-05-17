@@ -34,7 +34,7 @@ const sliderStart = 0;
 
 // Oʻahu zoom
 const zoomLevel = 11;
-const centerCoord = [21.483, -157.909];
+const centerCoord = [21.483, -157.980];
 
 const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
 
@@ -59,28 +59,58 @@ map.getPane('admin-boundaries').style.zIndex = 425;
 
 mapboxLight.addTo(map); // initial basemap
 
-
 //////// LAYER CONTROL AND LEGEND ////////
 
 // Add styled layer control to map
 // Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
-layerControl = L.Control.styledLayerControl( basemaps, overlayMaps, {collapsed: false, position:'topright'});
+
+const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
-layerControl.getContainer().id = 'styledLayerControl'; // set id for relocation
+layerControl.getContainer().id = 'layerControl'; // set id for navigation, style
+
+// Add functionality to nav bar link to open/close layer control
+function openCloseLayerControl(){
+  const layerControlContainer = document.querySelector('.leaflet-control-layers');
+  const layerControlToggle = document.querySelector('.layer-control-toggle');
+  if (layerControlToggle.classList.contains('control-closed')){
+    layerControlContainer.style.display = '';
+    layerControlToggle.classList.remove('control-closed');
+    this.setAttribute('title','Close the layer menu');
+    this.setAttribute('aria-label','Close the layer menu');
+    this.setAttribute('href','#layerControl') // This directs keyboard navigators to layer control container when it is toggled open
+  }
+  else{
+    layerControlContainer.style.display = 'none';
+    layerControlToggle.classList.add('control-closed');
+    this.setAttribute('title', 'Open the layer menu');
+    this.setAttribute('aria-label', 'Open the layer menu');
+    this.setAttribute('href','#'); // Set link back when menu is closed since there is nowhere to navigate to
+  }
+}
+
+const layerControlToggle = document.querySelector('.layer-control-toggle a');
+layerControlToggle.onclick = openCloseLayerControl;
+
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-const legendDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
+const legendOuterDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
+const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDiv);
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
 // Set up entries for all layers/layer groups. All entries will initially be hidden.
 
 // Exposure layers
+
 // const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
 const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
 passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>' + passive.options.legendEntry;
+const gwiEntry = L.DomUtil.create('div','legend-gwi legend-entry legend-entry-hidden',legendDiv);
+gwiEntry.innerHTML = '<span class="legend-subheader">Groundwater Inundation</span><br>' + gwi.options.legendEntry;
+const drainageEntry = L.DomUtil.create('div','legend-drainage legend-entry legend-entry-hidden',legendDiv);
+drainageEntry.innerHTML = '<span class="legend-subheader">Drainage Backflow</span><br>' + drainage.options.legendEntry;
 const waveEntry = L.DomUtil.create('div','legend-wave legend-entry legend-entry-hidden',legendDiv);
 waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>' + wave.options.legendEntry;
 
@@ -94,13 +124,35 @@ roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+
 const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry legend-entry-hidden',legendDiv);
 stormwaterEntry.innerHTML = stormwater.options.legendEntry;
 
-// Other layers
-for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+// Critical facilities sublayers
+const critFacilitiesEntry = L.DomUtil.create('div','legend-critical-facilities legend-entry legend-entry-hidden',legendDiv);
+critFacilitiesEntry.innerHTML = '<span class="legend-subheader">Critical Facilities</span>'
+for (let layer of [hospitals,fireStations,policeStations,schools]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, critFacilitiesEntry);
   entry.innerHTML = layer.options.legendEntry;
 }
 
-const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-entry-hidden',legendDiv);
+// Wastewater infrastructure sublayers
+const wastewaterEntry = L.DomUtil.create('div','legend-wastewater legend-entry legend-entry-hidden',legendDiv);
+wastewaterEntry.innerHTML = '<span class="legend-subheader">Wastewater Infrastructure</span>'
+for (let layer of [treatmentPlants, pumpStations, cesspools]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, wastewaterEntry);
+  entry.innerHTML = layer.options.legendEntry;
+}
+
+// Electrical infrastructure sublayers
+const electricalEntry = L.DomUtil.create('div','legend-electrical legend-entry legend-entry-hidden',legendDiv);
+electricalEntry.innerHTML = '<span class="legend-subheader">Electrical Infrastructure</span>'
+for (let layer of [substations, transmission]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, electricalEntry);
+  entry.innerHTML = layer.options.legendEntry;
+}
+
+// Other layers
+for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32, tmk_bounds]){
+  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+  entry.innerHTML = layer.options.legendEntry;
+}
 
 // const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
 // const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
@@ -108,25 +160,6 @@ const femaEntry = L.DomUtil.create('div','legend-femaflood legend-entry legend-e
 
 // Show/hide simple legend according to legend radio button state (created in styledLayerControl)
 // const legendRadio = document.querySelector('.legend-radio-group');
-
-// function toggleLegendRadio(){
-//   const radioButtonGroup = document.getElementsByName("legend-toggle");
-//   const checkedRadio = Array.from(radioButtonGroup).find(
-//     (radio) => radio.checked
-//   );
-//   if (checkedRadio.value == 'full-menu'){
-//     document.querySelector('.ac-container').classList.remove('legend-container-hidden');
-//     document.querySelector('.legend-container').classList.add('legend-container-hidden');
-//   }
-//   else {
-//     document.querySelector('.ac-container').classList.add('legend-container-hidden');
-//     document.querySelector('.legend-container').classList.remove('legend-container-hidden');
-//   }
-// }
-// legendRadio.onclick = function () {
-//   toggleLegendRadio();
-// };
-
 
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
@@ -141,9 +174,10 @@ function removeWithTimeout(layer) {
 
 map.on('overlayadd', function addOverlay(e){
     const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
-    // Update legend
 
+    // Update legend
     const entryDiv = document.querySelector('.legend-'+ legendKey);
+
     // Remove class to allow display
     entryDiv.classList.remove('legend-entry-hidden');
   
@@ -151,9 +185,9 @@ map.on('overlayadd', function addOverlay(e){
 
     // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
     const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
-    const exposureGroup = [passive, wave, compFlood];
+    const exposureGroup = [passive, wave, compFlood]; 
 
-    for(let group of [adminGroup, exposureGroup]){
+    for(let group of [adminGroup]){
       if (group.includes(e.layer)){
         for(let layer of group){
             if (layer.options.legendKey != legendKey && map.hasLayer(layer)){
@@ -164,29 +198,20 @@ map.on('overlayadd', function addOverlay(e){
     }
 });
 
-
 map.on('overlayremove', function(e){
   const legendKey = (e.layer != undefined)? e.layer.options.legendKey: e.options.legendKey;
   const entryDiv = document.querySelector('.legend-'+ legendKey);
+
   // Restore class to remove display
   entryDiv.classList.add('legend-entry-hidden');
+
+  // For layers with sublayers, remove hidden class on sublayer elements so all entries will appear in legend if layer is reselected. 
+  // (All sublayers are reset to checked when main layer is removed.)
+  Array.from(entryDiv.children).forEach((child) => child.classList.remove('legend-entry-hidden'));
 })
 
 
-
-// let legendToggle = document.querySelector('.legend-toggle');
-
-// // Switch between full menu and simple legend
-//  legendToggle.onclick = function() {
-//   document.querySelector('.ac-container').classList.toggle('legend-container-hidden');
-//   document.querySelector('.legend-container').classList.toggle('legend-container-hidden');
-
-//   // Change label of button
-//   let currentToggleText = document.querySelector('.legend-toggle').innerHTML;
-//   const toLegend = 'Simple legend <svg viewBox="0 0 28.56 16.6"><g><g><rect y="6.05" width="16.61" height="4.5"/><polygon points="14.18 16.6 28.56 8.3 14.18 0 14.18 16.6"/></g></g></svg>';
-//   const toMenu = '<svg viewBox="0 0 28.56 16.6"><g><g><rect x="11.95" y="6.05" width="16.61" height="4.5"/><polygon points="14.38 0 0 8.3 14.38 16.6 14.38 0"/></g></g></svg> Full layer menu';
-//   document.querySelector('.legend-toggle').innerHTML = currentToggleText.includes('Simple legend')? toMenu: toLegend;
-//  }
+// Layer style adjustments by zoom/basemap
 
 
  // Change layer styles based on light/dark (satellite) basemaps
@@ -204,7 +229,7 @@ map.on( 'baselayerchange',
       dhhl.setStyle(boundary_style2)
 
       // Also make sure legend styles are correct
-      const entries = document.querySelectorAll('.legend-line');
+      const entries = document.querySelectorAll('.admin-line');
       entries.forEach(entry => {
         entry.classList.remove('line-dark-basemap');
       })
@@ -220,7 +245,7 @@ map.on( 'baselayerchange',
       boards.setStyle( boundary_style );
       dhhl.setStyle(boundary_style2);
 
-      const entries = document.querySelectorAll('.legend-line');
+      const entries = document.querySelectorAll('.admin-line');
       entries.forEach(entry => {
         entry.classList.add('line-dark-basemap');
       })
@@ -228,36 +253,73 @@ map.on( 'baselayerchange',
   }
 );
 
-
-//Change styles based on map zoom level
+// Change styles based on map zoom level
 
 map.on('zoomend', function(){
   const currentZoom = map.getZoom();
+  const markerLayers = [hospitals,fireStations,policeStations,schools,pumpStations,treatmentPlants,substations];
 
   if (currentZoom < 13){
     stormwaterStyle.weight = 0.25;
     stormwaterStyle.radius = 2;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[0]})));
+    };
+
+    transmission.setStyle({weight: 2});
+
   }
   else if (currentZoom < 18){
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[1]})));
+    };
+
+    transmission.setStyle({weight: 3});
   }
   else {
     stormwaterStyle.weight = 0.5;
     stormwaterStyle.radius = 3.5;
     stormwaterLayers.forEach((layer) => layer.setStyle(stormwaterStyle));
+
+    for(let layer of markerLayers){
+      layer.eachLayer((l) => l.setIcon(L.icon({iconUrl:layer.options.iconUrl, iconSize:layer.options.iconSizes[2]})));
+    };
+
+    transmission.setStyle({weight: 3.5});
   }
 })
 
+map.on('zoomend', function() {
+  // Close tooltips for admin boundary layers at high zooms 
+  // const tooltips = document.querySelectorAll('.leaflet-tooltip');
+  // const tooltipStyle = map.getZoom() < adminZoomThreshold ? "block":"none";
+  // tooltips.forEach((tooltip) => tooltip.style.display = tooltipStyle);
+
+  // Adjust cursor based on if clickable tile layers are present
+  if (map.getZoom() < floodZoomThreshold){
+    L.DomUtil.removeClass(map._container,'pointer-cursor');
+  }
+  else{
+    queryableWMSLayers.forEach(layer => {
+      if (map.hasLayer(layer)) {
+        L.DomUtil.addClass(map._container,'pointer-cursor');
+      }
+    })
+  }
+})
 
 //////// OTHER CONTROLS ////////
 
 // Home zoom button
 function returnHome(){
-  map.setView(centerCoord,zoomLevel)
-  this.blur();
+  map.setView(centerCoord,zoomLevel);
+  this.blur(); // Remove focus after button is clicked (to prevent style from sticking)
 }
 
 const homeControl = L.control({position: 'topleft'});
@@ -285,11 +347,12 @@ L.easyPrint({
   filename: 'slr_viewer_map',
   hideControlContainer: false,
   exportOnly: true,
-  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities'], 
-  showClasses: ['legend-container'],
+  hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities',
+    'leaflet-control-attribution','logo-control'], 
+  showClasses: ['legend-container','print-attribution'],
+  sizeModes: ['A4Landscape']
 	// sizeModes: ['Current','A4Portrait', 'A4Landscape']
 }).addTo(map);
-
 
 // Add Mapbox logo per Terms of Service
 const logoControl = L.control({position: 'bottomleft'});
@@ -300,24 +363,6 @@ logoControl.onAdd = function() {
 }
 logoControl.addTo(map);
 
-
-// Configure info tooltips using Tippy library
-const infoTooltips = {
-  '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>'
-};
-Object.keys(infoTooltips).forEach(key => {
-  tippy(key, {
-    content: infoTooltips[key],
-    trigger:'click',
-    placement: 'right',
-    theme: 'dark',
-    allowHTML: true,
-    interactive: true,
-    appendTo: () => document.body
-  })
-});
-
-
 // Set up address/TMK search bar with Mapbox geocoder and State of Hawaiʻi TMK database
 // Leaflet-control-geocoder: https://github.com/perliedman/leaflet-control-geocoder
 
@@ -326,7 +371,14 @@ var activeAddress = {};
 // Keep track of layers assigned to queried TMKs so correct shape can be removed
 var activeTMK = {};
 
-const control = new L.Control.Geocoder({ geocoder: null, position:'topleft',placeholder:'Search by address or TMK', collapsed: false, suggestMinLength: 7, defaultMarkGeocode: false })
+const geocoderControl = new L.Control.Geocoder({ 
+  geocoder: null, 
+  position:'topleft',
+  placeholder:'Search by address or TMK', 
+  collapsed: false, 
+  suggestMinLength: 7, 
+  defaultMarkGeocode: false 
+})
   .on('startgeocode', function(e){
     inputStr = e.input.trim(); // Get input and remove any white space
 
@@ -378,8 +430,8 @@ const control = new L.Control.Geocoder({ geocoder: null, position:'topleft',plac
 
 // Set up geocoder restricted to bounding box around Hawaiʻi
 const geocoder = L.Control.Geocoder.mapbox({apiKey: ak, geocodingQueryParams:{'bbox':'-162,18,-154,23'}});
-control.options.geocoder = geocoder;
-control.addTo(map);
+geocoderControl.options.geocoder = geocoder;
+geocoderControl.addTo(map);
 
 // Set id to control position via css
 const geocoderDiv = document.querySelector('.leaflet-control-geocoder');
@@ -388,7 +440,6 @@ geocoderDiv.setAttribute('id','geocoder-control');
 // Add id to default geocoder error div to always hide display via css (using Tippy to create custom error tooltips instead)
 const geocoderErrorDiv = document.querySelector('.leaflet-control-geocoder-form-no-error');
 geocoderErrorDiv.setAttribute('id','geocoder-error-default');
-
 
 function queryTMK(tmk){
 
@@ -443,7 +494,7 @@ function queryTMK(tmk){
         style: {"fill": false, "color": tmkColor},
         onEachFeature: function(feature, layer){
           return layer.bindPopup('<strong>TMK ' + tmk + '</strong><br>Acres: '+ feature.properties.gisacres.toFixed(2) + '<br><br>'
-          + '<a href="javascript:void(0);" onClick="removeTMK('+ tmk +')">Remove shape from map</a>');
+          + '<a href="#" onClick="removeTMK('+ tmk +')">Remove shape from map</a>');
         }
       }).addTo(map);
 
@@ -487,6 +538,14 @@ function removeTMK(tmk){
 function removeAddress(address){
   map.removeLayer(activeAddress[address]);
 }
+
+// Add another baselayer change listener to switch TMK color in case user switches basemap while TMK shapes are already on the map
+map.on('baselayerchange', function() {
+  for (let tmk in activeTMK){
+    const tmkColor = map.hasLayer(mapboxLight)? "black":"#dbdbdb";
+    activeTMK[tmk].setStyle({'color':tmkColor})
+  }
+});
 
 // Set up loading icon control
 const loadingControl = L.control({position: 'middlecenter'});
@@ -532,12 +591,113 @@ layerGroups.forEach(grp => {
     layer.on('loading', showLoadingControl);
     layer.on('load', hideLoadingControl);
     layer.on('remove',hideLoadingControl);
+    // layer.on('tileerror', (error) => console.log(error))
   })
 })
 
+// Error control for printing errors
 
- // Initialize map with passive flooding layers
+map.on('easyPrint-error', () => console.log('printing error'));
+
+const errorControl = L.control({position: 'middlecenter'});
+errorControl.onAdd = function() {
+  const errorDiv = L.DomUtil.create('div','error-control');
+  errorDiv.innerHTML = 'Printing error. Sorry!';
+  const closeButton = L.DomUtil.create('a','close-btn',errorDiv);
+  closeButton.innerHTML = '&#10006;';
+  closeButton.setAttribute('role','button');
+  closeButton.onclick = removeErrorControl;
+  return errorDiv
+}
+
+function removeErrorControl(){
+  map.removeControl(errorControl);
+}
+map.on('easyPrint-error', () => map.addControl(errorControl));
+
+// Map attribution control for print images
+const printAttribution = L.control({position:'bottomright'});
+printAttribution.onAdd = function(){
+  const attr = L.DomUtil.create('div','print-attribution');
+  const timestamp = new Date().toLocaleString();
+  const currentAttr = document.querySelector('.leaflet-control-attribution').textContent;
+  const attrStr = currentAttr.replace(' Improve this map','').replace('Leaflet | ','');
+  attr.innerHTML = 'Map generated: ' + timestamp + '<br>Imagery ' + attrStr;
+  return attr
+}
+
+// Add to map when print button is pushed
+map.on('easyPrint-start', () => {
+  map.addControl(printAttribution);
+  console.log(printAttribution);
+});
+
+// Initialize map with passive flooding layers
 
 layerControl.selectLayer(passive); 
 const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
 passiveLegendEntry.classList.remove('legend-entry-hidden');
+
+
+// Configure info tooltips using Tippy library
+// For some reason, this needs to be after the map is initialized with first set of layers. 
+// StyledLayerControl is interfering somehow, but I can't figure out how. -KF
+const infoTooltips = {
+  '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>',
+  '#mhhw-info':'<span style="font-weight:600">Mean Higher High Water (MHHW):</span> The water level at the average highest tide of the day.',
+  '#passive-flooding-info':'More info about passive flooding. <br><a href="#">Click here for full details.</a>',
+};
+
+Object.keys(infoTooltips).forEach(key => {
+  tippy(key, {
+    content: infoTooltips[key],
+    trigger:'click',
+    placement: 'right',
+    theme: 'light-border',
+    allowHTML: true,
+    interactive: true,
+    appendTo: () => document.body
+  });
+});
+
+// Add functionality to tab button to open/close side panel
+function openClosePanel(){
+  const panel = document.querySelector('.side-panel-container');
+  const tabContainer = document.querySelector('.side-panel-tab-container');
+
+  // Open the side panel
+  if (this.classList.contains('panel-closed')){
+    panel.style.width = '225px';
+    tabContainer.style.left = '225px';
+
+    this.classList.remove('panel-closed');
+    this.style.backgroundImage = "url(images/arrow_left.svg)";
+
+    this.setAttribute('aria-label', 'Close the sea level slider panel');
+
+    // Move left side controls over
+    const leftControls = document.querySelectorAll('.leaflet-left .leaflet-control');
+    leftControls.forEach(control => control.classList.remove('side-panel-closed'));
+  }
+  // Close the side panel
+  else{
+    panel.style.width = 0;
+    tabContainer.style.left = '0px';
+
+    this.classList.add('panel-closed');
+    const newURL = (activeDepth < 10)? 'images/slr0' + activeDepth + '_open.svg':'images/slr' + activeDepth + '_open.svg';
+    this.style.backgroundImage = "url("+ newURL + ")";
+
+    // Also update aria-label
+    this.setAttribute('aria-label', 'Displayed sea level is ' + activeDepth + ' feet. Click to open sea level slider to adjust depth.');
+
+    // Move left side controls over
+    const leftControls = document.querySelectorAll('.leaflet-left .leaflet-control');
+    leftControls.forEach(control => control.classList.add('side-panel-closed'));
+  }
+}
+
+const closeButton = document.querySelector('.side-panel-tab');
+closeButton.onclick = openClosePanel;
+
+

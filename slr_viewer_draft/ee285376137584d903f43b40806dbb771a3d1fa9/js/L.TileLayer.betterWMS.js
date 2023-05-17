@@ -7,6 +7,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     //   Register a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onAdd.call(this, map);
     map.on('click', this.getFeatureInfo, this);
+    // L.DomUtil.addClass(map._container,'pointer-cursor');
   },
   
   onRemove: function (map) {
@@ -14,6 +15,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     //   Unregister a click listener, then do all the upstream WMS things
     L.TileLayer.WMS.prototype.onRemove.call(this, map);
     map.off('click', this.getFeatureInfo, this);
+    // L.DomUtil.removeClass(map._container,'pointer-cursor');
   },
   
   getFeatureInfo: function (evt) {
@@ -39,8 +41,9 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         })
         .then((data) => {
           var err = (isJsonRequest && data.features.length > 0) ? null : data;
-          if (data.features[0].properties.GRAY_INDEX != this.wmsParams.nullValue){
-            showResults(err, evt.latlng, data.features[0].properties.GRAY_INDEX);
+          const prop = this.wmsParams.queryProperty;
+          if (data.features[0].properties[prop] != this.wmsParams.nullValue){
+            showResults(err, evt.latlng, data.features[0].properties[prop]);
           }
         })
         .catch((error) => {showResults(error)});
@@ -79,9 +82,11 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   showGetFeatureInfo: function (err, latlng, content) {
     if (err) { console.log(err); return; } // do nothing if there's an error
     // Otherwise show the content in a popup, or something.
-    L.popup({ maxWidth: 800})
+    const latlngString = +(Math.round(latlng.lat + "e+4") + "e-4") + ', ' + +(Math.round(latlng.lng + "e+4") + "e-4");
+    const latlngIcon = '<svg viewBox="0 0 42.95 62.04"><g><path d="m21.48,0C11.56,0,0,6.15,0,21.8c0,10.62,16.52,34.09,21.48,40.24,4.41-6.15,21.48-29.06,21.48-40.24C42.95,6.15,31.39,0,21.48,0Zm0,34.35c-6.14,0-11.11-4.97-11.11-11.11s4.97-11.11,11.11-11.11,11.11,4.97,11.11,11.11-4.97,11.11-11.11,11.11Z"/></g></svg>';
+    L.popup({ maxWidth: 200})
       .setLatLng(latlng)
-      .setContent(String(content))
+      .setContent(this.wmsParams.queryDisplay(String(content)) + '<hr><div class="latlng">'+latlngIcon + latlngString + '</div>')
       .openOn(this._map);
   }
 });
@@ -89,4 +94,5 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 L.tileLayer.betterWms = function (url, options) {
   return new L.TileLayer.BetterWMS(url, options);  
 };
+
 
