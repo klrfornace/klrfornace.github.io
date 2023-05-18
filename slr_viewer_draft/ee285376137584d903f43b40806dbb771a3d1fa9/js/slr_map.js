@@ -104,18 +104,10 @@ legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level
 
 // Exposure layers
 
-// const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
-const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
-passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>' + passive.options.legendEntry;
-const gwiEntry = L.DomUtil.create('div','legend-gwi legend-entry legend-entry-hidden',legendDiv);
-gwiEntry.innerHTML = '<span class="legend-subheader">Groundwater Inundation</span><br>' + gwi.options.legendEntry;
-const drainageEntry = L.DomUtil.create('div','legend-drainage legend-entry legend-entry-hidden',legendDiv);
-drainageEntry.innerHTML = '<span class="legend-subheader">Drainage Backflow</span><br>' + drainage.options.legendEntry;
-const waveEntry = L.DomUtil.create('div','legend-wave legend-entry legend-entry-hidden',legendDiv);
-waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>' + wave.options.legendEntry;
-
-const compFloodEntry = L.DomUtil.create('div','legend-comp-flood legend-entry legend-entry-hidden',legendDiv);
-compFloodEntry.innerHTML = '<span class="legend-subheader">Compound Flooding Scenario<br>(December 2021 Kona Storm)</span><br>' + compFlood.options.legendEntry;
+for (let layer of Object.values(overlayMaps[0].layers)){
+  const entry = L.DomUtil.create('div','legend-'+ layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+  entry.innerHTML = '<span class="legend-subheader">'+ layer.options.displayName + '</span><br>' + layer.options.legendEntry;
+}
 
 // Impact layers
 const roadEntry = L.DomUtil.create('div', 'legend-roads legend-entry legend-entry-hidden',legendDiv);
@@ -149,7 +141,7 @@ for (let layer of [substations, transmission]){
 }
 
 // Other layers
-for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32, tmk_bounds]){
+for (let layer of Object.values(overlayMaps[2].layers)){
   const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
   entry.innerHTML = layer.options.legendEntry;
 }
