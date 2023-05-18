@@ -206,7 +206,7 @@ for (let i = 0; i < 11; i++) {
       format:'image/png', 
       transparent: true,
       opacity: 0.67,
-      errorTileUrl: 'https://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
+      // errorTileUrl: 'https://www.soest.hawaii.edu/crc/SLRviewer/tile_error.png',
       attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
       bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
       maxZoom: 19,
