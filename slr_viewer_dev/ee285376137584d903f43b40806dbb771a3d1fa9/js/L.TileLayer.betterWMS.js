@@ -21,7 +21,10 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   getFeatureInfo: function (evt) {
     // Only make the request if map zoom is at minimum zoom level. This is an attempt to manage multiple clickable layers at once - KF
     const popupMinZoom = this.wmsParams.popupMinZoom? this.wmsParams.popupMinZoom: 0;
-    // const nullValue = this.wmsParams.nullValue;
+    
+    const prop = this.wmsParams.queryProperty;
+
+    const nullValue = this.wmsParams.nullValue;
     if (this._map.getZoom() >= popupMinZoom){
     // Make an AJAX request to the server and hope for the best
     var url = this.getFeatureInfoUrl(evt.latlng),
@@ -32,22 +35,40 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
       const isJsonRequest = url.includes('json');
 
-      fetch(url)
-      .then((response) => {
+      if (isJsonRequest){
+        fetch(url)
+        .then((response) => {
+            if (!response.ok){
+              throw new Error('Connection error');
+            }
+            return response.json(); 
+          })
+          .then((data) => {
+            const err = (data.features.length > 0) ? null : data;
+            if (data.features[0].properties[prop] != this.wmsParams.nullValue){
+              showResults(err, evt.latlng, data.features[0].properties[prop]);
+            }
+          })
+          .catch((error) => {showResults(error)});
+      }
+      else{
+        fetch(url)
+        .then((response) => {
           if (!response.ok){
             throw new Error('Connection error');
           }
-          return response.json(); // <--- SWITCH TO TEXT HERE FOR XML (AND THEN PARSE) https://stackoverflow.com/questions/37693982/how-to-fetch-xml-with-fetch-api
+          return response.text(); // https://stackoverflow.com/questions/37693982/how-to-fetch-xml-with-fetch-api
         })
+        .then((str) => new window.DOMParser().parseFromString(str, "text/xml"))
         .then((data) => {
-          var err = (isJsonRequest && data.features.length > 0) ? null : data;
-          const prop = this.wmsParams.queryProperty;
-          if (data.features[0].properties[prop] != this.wmsParams.nullValue){
-            showResults(err, evt.latlng, data.features[0].properties[prop]);
+          const err = (data.getElementsByTagName('FIELDS')) ? null : data;
+          if (data.getElementsByTagName('FIELDS')[0].getAttribute(prop) != this.wmsParams.nullValue){
+            showResults(err, evt.latlng, data.getElementsByTagName('FIELDS')[0].getAttribute(prop));
           }
         })
         .catch((error) => {showResults(error)});
-      }
+      }      
+    }
   },
   
   getFeatureInfoUrl: function (latlng) {
@@ -69,8 +90,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
           width: size.x,
           layers: this.wmsParams.layers,
           query_layers: this.wmsParams.layers,
-          info_format: 'application/json',
-          // this._url.match('geodata.hawaii.gov')? 'application/vnd.ogc.gml':'application/json' // <-- ACCOUNT FOR DIFFERENT DATA TYPES HERE
+          info_format: this._url.match('geodata.hawaii.gov')? 'text/xml':'application/json' // <-- ACCOUNT FOR DIFFERENT DATA TYPES HERE
         };
     
     params[params.version === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);

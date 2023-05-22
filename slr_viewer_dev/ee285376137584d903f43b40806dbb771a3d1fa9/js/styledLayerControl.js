@@ -203,14 +203,17 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
         );
 
         // This prevents click and drag panning - KF
-
-        L.DomEvent.addListener(container, 'mousedown', function (){
-            me._map.dragging.disable();
-          })
         
-          L.DomEvent.addListener(document, 'mouseup', function (){
-            me._map.dragging.enable();
-          })
+        if (!L.Browser.mobile){
+            L.DomEvent.addListener(container, 'mousedown', function (){
+                me._map.dragging.disable();
+            })
+        
+            L.DomEvent.addListener(document, 'mouseup', function (){
+                me._map.dragging.enable();
+            })
+        }
+
         // end insert
         
         // Insert wrapper to tie container and utilities divs together
@@ -609,7 +612,9 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             
             // Create wrapper around checkbox items with padding set to allow for smooth transition of article element
             const wrapperDiv = L.DomUtil.create('div', 'wrapper', accordionGroup);
-
+            if (!obj.overlay){
+                wrapperDiv.classList.add('basemap-group');
+            }
 
             // Link to toggle all layers (moved to top of container - KF)
             if (obj.overlay && this.options.group_togglers.show) {

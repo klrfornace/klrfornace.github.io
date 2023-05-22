@@ -150,7 +150,8 @@ for (let button of scenarioBtnGroup){
 
 // Update map and map controls when slider value is updated
 depthSlider.noUiSlider.on('update', function(value) {
-    const currentDepth = layerTags[parseInt(value)];
+    // layers all contain a tag from 00ft to 10ft
+    const currentDepth = parseInt(value).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false}) + 'ft'; 
 
     // Switch layers in all layer groups 
     for (let i = 0; i < layerGroups.length; i++){

@@ -148,6 +148,9 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	padding: 4px 0 8px 0;
 }
 
+.wrapper.basemap-group{
+	padding: 8px 0 8px 0;
+}
 .ac-container article label {
     display: inline;
     cursor: pointer;
@@ -361,11 +364,5 @@ div[id^="leaflet-control-accordion-layers"] > button {
 
 .layer-label{
 	padding-right: 3px;
-}
-
-#wave-options{
-	font-weight: 400;
-	font-size: 13px;
-	padding-left: 20px;
 }
 

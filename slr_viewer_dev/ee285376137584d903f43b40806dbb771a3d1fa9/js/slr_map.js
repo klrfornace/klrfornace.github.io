@@ -36,7 +36,7 @@ const sliderStart = 0;
 const zoomLevel = 11;
 const centerCoord = [21.483, -157.980];
 
-const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
+const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19, dragging: !L.Browser.mobile}).setView(centerCoord, zoomLevel);
 
 // Restrict bounds to Hawaiʻi
 const southWest = L.latLng( 15.2763, -166.7944 );
@@ -100,62 +100,28 @@ const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDi
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
-// Set up entries for all layers/layer groups. All entries will initially be hidden.
-
-// Exposure layers
-
-// const slrxaEntry = L.DomUtil.create('div','legend-slrxa legend-entry legend-entry-hidden',legendDiv);
-const passiveEntry = L.DomUtil.create('div','legend-passive legend-entry legend-entry-hidden',legendDiv);
-passiveEntry.innerHTML = '<span class="legend-subheader">Passive Flooding</span><br>' + passive.options.legendEntry;
-const waveEntry = L.DomUtil.create('div','legend-wave legend-entry legend-entry-hidden',legendDiv);
-waveEntry.innerHTML = '<span class="legend-subheader">Annual High Wave-Driven Flooding</span><br>' + wave.options.legendEntry;
-
-const compFloodEntry = L.DomUtil.create('div','legend-comp-flood legend-entry legend-entry-hidden',legendDiv);
-compFloodEntry.innerHTML = '<span class="legend-subheader">Compound Flooding Scenario<br>(December 2021 Kona Storm)</span><br>' + compFlood.options.legendEntry;
-
-// Impact layers
-const roadEntry = L.DomUtil.create('div', 'legend-roads legend-entry legend-entry-hidden',legendDiv);
-roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+ roads.options.legendEntry;
-
-const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry legend-entry-hidden',legendDiv);
-stormwaterEntry.innerHTML = stormwater.options.legendEntry;
-
-// Critical facilities sublayers
-const critFacilitiesEntry = L.DomUtil.create('div','legend-critical-facilities legend-entry legend-entry-hidden',legendDiv);
-critFacilitiesEntry.innerHTML = '<span class="legend-subheader">Critical Facilities</span>'
-for (let layer of [hospitals,fireStations,policeStations,schools]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, critFacilitiesEntry);
-  entry.innerHTML = layer.options.legendEntry;
+// Loop through all groups/layers/sublayers in overlay object (input for styledLayerControl) to create simple legend entries
+for (i = 0; i < overlayMaps.length; i++){
+  for (let overlay of Object.values(overlayMaps[i].layers)){
+    // For layers with sublayers, add subheader and iterate over sublayer entries
+    if (overlay.sublayers){
+      const groupLayer = overlay.layer;
+      const sublayers = Object.values(overlay.sublayers);
+      const entry = L.DomUtil.create('div','legend-' + groupLayer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+      entry.innerHTML =  '<span class="legend-subheader">' + groupLayer.options.displayName + '</span>';
+      for (let sublayer of sublayers){
+        const sublayerEntry = L.DomUtil.create('div','legend-' + sublayer.options.legendKey, entry);
+        sublayerEntry.innerHTML = sublayer.options.legendEntry;
+      }
+    }
+    // For layers without sublayers, add subheader (if defined in layer/layer group options) and legend entry.
+    else {
+      const entry = L.DomUtil.create('div', 'legend-' + overlay.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+      const subheader = (overlay.options != undefined && overlay.options.legendSubheader)?'<span class="legend-subheader">'+ overlay.options.displayName + '</span><br>':'';
+      entry.innerHTML = subheader + overlay.options.legendEntry;
+    }
+  }
 }
-
-// Wastewater infrastructure sublayers
-const wastewaterEntry = L.DomUtil.create('div','legend-wastewater legend-entry legend-entry-hidden',legendDiv);
-wastewaterEntry.innerHTML = '<span class="legend-subheader">Wastewater Infrastructure</span>'
-for (let layer of [treatmentPlants, pumpStations, cesspools]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, wastewaterEntry);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// Electrical infrastructure sublayers
-const electricalEntry = L.DomUtil.create('div','legend-electrical legend-entry legend-entry-hidden',legendDiv);
-electricalEntry.innerHTML = '<span class="legend-subheader">Electrical Infrastructure</span>'
-for (let layer of [substations, transmission]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, electricalEntry);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// Other layers
-for (let layer of [devplan, moku, ahupuaa, boards, dhhl, oahuSetback, slrxa32, tmk_bounds]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
-// const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
-// const geologyEntry = L.DomUtil.create('div','legend-geology legend-entry legend-entry-hidden',legendDiv);
-
-// Show/hide simple legend according to legend radio button state (created in styledLayerControl)
-// const legendRadio = document.querySelector('.legend-radio-group');
 
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
@@ -181,9 +147,9 @@ map.on('overlayadd', function addOverlay(e){
 
     // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
     const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
-    const exposureGroup = [passive, wave, compFlood];
+    const exposureGroup = [passive, wave, compFlood]; 
 
-    for(let group of [adminGroup, exposureGroup]){
+    for(let group of [adminGroup]){
       if (group.includes(e.layer)){
         for(let layer of group){
             if (layer.options.legendKey != legendKey && map.hasLayer(layer)){
@@ -367,7 +333,14 @@ var activeAddress = {};
 // Keep track of layers assigned to queried TMKs so correct shape can be removed
 var activeTMK = {};
 
-const geocoderControl = new L.Control.Geocoder({ geocoder: null, position:'topleft',placeholder:'Search by address or TMK', collapsed: false, suggestMinLength: 7, defaultMarkGeocode: false })
+const geocoderControl = new L.Control.Geocoder({ 
+  geocoder: null, 
+  position:'topleft',
+  placeholder:'Search by address or TMK', 
+  collapsed: false, 
+  suggestMinLength: 7, 
+  defaultMarkGeocode: false 
+})
   .on('startgeocode', function(e){
     inputStr = e.input.trim(); // Get input and remove any white space
 
@@ -584,7 +557,7 @@ layerGroups.forEach(grp => {
   })
 })
 
-// Error control
+// Error control for printing errors
 
 map.on('easyPrint-error', () => console.log('printing error'));
 
@@ -649,8 +622,7 @@ Object.keys(infoTooltips).forEach(key => {
   });
 });
 
-// Add tab button to open/close side panel
-
+// Add functionality to tab button to open/close side panel
 function openClosePanel(){
   const panel = document.querySelector('.side-panel-container');
   const tabContainer = document.querySelector('.side-panel-tab-container');
@@ -661,7 +633,7 @@ function openClosePanel(){
     tabContainer.style.left = '225px';
 
     this.classList.remove('panel-closed');
-    this.style.backgroundImage = "url(images/close2.svg)";
+    this.style.backgroundImage = "url(images/arrow_left.svg)";
 
     this.setAttribute('aria-label', 'Close the sea level slider panel');
 
@@ -687,38 +659,5 @@ function openClosePanel(){
   }
 }
 
-// function openPanel(){
-//   const panel = document.querySelector('.side-panel-container');
-//   panel.style.width == '0px'? panel.style.width = '225px': panel.style.width = 0;
-//   const panelControl = document.querySelector('.panel-control');
-//   panelControl.classList.add('side-panel-open');
-// }
-
-// Add functionality to close button
 const closeButton = document.querySelector('.side-panel-tab');
 closeButton.onclick = openClosePanel;
-
-// const sidePanelControl = L.control({position:'topleft'})
-// sidePanelControl.onAdd = function() {
-//   const tab = L.DomUtil.create('div','leaflet-bar panel-control side-panel-open');
-//   tab.id = 'slr-tab-container';
-//   const tabButton =  L.DomUtil.create('a','slr-tab-button', tab);
-//   tabButton.id = 'slr-tab-button';
-//   tabButton.role = "button";
-//   tabButton.href = '#';
-//   tabButton.title = 'Open sea level slider';
-//   tabButton.setAttribute('aria-label','Displayed sea level is ' + document.getElementById("depth-level-label").innerHTML + '. Click to open sea level slider to adjust depth.');
-//   tabButton.setAttribute('aria-disable',false);
-//   tabButton.innerHTML = '<span aria-hidden="true"></span></a>';
-//   tabButton.onclick = openPanel;
-
-//   tab.setAttribute('aria-haspopup', true);
-//   if (!L.Browser.touch) {
-//       L.DomEvent.disableClickPropagation(tab);
-//       L.DomEvent.on(tab, 'wheel', L.DomEvent.stopPropagation);
-//   } else {
-//       L.DomEvent.on(tab, 'click', L.DomEvent.stopPropagation);
-//   }
-//   return tab
-// }
-// sidePanelControl.addTo(map);

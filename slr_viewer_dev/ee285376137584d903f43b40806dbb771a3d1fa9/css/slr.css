@@ -520,7 +520,7 @@ a {
 
 .side-panel-tab{
   background-color:#dcf0f7;
-  background-image: url('../images/close2.svg');
+  background-image: url('../images/arrow_left.svg');
   background-position: 45% center;
   background-repeat: no-repeat;
   background-size: 45%;
