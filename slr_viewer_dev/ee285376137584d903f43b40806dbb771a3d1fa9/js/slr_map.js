@@ -108,7 +108,7 @@ for (i = 0; i < overlayMaps.length; i++){
       const groupLayer = overlay.layer;
       const sublayers = Object.values(overlay.sublayers);
       const entry = L.DomUtil.create('div','legend-' + groupLayer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
-      entry.innerHTML =  '<span class="legend-subheader">' + groupLayer.options.displayName + '</span>';
+      entry.innerHTML =  '<span class="legend-subheader">' + groupLayer.options.legendSubheader + '</span>';
       for (let sublayer of sublayers){
         const sublayerEntry = L.DomUtil.create('div','legend-' + sublayer.options.legendKey, entry);
         sublayerEntry.innerHTML = sublayer.options.legendEntry;
@@ -117,7 +117,7 @@ for (i = 0; i < overlayMaps.length; i++){
     // For layers without sublayers, add subheader (if defined in layer/layer group options) and legend entry.
     else {
       const entry = L.DomUtil.create('div', 'legend-' + overlay.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
-      const subheader = (overlay.options != undefined && overlay.options.legendSubheader)?'<span class="legend-subheader">'+ overlay.options.displayName + '</span><br>':'';
+      const subheader = (overlay.options != undefined && overlay.options.legendSubheader)?'<span class="legend-subheader">'+ overlay.options.legendSubheader + '</span><br>':'';
       entry.innerHTML = subheader + overlay.options.legendEntry;
     }
   }

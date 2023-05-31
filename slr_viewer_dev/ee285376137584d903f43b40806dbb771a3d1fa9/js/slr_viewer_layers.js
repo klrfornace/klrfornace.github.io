@@ -16,69 +16,13 @@ const mapboxLight = L.tileLayer(mapboxURL, mapboxOptions('mapbox/light-v10'));
 const mapboxSatellite = L.tileLayer(mapboxURL, mapboxOptions('mapbox/satellite-v9'));
 const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/satellite-streets-v11'));
 
-// const test = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' + (L.Browser.retina ? '@2x.png' : '.png'), {
-//    attribution:'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
-//    subdomains: 'abcd',
-//    maxZoom: 20,
-//    minZoom: 0
-//  });
-
-// const mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
-//   attribution:  '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-//   id: 'mapbox/streets-v11',
-//   maxZoom: 20,
-//   tileSize: 512,
-//   zoomOffset: -1,
-//   accessToken:ak
-// });
-
-
-// var Google_Grayscale_Simple = L.gridLayer.googleMutant(
-//   {
-//     type: 'roadmap',
-//     maxZoom: 20,
-//     styles: [{"featureType":"administrative","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"landscape","elementType":"labels.text","stylers":[{"lightness":-65},{"weight":3}]},{"featureType":"landscape","elementType":"labels.text.stroke","stylers":[{"lightness":100}]},{"featureType":"poi","stylers":[{"saturation":-100},{"lightness":25},{"visibility":"off"}]},{"featureType":"road.highway","stylers":[{"saturation":-100},{"visibility":"off"}]},{"featureType":"road.arterial","stylers":[{"saturation":-100},{"lightness":30},{"visibility":"on"}]},{"featureType":"road.local","stylers":[{"saturation":-100},{"lightness":40},{"visibility":"on"}]},{"featureType":"transit","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"administrative.province","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#ffff00"},{"lightness":25},{"saturation":-97}]}],
-//     basemap: true,
-//     basemapName: 'Google_Grayscale_Simple'
-//   }
-// );
-
-
-// var Google_Satellite = L.gridLayer.googleMutant( { type: 'satellite', maxZoom: 20, basemap: true, basemapName: 'Google_Satellite' } );
-
-// Esri basemaps
-
-// map.createPane('base');
-// map.getPane('base').style.zIndex = 0;
-// // var tiles = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery", {apikey: ak, pane:'base'}).addTo(map);
-// // var tiles = L.esri.Vector.vectorBasemapLayer("ArcGIS:LightGray:Base", {apikey: ak, pane:'base'}).addTo(map);
-// var tiles = L.esri.Vector.vectorBasemapLayer("OSM:LightGray:Base", {apikey: ak, pane:'base'}).addTo(map);
-
-// map.createPane('labels');
-// map.getPane('labels').style.zIndex = 650;
-// map.getPane('labels').style.pointerEvents = 'none';
-
-// var mapLabels = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery:Labels", {apikey: ak, pane: 'labels'}).addTo(map);
-// var mapLabels = L.esri.Vector.vectorBasemapLayer("OSM:LightGray:Labels", {apikey: ak, pane: 'labels'}).addTo(map);
-
-
-// const ESRI_WorldGrayCanvas = L.tileLayer(
-//     'http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-//     {
-//       attribution: 'Map &copy; ESRI',
-//       // 'Map &copy; ESRI, DeLorme, NAVTEQ',
-//       minZoom: 0,
-//       maxZoom: 19,
-//       basemap: true,
-//       basemapName: 'ESRI_WorldGrayCanvas'
-//     }
-//   );
-
 //////// OVERLAYS ////////
 
 // Base URLs for CRC Geoserver
 const crcgeoWMS = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/wms';
 const crcgeoWFS = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
+// For Mapbox vector tiles
+const crcgeoMVT = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/${layerName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`
 
 //////// EXPOSURE LAYERS ////////
 
@@ -174,7 +118,7 @@ for (let i = 0; i < 11; i++) {
 
 //////// IMPACT LAYERS ////////
 
-// Flooded roads - loaded as vector tiles from Geoserver
+// Flooded roads - loaded as vector tiles from Geoserver since WFS was too laggy for complicated shapes
 
 const roadLayers = {
   '1': [],
@@ -205,7 +149,7 @@ for (let i = 0; i < 11; i++) {
   for (let layer in roadLayers) {
       const fullLayerName = (i < 10)? `CRC%3Ahi_state_80prob_0${i}ftslr_${layer}ft_strt_v3` :  `CRC%3Ahi_state_80prob_${i}ftslr_${layer}ft_strt_v3`;
       const layerName = (i < 10)? `hi_state_80prob_0${i}ftslr_${layer}ft_strt_v3` :  `hi_state_80prob_${i}ftslr_${layer}ft_strt_v3`;
-      const roadURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/' + fullLayerName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+      const roadURL = crcgeoMVT(fullLayerName);
       const styleFunction = (layer == '1')? style1ft: style2ft;
 
       const roadTileOptions = {
@@ -226,44 +170,6 @@ for (let i = 0; i < 11; i++) {
         })
   }
 }
-
-// WFS version - was too laggy for complicated shapes
-
-// Initial styles for zoomed out map
-// const roadStyle1ft = {
-//   color: '#f45a9b',
-//   weight: 1,
-//   opacity: 1
-// };
-
-// const roadStyle2ft = {
-//   color: '#9f0c4a',
-//   weight: 1,
-//   opacity: 1
-// };
-
-// const roadOptions = (ft, floodDepth) => (
-//   {style: floodDepth == '1ft'? roadStyle1ft: roadStyle2ft,
-//     // onEachFeature: function ( feature, layer ) {
-//     //   var street_name = feature.properties.name;
-//     //   var tooltip = '<center><b>0.5 ft scenario';
-//     //   if ( street_name ) {
-//     //     tooltip += ':<br/>' + street_name;
-//     //   }
-//     //   tooltip += '</b></center>';
-//     //   layer.bindTooltip( tooltip, { sticky: true } );
-//     // },
-//     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-//     name: (ft < 10) ? `Flooded roads 0${ft}ft_${floodDepth}` : `Flooded roads ${ft}ft_${floodDepth}`,
-//   });
-// for (let i = 0; i < 11; i++) {
-//   for (let layer in roadLayers) {
-//     const layerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
-//     // const layerName = (i < 10)? `CRC%3AHI_Oahu_80prob_0${i}ftSLR_${layer}_strt_v2` :  `CRC%3AHI_Oahu_80prob_${i}ftSLR_${layer}_strt_v2`;
-//     const roadWFS = `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
-//     roadLayers[layer][i] = new L.GeoJSON.AJAX(roadWFS, roadOptions(i, layer));
-//   }
-// }
 
 // Stormwater structures
 
@@ -365,7 +271,7 @@ const treatmentPlants = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Asewer_-_treatment_pl
 });
 
 // WFS method was too laggy for the large number of features so loading cesspool points as vector tiles
-const cesspoolURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/CRC%3Aosds_dots_w_tracts_clean_atts_kp@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+const cesspoolURL = crcgeoMVT('CRC%3Aosds_dots_w_tracts_clean_atts_kp');
 
 function cesspoolStyle(properties, zoom) {
   const iconSize = (zoom < 13) ? [6,6]:
@@ -385,16 +291,6 @@ const cesspoolTileOptions = {
 }
 
 const cesspools = L.vectorGrid.protobuf(cesspoolURL, cesspoolTileOptions);
-
-// Original WFS method
-// const cesspools = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aosds_dots_w_tracts_clean_atts_kp'), {
-//   pointToLayer: (feature, latlng) => (L.marker(latlng, {icon: L.icon({iconSize:[6,6], iconUrl: "images/diamond.svg"})})),
-//   iconUrl:"images/diamond.svg",
-//   iconSizes:[[6,6],[9,9],[12,12]],
-//   legendKey:'cesspool',
-//   legendSymbol: '<img class="legend-sublayer legend-icon small-shape tight-layout" src="images/diamond.svg"></img>',
-//   legendEntry: '<div class="legend-sublayer"><img class="legend-sublayer legend-icon small-shape" src="images/diamond.svg"></img>Cesspools</div>'
-// });
 
 const sewerStyle = {
   color: '#c76113',
@@ -651,12 +547,14 @@ function highlightBoundaries ( e ) {
 // For converting names returned in all caps
 function toTitleCase(str) {
     return str.replace(
-      /\w\S*/g,
+      // /\w\S*/g, // white space only
+      /\b[\w']+\b/g, // all word boundaries (including hyphens)
       function(txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
 }
+
 // Development / Community Plan Areas (Districts):
 
 const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&outFields=*&returnGeometry=true&outSR=4326&f=geojson';

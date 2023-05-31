@@ -586,11 +586,11 @@ a {
   border-top-right-radius: 3px;
 }
 
-.leaflet-touch .leaflet-bar a {
+/* .leaflet-touch .leaflet-bar a {
   width: 32px;
   height: 32px;
   line-height: 32px;
-}
+} */
 
 /* To overrule leaflet class added later when legend control is expanded/hidden*/
 #ac-container.legend-container-hidden form{
@@ -635,7 +635,7 @@ a {
 .error-control:hover a{
   opacity: 60%;
 }
-/* Geocoded control */
+/* Geocoder control */
 
 .leaflet-control-geocoder-form input{
   width: 236px;
@@ -643,14 +643,18 @@ a {
 }
 
 #geocoder-control {
-  height: 32px;
-  margin-top: -149px;
+  /* height: 32px; */
+  margin-top: -141px;
   margin-left: 280px;
   transition: margin-left 0.3s linear;
   } 
 
 #geocoder-error-default {
   display: none;
+}
+
+.leaflet-control-geocoder-alternatives li{
+  white-space:normal;
 }
 
 /* Styles to move control positions when side panel is open/closed */
