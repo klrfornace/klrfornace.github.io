@@ -1,3 +1,5 @@
+// Modified version of Leaflet.StyledLayerControl
+// Original version available here: https://github.com/davicustodio/Leaflet.StyledLayerControl
 L.Control.StyledLayerControl = L.Control.Layers.extend({
     options: {
         collapsed: true,

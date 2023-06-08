@@ -1,6 +1,6 @@
 const depthSlider = document.getElementById('depth-slider');
 const scenarioSelect = document.getElementById('scenario-select');
-const scenarioRadio = document.querySelector('.scenario-radio-group');
+// const scenarioRadio = document.querySelector('.scenario-radio-group');
 
 const depths = ['0 ft','1 ft','2 ft','3 ft','4 ft','5 ft','6 ft','7 ft','8 ft','9 ft','10 ft'];
 const maxDepth = 10;

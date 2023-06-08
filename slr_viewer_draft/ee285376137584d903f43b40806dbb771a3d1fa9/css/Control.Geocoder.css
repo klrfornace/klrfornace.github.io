@@ -48,7 +48,7 @@
   height: 26px;
   border: none;
   background-color: white;
-  background-image: url("search_icon.svg");
+  background-image: url("../images/search_icon.svg");
   background-repeat: no-repeat;
   background-position: center;
   cursor: pointer;

@@ -36,7 +36,7 @@ const sliderStart = 0;
 const zoomLevel = 11;
 const centerCoord = [21.483, -157.980];
 
-const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19, dragging: !L.Browser.mobile}).setView(centerCoord, zoomLevel);
+const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
 
 // Restrict bounds to Hawaiʻi
 const southWest = L.latLng( 15.2763, -166.7944 );
@@ -99,6 +99,8 @@ const legendOuterDiv = document.querySelector('.legend-container'); //this div i
 const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDiv);
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
+
+// Set up entries for all layers/layer groups. All entries will initially be hidden.
 
 // Loop through all groups/layers/sublayers in overlay object (input for styledLayerControl) to create simple legend entries
 for (i = 0; i < overlayMaps.length; i++){
@@ -661,3 +663,5 @@ function openClosePanel(){
 
 const closeButton = document.querySelector('.side-panel-tab');
 closeButton.onclick = openClosePanel;
+
+

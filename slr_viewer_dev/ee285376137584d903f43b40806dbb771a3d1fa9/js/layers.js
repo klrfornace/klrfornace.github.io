@@ -942,17 +942,6 @@ const electrical = L.layerGroup([substations, transmission],
     legendSubheader: 'Electrical Infrastructure',
 });
 
-// Array of queryable WMS tile layers/layer groups
-const queryableWMSLayers = [passive, wave, femaFlood, geology];
-
-// Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
-const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
-const wmsSingleLayers = [femaFlood, slrxa32, tmk_bounds];
-const unconnectedLayers = [land_use_districts, geology, soils];
-
-// Add event listener to GeoJSON AJAX layers to catch data:loaded event.
-//(Data starts loading before layer is added to map so this can happen before layer is added.)
-ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.loadStatus = 'loaded'));
 
 ///////// LAYER CONTROL OBJECTS //////////
 
@@ -1028,7 +1017,14 @@ const overlayMaps = [
 ];
 
 
-// <span class="okina">&#699;</span>
+// Array of queryable WMS tile layers/layer groups
+const queryableWMSLayers = [passive, wave, roads];
 
+// Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
+const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl, oahuSetback];
+const wmsSingleLayers = [slrxa32, tmk_bounds];
+// const unconnectedLayers = [land_use_districts, geology, soils];
 
-
+// Add event listener to GeoJSON AJAX layers to catch data:loaded event.
+//(Data starts loading before layer is added to map so this can happen before layer is added.)
+ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.loadStatus = 'loaded'));

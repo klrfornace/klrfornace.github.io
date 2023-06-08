@@ -36,7 +36,7 @@ const sliderStart = 0;
 const zoomLevel = 11;
 const centerCoord = [21.483, -157.980];
 
-const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
+const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19, dragging: !L.Browser.mobile}).setView(centerCoord, zoomLevel);
 
 // Restrict bounds to Hawaiʻi
 const southWest = L.latLng( 15.2763, -166.7944 );
@@ -62,8 +62,6 @@ mapboxLight.addTo(map); // initial basemap
 //////// LAYER CONTROL AND LEGEND ////////
 
 // Add styled layer control to map
-// Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
-
 const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
@@ -100,58 +98,28 @@ const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDi
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
-// Set up entries for all layers/layer groups. All entries will initially be hidden.
-
-// Exposure layers
-
-for (let layer of Object.values(overlayMaps[0].layers)){
-  const entry = L.DomUtil.create('div','legend-'+ layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
-  entry.innerHTML = '<span class="legend-subheader">'+ layer.options.displayName + '</span><br>' + layer.options.legendEntry;
+// Loop through all groups/layers/sublayers in overlay object (input for styledLayerControl) to create simple legend entries
+for (i = 0; i < overlayMaps.length; i++){
+  for (let overlay of Object.values(overlayMaps[i].layers)){
+    // For layers with sublayers, add subheader and iterate over sublayer entries
+    if (overlay.sublayers){
+      const groupLayer = overlay.layer;
+      const sublayers = Object.values(overlay.sublayers);
+      const entry = L.DomUtil.create('div','legend-' + groupLayer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+      entry.innerHTML =  '<span class="legend-subheader">' + groupLayer.options.legendSubheader + '</span>';
+      for (let sublayer of sublayers){
+        const sublayerEntry = L.DomUtil.create('div','legend-' + sublayer.options.legendKey, entry);
+        sublayerEntry.innerHTML = sublayer.options.legendEntry;
+      }
+    }
+    // For layers without sublayers, add subheader (if defined in layer/layer group options) and legend entry.
+    else {
+      const entry = L.DomUtil.create('div', 'legend-' + overlay.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
+      const subheader = (overlay.options != undefined && overlay.options.legendSubheader)?'<span class="legend-subheader">'+ overlay.options.legendSubheader + '</span><br>':'';
+      entry.innerHTML = subheader + overlay.options.legendEntry;
+    }
+  }
 }
-
-// Impact layers
-const roadEntry = L.DomUtil.create('div', 'legend-roads legend-entry legend-entry-hidden',legendDiv);
-roadEntry.innerHTML = '<span class="legend-subheader">Flooded Roads</span><br>'+ roads.options.legendEntry;
-
-const stormwaterEntry = L.DomUtil.create('div', 'legend-stormwater legend-entry legend-entry-hidden',legendDiv);
-stormwaterEntry.innerHTML = stormwater.options.legendEntry;
-
-// Critical facilities sublayers
-const critFacilitiesEntry = L.DomUtil.create('div','legend-critical-facilities legend-entry legend-entry-hidden',legendDiv);
-critFacilitiesEntry.innerHTML = '<span class="legend-subheader">Critical Facilities</span>'
-for (let layer of [hospitals,fireStations,policeStations,schools]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, critFacilitiesEntry);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// Wastewater infrastructure sublayers
-const wastewaterEntry = L.DomUtil.create('div','legend-wastewater legend-entry legend-entry-hidden',legendDiv);
-wastewaterEntry.innerHTML = '<span class="legend-subheader">Wastewater Infrastructure</span>'
-for (let layer of [treatmentPlants, pumpStations, cesspools]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, wastewaterEntry);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// Electrical infrastructure sublayers
-const electricalEntry = L.DomUtil.create('div','legend-electrical legend-entry legend-entry-hidden',legendDiv);
-electricalEntry.innerHTML = '<span class="legend-subheader">Electrical Infrastructure</span>'
-for (let layer of [substations, transmission]){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey, electricalEntry);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// Other layers
-for (let layer of Object.values(overlayMaps[2].layers)){
-  const entry = L.DomUtil.create('div','legend-' + layer.options.legendKey + ' legend-entry legend-entry-hidden',legendDiv);
-  entry.innerHTML = layer.options.legendEntry;
-}
-
-// const testEntry = L.DomUtil.create('div','legend-test legend-entry legend-entry-hidden',legendDiv);
-// const soilEntry = L.DomUtil.create('div','legend-soils legend-entry legend-entry-hidden',legendDiv);
-// const geologyEntry = L.DomUtil.create('div','legend-geology legend-entry legend-entry-hidden',legendDiv);
-
-// Show/hide simple legend according to legend radio button state (created in styledLayerControl)
-// const legendRadio = document.querySelector('.legend-radio-group');
 
 
 // Add event listeners to manage exclusive layers and update legend as layers are added/removed.
@@ -204,7 +172,6 @@ map.on('overlayremove', function(e){
 
 
 // Layer style adjustments by zoom/basemap
-
 
  // Change layer styles based on light/dark (satellite) basemaps
 map.on( 'baselayerchange',
@@ -331,8 +298,6 @@ homeControl.onAdd = function(){
 homeControl.addTo(map);
 
 // Add easy print button to export map.
-// leaflet-easyPrint: https://github.com/rowanwins/leaflet-easyPrint
-// Bundle updated per this issue: https://github.com/rowanwins/leaflet-easyPrint/issues/109
 L.easyPrint({
 	title: 'Export this map',
 	position: 'topleft',
@@ -420,7 +385,7 @@ const geocoderControl = new L.Control.Geocoder({
     
   });
 
-// Set up geocoder restricted to bounding box around Hawaiʻi
+// Set up Mapbox geocoder restricted to bounding box around Hawaiʻi
 const geocoder = L.Control.Geocoder.mapbox({apiKey: ak, geocodingQueryParams:{'bbox':'-162,18,-154,23'}});
 geocoderControl.options.geocoder = geocoder;
 geocoderControl.addTo(map);
@@ -434,7 +399,6 @@ const geocoderErrorDiv = document.querySelector('.leaflet-control-geocoder-form-
 geocoderErrorDiv.setAttribute('id','geocoder-error-default');
 
 function queryTMK(tmk){
-
   // Define the ArcGIS REST API URL; return result in GeoJSON format; include
   // parcel acres in addition to the geometry of the search result:
 
@@ -588,7 +552,6 @@ layerGroups.forEach(grp => {
 })
 
 // Error control for printing errors
-
 map.on('easyPrint-error', () => console.log('printing error'));
 
 const errorControl = L.control({position: 'middlecenter'});
@@ -625,7 +588,6 @@ map.on('easyPrint-start', () => {
 });
 
 // Initialize map with passive flooding layers
-
 layerControl.selectLayer(passive); 
 const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
 passiveLegendEntry.classList.remove('legend-entry-hidden');
@@ -633,7 +595,7 @@ passiveLegendEntry.classList.remove('legend-entry-hidden');
 
 // Configure info tooltips using Tippy library
 // For some reason, this needs to be after the map is initialized with first set of layers. 
-// StyledLayerControl is interfering somehow, but I can't figure out how. -KF
+// StyledLayerControl is interfering somehow (probably because it is creating layer control multiple times), but I just left it alone. -KF
 const infoTooltips = {
   '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>',
   '#mhhw-info':'<span style="font-weight:600">Mean Higher High Water (MHHW):</span> The water level at the average highest tide of the day.',
@@ -691,5 +653,3 @@ function openClosePanel(){
 
 const closeButton = document.querySelector('.side-panel-tab');
 closeButton.onclick = openClosePanel;
-
-

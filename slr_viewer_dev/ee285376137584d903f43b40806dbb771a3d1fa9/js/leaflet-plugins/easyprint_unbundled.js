@@ -1,3 +1,7 @@
+// Modified version of leaflet-easyPrint (unbundled)
+// Original version available here: https://github.com/rowanwins/leaflet-easyPrint
+// Bundle updated per this issue: https://github.com/rowanwins/leaflet-easyPrint/issues/109
+
 !function(t, e) {
     "object" == typeof exports && "undefined" != typeof module ? e() : "function" == typeof define && define.amd ? define(e) : e()
 }(0, function() {
