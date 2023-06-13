@@ -857,7 +857,7 @@ const oahuSetback = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_70yr_rate_plus_60ft
   legendEntry: '<svg class="legend-line setback-line" viewBox="0 0 31.74 5.74"><g><path d="m31.74,5.74h-4.74V0h4.74v5.74Zm-8.74,0h-5V0h5v5.74Zm-9,0h-5V0h5v5.74Zm-9,0H0V0h5v5.74Z"/></g></svg>O<span class="okina">&#699;</span>ahu Shoreline Setback'
 });
 
-
+//<button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button>
 //////////  LAYER GROUPS  //////////
 
 // Initialize layer groups that change with depth
@@ -866,7 +866,8 @@ const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],
   legendKey:'passive',
   legendEntry: 'Marine flooding: water depth<br><img src="images/blue_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/green_colorbar.svg" style="width:220px; height:17px">',
   legendSubheader: 'Passive Flooding',
-  displayName: 'Passive Flooding'
+  displayName: 'Passive Flooding',
+  infoButtonId: 'passive-flooding-info'
 })
 const wave = L.layerGroup(waveLayers[0],{
   legendKey:'wave',
@@ -967,7 +968,11 @@ const basemaps = [
 // layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2}}
 // (...And yes this could be constructed more efficiently)
 
-const labelFormat = (layer, inline) => inline? '<div class="legend-panel-inline">'+ layer.options.legendSymbol + '</div><span class="layer-label">'+layer.options.displayName +'</span>':'<span class="layer-label">'+ layer.options.displayName + '</span><div class="legend-panel">'+ layer.options.legendEntry + '</div>';
+// Functions to simplify formatting
+const infoButton = (buttonId) => buttonId != undefined? '<button class="info-button" type="button" id="' + buttonId + '" aria-label="more info"></button>':'';
+const labelFormat = (layer, inline) => inline? 
+'<div class="legend-panel-inline">'+ layer.options.legendSymbol + '</div><span class="layer-label">'+layer.options.displayName +'</span>'+ infoButton(layer.options.infoButtonId):
+'<span class="layer-label">'+ layer.options.displayName + '</span>'+ infoButton(layer.options.infoButtonId) + '<div class="legend-panel">'+ layer.options.legendEntry + '</div>';
 
 const overlayMaps = [
   { groupName: '<h3><img src="images/wave.svg" class="label-icon">EXPOSURE</h3>', 
