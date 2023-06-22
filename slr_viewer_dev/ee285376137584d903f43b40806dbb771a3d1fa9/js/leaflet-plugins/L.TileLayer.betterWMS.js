@@ -19,13 +19,12 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   },
   
   getFeatureInfo: function (evt) {
-    // Only make the request if map zoom is at minimum zoom level. This is an attempt to manage multiple clickable layers at once - KF
-    const popupMinZoom = this.wmsParams.popupMinZoom? this.wmsParams.popupMinZoom: 0;
+    // Only make the request if map zoom is at minimum zoom level. This was an attempt to manage multiple clickable layers at once but I abandoned it- KF
+    // const popupMinZoom = this.wmsParams.popupMinZoom? this.wmsParams.popupMinZoom: 0;
     
     const prop = this.wmsParams.queryProperty;
 
     const nullValue = this.wmsParams.nullValue;
-    if (this._map.getZoom() >= popupMinZoom){
     // Make an AJAX request to the server and hope for the best
     var url = this.getFeatureInfoUrl(evt.latlng),
         showResults = L.Util.bind(this.showGetFeatureInfo, this);
@@ -68,7 +67,6 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         })
         .catch((error) => {showResults(error)});
       }      
-    }
   },
   
   getFeatureInfoUrl: function (latlng) {

@@ -26,7 +26,6 @@ L.Map.include({
 });
 
 // Set up map
-const sliderStart = 0;
 
 // Statewide zoom
 // const zoomLevel = 8;
@@ -48,8 +47,8 @@ map.options.maxBounds = bounds;
 map.createPane('base'); // ensure basemaps are always the lowest layer
 map.getPane('base').style.zIndex = 150;
 
-map.createPane('mvt-line'); // for vector tiles that should be moved up
-map.getPane('mvt-line').style.zIndex = 390; // right behind line layers at 400
+map.createPane('mvt-line'); // for vector tiles that should be moved up to polygon/line level
+map.getPane('mvt-line').style.zIndex = 390; // right behind polygon/line layers at 400
 
 map.createPane('underlay'); // for tile layers that need to above basemap but below all other layers
 map.getPane('underlay').style.zIndex = 175;
@@ -62,6 +61,7 @@ mapboxLight.addTo(map); // initial basemap
 //////// LAYER CONTROL AND LEGEND ////////
 
 // Add styled layer control to map
+// basemaps and overlayMaps objects are created in layers.js
 const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
@@ -93,12 +93,12 @@ layerControlToggle.onclick = openCloseLayerControl;
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-const legendOuterDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
+const legendOuterDiv = document.querySelector('.legend-container'); // this div is created in styledLayerControl
 const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDiv);
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
-// Loop through all groups/layers/sublayers in overlay object (input for styledLayerControl) to create simple legend entries
+// Loop through all groups/layers/sublayers in overlayMaps object (same input as for styledLayerControl) to create simple legend entries
 for (i = 0; i < overlayMaps.length; i++){
   for (let overlay of Object.values(overlayMaps[i].layers)){
     // For layers with sublayers, add subheader and iterate over sublayer entries
@@ -142,10 +142,9 @@ map.on('overlayadd', function addOverlay(e){
     entryDiv.classList.remove('legend-entry-hidden');
   
     // Remove any other layers in administrative boundary pane if another is added. (Other exclusive groups to be added)
-
     // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
     const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
-    const exposureGroup = [passive, wave, compFlood]; 
+    const exposureGroup = [passive, wave, compFlood]; // (flood layers not managed as exclusive layers for now)
 
     for(let group of [adminGroup]){
       if (group.includes(e.layer)){
@@ -156,6 +155,13 @@ map.on('overlayadd', function addOverlay(e){
         }
       }
     }
+
+  // Change cursor to pointer if clickable tile layers are present
+  queryableWMSLayers.forEach(layer => {
+    if (map.hasLayer(layer)) {
+        L.DomUtil.addClass(map._container,'pointer-cursor');
+      }
+    })
 });
 
 map.on('overlayremove', function(e){
@@ -168,6 +174,18 @@ map.on('overlayremove', function(e){
   // For layers with sublayers, remove hidden class on sublayer elements so all entries will appear in legend if layer is reselected. 
   // (All sublayers are reset to checked when main layer is removed.)
   Array.from(entryDiv.children).forEach((child) => child.classList.remove('legend-entry-hidden'));
+
+  // Change cursor to default if no clickable tile layers are present
+  let clickablePresent = false;
+  queryableWMSLayers.forEach(layer => {
+    if (map.hasLayer(layer)) {
+      clickablePresent = true;
+    }
+  })
+  if (!clickablePresent) {
+    L.DomUtil.removeClass(map._container,'pointer-cursor');
+  }
+
 })
 
 
@@ -177,6 +195,7 @@ map.on('overlayremove', function(e){
 map.on( 'baselayerchange',
   function() {
     if ( map.hasLayer( mapboxLight )) {
+      // These styles are initially created in layers.js
       boundary_style.color = '#6e6e6e';
       boundary_style2.color = '#6e6e6e'; // Thicker line style
       boundary_highlight_style.color = '#3c3c3c';
@@ -185,7 +204,7 @@ map.on( 'baselayerchange',
       devplan.setStyle( boundary_style );
       moku.setStyle( boundary_style );
       boards.setStyle( boundary_style );
-      dhhl.setStyle(boundary_style2)
+      dhhl.setStyle(boundary_style2);
 
       // Also make sure legend styles are correct
       const entries = document.querySelectorAll('.admin-line');
@@ -254,24 +273,24 @@ map.on('zoomend', function(){
   }
 })
 
-map.on('zoomend', function() {
+// map.on('zoomend', function() {
   // Close tooltips for admin boundary layers at high zooms 
   // const tooltips = document.querySelectorAll('.leaflet-tooltip');
   // const tooltipStyle = map.getZoom() < adminZoomThreshold ? "block":"none";
   // tooltips.forEach((tooltip) => tooltip.style.display = tooltipStyle);
 
   // Adjust cursor based on if clickable tile layers are present
-  if (map.getZoom() < floodZoomThreshold){
-    L.DomUtil.removeClass(map._container,'pointer-cursor');
-  }
-  else{
-    queryableWMSLayers.forEach(layer => {
-      if (map.hasLayer(layer)) {
-        L.DomUtil.addClass(map._container,'pointer-cursor');
-      }
-    })
-  }
-})
+//   if (map.getZoom() < floodZoomThreshold){
+//     L.DomUtil.removeClass(map._container,'pointer-cursor');
+//   }
+//   else{
+//     queryableWMSLayers.forEach(layer => {
+//       if (map.hasLayer(layer)) {
+//         L.DomUtil.addClass(map._container,'pointer-cursor');
+//       }
+//     })
+//   }
+// })
 
 //////// OTHER CONTROLS ////////
 
@@ -297,7 +316,8 @@ homeControl.onAdd = function(){
 }
 homeControl.addTo(map);
 
-// Add easy print button to export map.
+// Add easy print button to export map as png
+// This will create a png with only the simple legend in top right corner and simplified data attribution info in lower right corner.
 L.easyPrint({
 	title: 'Export this map',
 	position: 'topleft',
@@ -333,7 +353,7 @@ const geocoderControl = new L.Control.Geocoder({
   position:'topleft',
   placeholder:'Search by address or TMK', 
   collapsed: false, 
-  suggestMinLength: 7, 
+  suggestMinLength: 7, // number of characters entered before Mapbox provides address suggestions. Higher number will limit number of geocoding requests. 
   defaultMarkGeocode: false 
 })
   .on('startgeocode', function(e){
@@ -443,7 +463,7 @@ function queryTMK(tmk){
         return;
       }
 
-      //Set color based on light or dark basemap
+      // Set TMK shape color based on light or dark basemap
       tmkColor = map.hasLayer(mapboxLight) ? "black":"#dbdbdb";
 
       const tmkPolygon = L.geoJSON(data, {
@@ -570,7 +590,7 @@ function removeErrorControl(){
 }
 map.on('easyPrint-error', () => map.addControl(errorControl));
 
-// Map attribution control for print images
+// Simplified attribution control for print images
 const printAttribution = L.control({position:'bottomright'});
 printAttribution.onAdd = function(){
   const attr = L.DomUtil.create('div','print-attribution');

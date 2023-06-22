@@ -5,7 +5,7 @@ const mapboxOptions = (layerId) => ({
   attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> '
               +'<strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
   id: layerId,
-  maxZoom: 20,
+  maxZoom: 19,
   tileSize: 512,
   zoomOffset: -1,
   accessToken:ak,
@@ -25,9 +25,6 @@ const crcgeoWFS = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/CRC/
 const crcgeoMVT = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/${layerName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`
 
 //////// EXPOSURE LAYERS ////////
-
-// Threshold for clicking on flood layers to show pop-ups
-const floodZoomThreshold = 12;
 
 const passiveWmsOptions = (ft, type) => (
   {
@@ -49,9 +46,8 @@ const passiveWmsOptions = (ft, type) => (
                 data == 11? ('Depth below sea level:<div class="popup-data"> 10+ ft</div>'): 
                 ('Depth below sea level:<div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')),
     nullValue: type === "SCI"? 127:15,
-    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v3` : `CRC:HI_State_80prob_${ft}ft_${type}_v3`, 
-    name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,
+    name: (ft < 10) ? `Passive ${type} 0${ft}ft all-scenarios` : `Passive ${type} ${ft}ft all-scenarios`,
   }
 ) 
 
@@ -79,9 +75,8 @@ const waveWmsOptions = (ft) => (
     queryable: true,
     queryProperty: 'GRAY_INDEX',
     nullValue: -999,
-    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:Waikiki_annual_wave_OsWkh1_0${ft}ft` : `CRC:Waikiki_annual_wave_OsWkh1_${ft}ft`, 
-    name: (ft < 10) ? `Annual wave 0${ft}ft` : `Annual wave ${ft}ft`,
+    name: (ft < 10) ? `Annual wave 0${ft}ft all-scenarios` : `Annual wave ${ft}ft all-scenarios`,
   }
 ) 
 
@@ -104,9 +99,8 @@ for (let i = 0; i < 11; i++) {
       maxZoom: 19,
       queryable: true,
       nullValue: -999,
-      popupMinZoom: floodZoomThreshold,
       layers: (ft < 10) ? `CRC:compound_flooding_prelim_0${ft}ft` : `CRC:compound_flooding_prelim_${ft}ft`, 
-      name: (ft < 10) ? `Kona storm scenario 0${ft}ft` : `Kona storm scenario ${ft}ft`,
+      name: (ft < 10) ? `Kona storm scenario 0${ft}ft all-scenarios` : `Kona storm scenario ${ft}ft all-scenarios`,
     }
   ) 
   
@@ -156,7 +150,7 @@ for (let i = 0; i < 11; i++) {
         vectorTileLayerStyles: {[layerName]: styleFunction},
         interactive: true,	// Make sure that this VectorGrid fires mouse/pointer events
         attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-        name: (i < 10) ? `Flooded roads 0${i}ft_${layer}` : `Flooded roads ${i}ft_${layer}`,
+        name: (i < 10) ? `Flooded roads 0${i}ft_${layer} all-scenarios` : `Flooded roads ${i}ft_${layer} all-scenarios`,
         pane: 'mvt-line'
       }
       roadLayers[layer][i] = L.vectorGrid.protobuf(roadURL, roadTileOptions)
@@ -196,7 +190,7 @@ const stormwaterOptions = (ft) => (
     //   layer.bindTooltip( tooltip, { sticky: true } );
     // },
     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-    name: (ft < 10) ? `Flooded stormwater structures 0${ft}ft` : `Flooded stormwater structures ${ft}ft`,
+    name: (ft < 10) ? `Flooded stormwater structures 0${ft}ft all-scenarios` : `Flooded stormwater structures ${ft}ft all-scenarios`,
   });
 
 for (let i = 0; i < 11; i++) {
@@ -335,7 +329,7 @@ const transmission = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Atransmission_lines_hi_h
 
 //////////  OTHER OVERLAYS  //////////
 
-// Geology Layer: 
+// Geology Layer - not currently connected!
 
 const geology = L.tileLayer.wms(
     'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/hi_usgs_all_geology/wms',
@@ -358,7 +352,7 @@ const geology = L.tileLayer.wms(
     }
   );
 
-// Soils survey:
+// Soils survey - not currently connected!
 
 const soils = L.tileLayer.wms(
     'https://geodata.hawaii.gov/arcgis/services/Terrestrial/MapServer/WMSServer',
@@ -382,7 +376,7 @@ const soils = L.tileLayer.wms(
     }
   );
  
-// State Land Use Districts (Agricultural, Conservation, Rural, Urban):
+// State Land Use Districts (Agricultural, Conservation, Rural, Urban) - not currently connected!
 // Was layer '15' then it switched to '16' (2019-09) then it switched to
 // '17' (2021-12); does not match REST which shows '20':
 
@@ -408,9 +402,9 @@ const land_use_districts = L.tileLayer.wms(
     }
   );
   
-// FEMA Flood Hazard Zones: 
+// FEMA Flood Hazard Zones
 
-// ***** NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. No idea why.*****
+//  NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. Not sure why.
 const femaFlood = L.tileLayer.wms(
   'https://geodata.hawaii.gov/arcgis/services/Hazards/MapServer/WMSServer',
   {
@@ -419,8 +413,6 @@ const femaFlood = L.tileLayer.wms(
     sld: 'http://www.soest.hawaii.edu/crc/SLRviewer/slds/fema_flood_test.xml',
     // sld: 'http://www.pacioos.hawaii.edu/ssi/sld/flood_hazard_zones.xml',
     version: '1.1.1',
-    //brought up darker color shades on my computer strangely...
-    //format: 'image/png',
     format: 'image/png',
     transparent: true,
     opacity: 0.67,
@@ -428,69 +420,37 @@ const femaFlood = L.tileLayer.wms(
     attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
     //bounds: L.latLngBounds( L.latLng( 20.5001, -159.79 ), L.latLng( 22.2353, -155.979 ) ),
     bounds: L.latLngBounds( L.latLng( 18.891141, -160.250512 ), L.latLng( 22.235775, -154.730304 ) ),
-    maxZoom: 20,
+    maxZoom: 19,
     // My custom attributes:
-    name: 'Flood Hazard Zones',
-    pane: 'underlay',
-    legendKey: 'test1',
     queryable: true 
   }
 );
 
+// Esri WMS doesn't allow hatching so use leaflet-polygon.fillPattern plugin to apply hatching to specific zones queried as GeoJSONs
 const leveeURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27%LEVEE%%27&outFields=*&outSR=4326&f=geojson'
 const floodwayURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27FLOODWAY%27&outFields=*&outSR=4326&f=geojson'
 
 const leveeHatch = new L.GeoJSON.AJAX(leveeURL, 
   {style:{fill:false, weight: 0.000001, opacity: 0.4}, 
   imgId:'hatch-gray',
-  legendKey: 'test1',
-  legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
-  legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
 });
 
 const floodwayHatch = new L.GeoJSON.AJAX(floodwayURL, 
   {style:{fill:false, weight: 0.000001, opacity: 0.67},
   imgId:'hatch-red',
-  legendKey: 'test2',
-  legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
-  legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
 });
 
-
-function femaStyle(properties, zoom) {
-  const zone = properties.fld_zone;
-  const subtype = properties.zone_subty;
-
-  if (zone === 'D' || (zone === 'X' && subtype.includes('MINIMAL'))){
-    return {
-      weight: 0,
-      fill: false
-    }
-  }
-
-  else{
-    const fillColor = (['A','AE','AH','AO','VE'].includes(zone)) ? '#5cffff':'#ff9648';
-    return {
-      weight: 1,
-      color: '#ffffff',
-      fillColor: fillColor,
-      fillOpacity: 0.5,
-      fill: true
-    }
-  }
-
-};
-
-const femaMVT = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/CRC%3AFlood_Hazard_Areas_(DFIRM)_-_Statewide@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
-
-const femaTest = L.vectorGrid.protobuf(femaMVT, {
-  vectorTileLayerStyles: {'Flood_Hazard_Areas_(DFIRM)_-_Statewide':femaStyle},
-  interactive: true,
-  attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
+// Group the main layer and hatch pieces together.
+const femaZones = L.layerGroup([femaFlood, leveeHatch, floodwayHatch],{
   pane: 'underlay',
-  legendKey: 'femaflood'
+  legendKey:'fema',
+  legendEntry:'<div class="long-legend-wrapper"><div class="legend-box" style="background:#5cffff; opacity:0.67;"></div><div style="font-size:12px">1% Annual Chance Flood Hazard</div></div>'+
+              '<img class="legend-box" src="images/hatch_red_zoom.png" style="opacity:0.67;"><div style="font-size:12px">Floodway</div>'+
+              '<div class="long-legend-wrapper"><div class="legend-box" style="background:#ff9648; opacity:0.67;"></div><div style="font-size:12px">0.2% Annual Chance Flood Hazard</div></div>'+
+              '<div class="long-legend-wrapper"><div><img class="legend-box" src="images/hatch_darkgray_zoom.png" style="opacity:0.67;"></div><div style="font-size:12px">Area with Reduced Risk Due to Levee</div></div>',
+  displayName: 'FEMA Flood Hazard Areas',
+  legendSubheader: 'FEMA Flood Hazard Areas'
 })
-
 
 // SLR-XA 3.2 ft (2017)
 const slrxa32 = L.tileLayer.wms(
@@ -534,14 +494,10 @@ const boundary_highlight_style = {
   };
 
 
-// const adminZoomThreshold = 15; 
-
 function highlightBoundaries ( e ) {
-  // if (map.getZoom() < adminZoomThreshold) {
-    let layer = e.target;
+    const layer = e.target;
     layer.setStyle( boundary_highlight_style );
     if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
-  // }
   }
 
 // For converting names returned in all caps
@@ -570,14 +526,6 @@ const devplan = new L.GeoJSON.AJAX(devplanURL,
             click: function(e){
               const tooltip = layer.getTooltip();
               map.closeTooltip(tooltip)
-              // if (map.getZoom() < adminZoomThreshold) {
-              //   map.fitBounds( layer.getBounds())
-                // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-                // L.popup({ maxWidth: 200})
-                // .setLatLng(e.latlng)
-                // .setContent('<strong>' + feature.properties.district + '</strong>', { direction: 'left', sticky: true } )
-                // .openOn(map);
-              //}
             }
 
             // Zoom to clicked polygon if no other clickable overlays are
@@ -618,15 +566,6 @@ const ahupuaa = new L.GeoJSON.AJAX(ahupuaaURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            // if (map.getZoom() < adminZoomThreshold) {
-            //   map.fitBounds( layer.getBounds())
-
-            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-            //   // L.popup({ maxWidth: 200})
-            //   // .setLatLng(e.latlng)
-            //   // .setContent('<strong>' + ahupuaa_name + '</strong>', { direction: 'left', sticky: true } )
-            //   // .openOn(map);
-            // }
           }
           // Zoom to clicked polygon if no other clickable overlays are
           // expecting a pop-up window:
@@ -674,15 +613,6 @@ const moku = new L.GeoJSON.AJAX(mokuURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            // if (map.getZoom() < adminZoomThreshold) {
-            //   map.fitBounds( layer.getBounds())
-
-            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-            //   // L.popup({ maxWidth: 200})
-            //   // .setLatLng(e.latlng)
-            //   // .setContent('<strong>' + moku_name + '</strong>', { direction: 'left', sticky: true } )
-            //   // .openOn(map);
-            // }
           }
 
           // Zoom to clicked polygon if no other clickable overlays are
@@ -727,15 +657,6 @@ const boards = new L.GeoJSON.AJAX(boardURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            // if (map.getZoom() < adminZoomThreshold) {
-            //   map.fitBounds( layer.getBounds())
-
-            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-            //   // L.popup({ maxWidth: 200})
-            //   // .setLatLng(e.latlng)
-            //   // .setContent('<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>', { direction: 'left', sticky: true } )
-            //   // .openOn(map);
-            // }
           }
         }
       );
@@ -772,15 +693,6 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
           click: function(e){
             const tooltip = layer.getTooltip();
             map.closeTooltip(tooltip)
-            // if (map.getZoom() < adminZoomThreshold) {
-            //   map.fitBounds( layer.getBounds())
-
-            //   // Set up pop-ups manually so they will only show at lower zoom levels. This allows pop-ups for other layers to show at high zoom levels.
-            //   // L.popup({ maxWidth: 200})
-            //   // .setLatLng(e.latlng)
-            //   // .setContent('<strong>' + feature.properties.name20 + '</strong><br>Population (2020): ' + feature.properties.pop20.toLocaleString("en-US"), { direction: 'left', sticky: true } )
-            //   // .openOn(map);
-            // }
           }
 
           // Zoom to clicked polygon if no other clickable overlays are
@@ -834,11 +746,6 @@ const tmk_bounds = L.tileLayer.betterWms(
 tmk_bounds.options.legendEntry ='<svg class="legend-line tmk-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3"/></g></svg>TMK Parcels';
 tmk_bounds.options.legendSymbol ='<svg class="legend-line tmk-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3"/></g></svg>';
 
-// TMK parcel boundaries
-
-// GeoJSON call for KP parcels only - exceeds record limit (1000)
-// const tmkUrlKP = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/25/query?where=county+LIKE+%27Honolulu%27+and+zone+LIKE+%274%27&outFields=*&f=geojson';
-
 
 // Oʻahu shoreline setback (2023)
 
@@ -857,7 +764,6 @@ const oahuSetback = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_70yr_rate_plus_60ft
   legendEntry: '<svg class="legend-line setback-line" viewBox="0 0 31.74 5.74"><g><path d="m31.74,5.74h-4.74V0h4.74v5.74Zm-8.74,0h-5V0h5v5.74Zm-9,0h-5V0h5v5.74Zm-9,0H0V0h5v5.74Z"/></g></svg>O<span class="okina">&#699;</span>ahu Shoreline Setback'
 });
 
-//<button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button>
 //////////  LAYER GROUPS  //////////
 
 // Initialize layer groups that change with depth
@@ -1016,6 +922,7 @@ const overlayMaps = [
       [labelFormat(dhhl, true)]: dhhl,
       [labelFormat(oahuSetback, true)]: oahuSetback,
       [labelFormat(slrxa32)]: slrxa32,
+      [labelFormat(femaZones)]: femaZones,
       [labelFormat(tmk_bounds, true)]: tmk_bounds
     }
   }
@@ -1027,8 +934,7 @@ const queryableWMSLayers = [passive, wave, roads];
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl, oahuSetback];
-const wmsSingleLayers = [slrxa32, tmk_bounds];
-// const unconnectedLayers = [land_use_districts, geology, soils];
+const wmsSingleLayers = [slrxa32, tmk_bounds, femaFlood];
 
 // Add event listener to GeoJSON AJAX layers to catch data:loaded event.
 //(Data starts loading before layer is added to map so this can happen before layer is added.)
