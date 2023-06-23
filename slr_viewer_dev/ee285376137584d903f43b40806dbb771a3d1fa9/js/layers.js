@@ -26,6 +26,7 @@ const crcgeoMVT = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/gwc/
 
 //////// EXPOSURE LAYERS ////////
 
+// Passive flooding and low-lying areas
 const passiveWmsOptions = (ft, type) => (
   {
     tiled:true, 
@@ -38,7 +39,7 @@ const passiveWmsOptions = (ft, type) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
-    queryProperty: 'GRAY_INDEX',
+    queryFields: ['GRAY_INDEX'],
     queryDisplay: type === "SCI"? ((data) => 
                 data == 11? ('Water depth at average highest tide of the day: <div class="popup-data"> 10+ ft</div>'):
                 ('Water depth at average highest tide of the day: <div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')):
@@ -61,6 +62,7 @@ for (let i = 0; i < 11; i++) {
   }
 }
 
+// Annual high wave flooding
 const waveWmsOptions = (ft) => (
   {
     tiled:true, 
@@ -73,7 +75,7 @@ const waveWmsOptions = (ft) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
-    queryProperty: 'GRAY_INDEX',
+    queryFields: ['GRAY_INDEX'],
     nullValue: -999,
     layers: (ft < 10) ? `CRC:Waikiki_annual_wave_OsWkh1_0${ft}ft` : `CRC:Waikiki_annual_wave_OsWkh1_${ft}ft`, 
     name: (ft < 10) ? `Annual wave 0${ft}ft all-scenarios` : `Annual wave ${ft}ft all-scenarios`,
@@ -86,6 +88,7 @@ for (let i = 0; i < 11; i++) {
     waveLayers[i] = L.tileLayer.betterWms(crcgeoWMS, waveWmsOptions(i));
   }
 
+  // Preliminary compound flooding simulation
   const compFloodWmsOptions = (ft) => (
     {
       tiled:true, 
@@ -199,7 +202,7 @@ for (let i = 0; i < 11; i++) {
     stormwaterLayers[i] = new L.GeoJSON.AJAX(stormwaterWFS, stormwaterOptions(i));
 };
 
-// Critical Facilities
+// Critical facilities
 
 const hospitals = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Ahospitals__and_clinics_kp'), {
   pointToLayer: (feature, latlng) => (L.marker(latlng, {icon: L.icon({iconUrl:"images/hospital_maroon.svg", iconSize:[16,16]})})),
@@ -292,7 +295,7 @@ const sewerStyle = {
   opacity: 0.75
 };
 
-// This layer will also have to be converted to vector tiles if it is added to viewer
+// This layer will also have to be converted to vector tiles if it is added to viewer (not currently connected)
 const sewerMains = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_sewer_main_kp'), {
   style: sewerStyle,
   legendKey:'sewer-main',
@@ -329,7 +332,7 @@ const transmission = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Atransmission_lines_hi_h
 
 //////////  OTHER OVERLAYS  //////////
 
-// Geology Layer - not currently connected!
+// Geology Layer - not currently connected
 
 const geology = L.tileLayer.wms(
     'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/hi_usgs_all_geology/wms',
@@ -352,7 +355,7 @@ const geology = L.tileLayer.wms(
     }
   );
 
-// Soils survey - not currently connected!
+// Soils survey - not currently connected
 
 const soils = L.tileLayer.wms(
     'https://geodata.hawaii.gov/arcgis/services/Terrestrial/MapServer/WMSServer',
@@ -376,7 +379,7 @@ const soils = L.tileLayer.wms(
     }
   );
  
-// State Land Use Districts (Agricultural, Conservation, Rural, Urban) - not currently connected!
+// State Land Use Districts (Agricultural, Conservation, Rural, Urban) - not currently connected
 // Was layer '15' then it switched to '16' (2019-09) then it switched to
 // '17' (2021-12); does not match REST which shows '20':
 
@@ -405,7 +408,7 @@ const land_use_districts = L.tileLayer.wms(
 // FEMA Flood Hazard Zones
 
 //  NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. Not sure why.
-const femaFlood = L.tileLayer.wms(
+const femaFlood = L.tileLayer.betterWms(
   'https://geodata.hawaii.gov/arcgis/services/Hazards/MapServer/WMSServer',
   {
     layers: '2',
@@ -422,6 +425,8 @@ const femaFlood = L.tileLayer.wms(
     bounds: L.latLngBounds( L.latLng( 18.891141, -160.250512 ), L.latLng( 22.235775, -154.730304 ) ),
     maxZoom: 19,
     // My custom attributes:
+    queryFields: ['fld_zone','zone_subty'],
+    queryDisplay: (data) => (data[1] != ' ') ? 'Flood Zone: ' + data[0] + ' (' + toTitleCase(data[1]) + ')': 'Flood Zone: ' + data[0],
     queryable: true 
   }
 );
@@ -736,8 +741,8 @@ const tmk_bounds = L.tileLayer.betterWms(
     displayName: 'TMK Parcels',
     name: 'TMK Parcels',
     queryable: true,
-    queryProperty: 'tmk9num',
-    queryDisplay: (data) => 'TMK: ' + data,
+    queryFields: ['tmk9num'],
+    queryDisplay: (data) => 'TMK: ' + data[0],
     legendKey:'tmk',
   }
 );
@@ -867,11 +872,13 @@ const basemaps = [
 ];
 
 // Create overlay layer object for layer control
-// For all layers that change with depth, use L.LayerGroup initialized with any layer instead of individual layer. This allows for switching of layers 
-// within the group as depth changes while keeping connection between layerGroup/_leaflet_id and checkbox input intact. Note this seems to cause assigned
-// z indexes (from styledLayerControl) to go haywire, so it's safest to use map panes if layer order is critical. 
+
+// For all layers that change with depth or scenario, use L.LayerGroup initialized with any layer instead of individual layer. This allows for switching of  
+// layers within the group as depth/scenario changes while keeping connection between layerGroup/_leaflet_id and checkbox input intact. Note this seems to cause 
+// assigned z indexes (from styledLayerControl) to go haywire, so it's safest to use map panes if layer order is critical. 
+
 // For groups of sublayers added to map together but with individual sublayer controls, enter layer as object like:
-// layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2}}
+// layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2 ...}}
 // (...And yes this could be constructed more efficiently)
 
 // Functions to simplify formatting

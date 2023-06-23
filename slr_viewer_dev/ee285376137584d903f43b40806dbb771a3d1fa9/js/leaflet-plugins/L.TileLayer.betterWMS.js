@@ -22,9 +22,8 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     // Only make the request if map zoom is at minimum zoom level. This was an attempt to manage multiple clickable layers at once but I abandoned it- KF
     // const popupMinZoom = this.wmsParams.popupMinZoom? this.wmsParams.popupMinZoom: 0;
     
-    const prop = this.wmsParams.queryProperty;
+    const fields = this.wmsParams.queryFields;
 
-    const nullValue = this.wmsParams.nullValue;
     // Make an AJAX request to the server and hope for the best
     var url = this.getFeatureInfoUrl(evt.latlng),
         showResults = L.Util.bind(this.showGetFeatureInfo, this);
@@ -44,12 +43,26 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
           })
           .then((data) => {
             const err = (data.features.length > 0) ? null : data;
-            if (data.features[0].properties[prop] != this.wmsParams.nullValue){
-              showResults(err, evt.latlng, data.features[0].properties[prop]);
+            // for single field queries
+            if (fields.length == 1){
+              if (data.features[0].properties[fields[0]] != this.wmsParams.nullValue){
+                showResults(err, evt.latlng, data.features[0].properties[fields[0]]);
+              }
             }
+            else{
+              if (data.features[0].properties[fields[0]] != this.wmsParams.nullValue){
+                let results = [];
+                for (let i=0; i < fields.length; i++){
+                  results.push(data.features[0].properties[fields[i]])
+                }
+                showResults(err, evt.latlng, results);
+              }
+            }
+
           })
           .catch((error) => {showResults(error)});
       }
+      // xml requests
       else{
         fetch(url)
         .then((response) => {
@@ -61,8 +74,21 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         .then((str) => new window.DOMParser().parseFromString(str, "text/xml"))
         .then((data) => {
           const err = (data.getElementsByTagName('FIELDS')) ? null : data;
-          if (data.getElementsByTagName('FIELDS')[0].getAttribute(prop) != this.wmsParams.nullValue){
-            showResults(err, evt.latlng, data.getElementsByTagName('FIELDS')[0].getAttribute(prop));
+          // for single field queries
+          if (fields.length == 1){
+            if (data.getElementsByTagName('FIELDS')[0].getAttribute(fields[0]) != this.wmsParams.nullValue){
+              showResults(err, evt.latlng, data.getElementsByTagName('FIELDS')[0].getAttribute(fields[0]));
+            }
+          }
+          // for multiple field queries
+          else {
+            if (data.getElementsByTagName('FIELDS')[0].getAttribute(fields[0]) != this.wmsParams.nullValue){
+              let results = [];
+              for (let i=0; i < fields.length; i++){
+                results.push(data.getElementsByTagName('FIELDS')[0].getAttribute(fields[i]));
+              }
+              showResults(err, evt.latlng, results);
+            }
           }
         })
         .catch((error) => {showResults(error)});
@@ -104,7 +130,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     const latlngIcon = '<svg viewBox="0 0 42.95 62.04"><g><path d="m21.48,0C11.56,0,0,6.15,0,21.8c0,10.62,16.52,34.09,21.48,40.24,4.41-6.15,21.48-29.06,21.48-40.24C42.95,6.15,31.39,0,21.48,0Zm0,34.35c-6.14,0-11.11-4.97-11.11-11.11s4.97-11.11,11.11-11.11,11.11,4.97,11.11,11.11-4.97,11.11-11.11,11.11Z"/></g></svg>';
     L.popup({ maxWidth: 200})
       .setLatLng(latlng)
-      .setContent(this.wmsParams.queryDisplay(String(content)) + '<hr><div class="latlng">'+latlngIcon + latlngString + '</div>')
+      .setContent(this.wmsParams.queryDisplay(content) + '<hr><div class="latlng">'+latlngIcon + latlngString + '</div>')
       .openOn(this._map);
   }
 });

@@ -140,8 +140,8 @@ for (let button of scenarioBtnGroup){
             const newLayers = layers.filter(layer => layer.options.name.includes(scenarioTag));
             // Remove old layer/add new layer
             group.eachLayer(function(layer) {
-                if (!layer.options.name.includes("all-scenarios")){
-                    group.removeLayer(layer); // Ignore layers that are independent of scenario
+                if (!layer.options.name.includes("all-scenarios")){ // Ignore layers that are independent of scenario
+                    group.removeLayer(layer); 
                 }
             });
             newLayers.forEach(layer => {
