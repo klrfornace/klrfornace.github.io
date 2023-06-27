@@ -49,6 +49,8 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
                 showResults(err, evt.latlng, data.features[0].properties[fields[0]]);
               }
             }
+            // for multiple field queries
+            // Note that currently only first field is checked for null value
             else{
               if (data.features[0].properties[fields[0]] != this.wmsParams.nullValue){
                 let results = [];
@@ -114,7 +116,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
           width: size.x,
           layers: this.wmsParams.layers,
           query_layers: this.wmsParams.layers,
-          info_format: this._url.match('geodata.hawaii.gov')? 'text/xml':'application/json' // <-- ACCOUNT FOR DIFFERENT DATA TYPES HERE
+          info_format: this._url.match('geodata.hawaii.gov')? 'text/xml':'application/json' // Account for different data formats here. HI State ArcGIS WMS returns xml, not JSON.
         };
     
     params[params.version === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);

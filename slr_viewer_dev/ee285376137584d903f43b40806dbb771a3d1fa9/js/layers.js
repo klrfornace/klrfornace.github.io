@@ -778,13 +778,15 @@ const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],
   legendEntry: 'Marine flooding: water depth<br><img src="images/blue_colorbar.svg" style="width:220px; height: 17px;margin-bottom:5px;"><br>Low-lying areas: depth below sea level<br><img src="images/green_colorbar.svg" style="width:220px; height:17px">',
   legendSubheader: 'Passive Flooding',
   displayName: 'Passive Flooding',
-  infoButtonId: 'passive-flooding-info'
+  infoButtonId: 'passive-flooding-info',
+  superLabel: 'CHRONIC FLOODING'
 })
 const wave = L.layerGroup(waveLayers[0],{
   legendKey:'wave',
   legendEntry: 'Water depth<br><img src="images/purple_colorbar.svg" style="width:220px; height:17px;">',
   legendSubheader: 'Annual High Wave-Driven Flooding',
-  displayName: 'Annual High Wave-Driven Flooding'
+  displayName: 'Annual High Wave-Driven Flooding',
+  superLabel: 'EPISODIC FLOODING'
 });
 const roads = L.layerGroup(roadLayers[0],{
   legendKey:'roads',
@@ -936,8 +938,8 @@ const overlayMaps = [
 ];
 
 
-// Array of queryable WMS tile layers/layer groups
-const queryableWMSLayers = [passive, wave, roads];
+// Array of queryable WMS tile layers/layer groups - this list is used to change cursor to pointer when any of these layers is present
+const queryableWMSLayers = [passive, wave, roads, femaFlood];
 
 // Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
 const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl, oahuSetback];

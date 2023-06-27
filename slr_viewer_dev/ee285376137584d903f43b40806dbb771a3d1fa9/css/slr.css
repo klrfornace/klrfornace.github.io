@@ -34,19 +34,6 @@ body {
   padding: 7.5px 10px;
 }
 
-/* .layer-control-btn{
-  height: 40px;
-  width: 40px;
-  background-color: rgba(255, 255, 255, 0.35);
-  background-image: url('../images/layers.svg');
-  background-repeat: no-repeat;
-  background-size: 67%;
-  background-position: 50% 50%;
-  border: none;
-  border-radius: 100%;
-  cursor: pointer;
-} */
-
 .layer-control-toggle{
   background-color: rgba(255,255,255,0.2); 
   height: 35px;
@@ -172,19 +159,6 @@ a {
   position: absolute;
   transition: width 0.3s linear;
 }
-/* 
-.side-panel-container:after{
-  background-image: url('../images/chevron.svg'); 
-  background-repeat: no-repeat;
-  background-size: 67%;
-	content : "";
-  position: absolute;
-  height: 45px;
-  width: 20px;
-  top: 5%;
-  left: 205px;
-  opacity:0.1;
-} */
 
 .header {
   font-family:'Roboto Flex', sans-serif; 
@@ -586,13 +560,7 @@ a {
   border-top-right-radius: 3px;
 }
 
-/* .leaflet-touch .leaflet-bar a {
-  width: 32px;
-  height: 32px;
-  line-height: 32px;
-} */
-
-/* To overrule leaflet class added later when legend control is expanded/hidden*/
+/* To overrule leaflet class added later when legend control is expanded/hidden */
 #ac-container.legend-container-hidden form{
   display: none;
 }
@@ -638,7 +606,7 @@ a {
 /* Geocoder control */
 
 .leaflet-control-geocoder-form input{
-  width: 236px;
+  width: 226px;
   font-family: 'Roboto Flex', sans-serif;
 }
 
