@@ -76,14 +76,14 @@ function openCloseLayerControl(){
     layerControlToggle.classList.remove('control-closed');
     this.setAttribute('title','Close the layer menu');
     this.setAttribute('aria-label','Close the layer menu');
-    this.setAttribute('href','#layerControl') // This directs keyboard navigators to layer control container when it is toggled open
+    // this.setAttribute('href','#layerControl') // This directs keyboard navigators to layer control container when it is toggled open - commented out because it causes jumping on smaller screens
   }
   else{
     layerControlContainer.style.display = 'none';
     layerControlToggle.classList.add('control-closed');
     this.setAttribute('title', 'Open the layer menu');
     this.setAttribute('aria-label', 'Open the layer menu');
-    this.setAttribute('href','#'); // Set link back when menu is closed since there is nowhere to navigate to
+    // this.setAttribute('href','#'); // Set link back when menu is closed since there is nowhere to navigate to
   }
 }
 
@@ -641,8 +641,8 @@ function openClosePanel(){
 
   // Open the side panel
   if (this.classList.contains('panel-closed')){
-    panel.style.width = '225px';
-    tabContainer.style.left = '225px';
+    panel.style.width = '';
+    tabContainer.style.left = '';
 
     this.classList.remove('panel-closed');
     this.style.backgroundImage = "url(images/arrow_left.svg)";

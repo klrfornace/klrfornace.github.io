@@ -126,6 +126,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	max-height: 0px;
 	height: 0px;
     /* padding: 8px 0; */
+	padding-right: 5px;
     line-height: 0px;
 	position: relative;
 	z-index: 10;
@@ -182,7 +183,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 
 .super-label{
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: 600;
 	letter-spacing: 1px;
 	padding-top: 5px;
 	padding-left: 4px;

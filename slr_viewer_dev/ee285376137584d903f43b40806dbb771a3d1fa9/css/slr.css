@@ -677,6 +677,11 @@ a {
   line-height: 24px;
 }
 
+.colorbar {
+  width: 220px;
+  height: 17px;
+}
+
 .legend-box{
   float: left;
   /* border: 2px solid #6e6e6e; */
@@ -925,4 +930,147 @@ img.huechange { filter: hue-rotate(140deg); }
 
 .leaflet-container .print-attribution{
   margin-right: 0px;
+}
+
+
+/* Styles for tablet size screens */
+
+@media only screen and (max-width: 1180px) {
+  #nav-bar {
+    height: 35px;
+  }
+
+  #map-container {
+    height: calc(100vh - 35px);
+  }
+
+  h1 { 
+    font-size: 22px;
+  }
+
+  .nav-bar-title {
+    padding: 6px 15px;
+  }
+
+  .nav-bar-item {
+    padding: 5px 10px;
+  }
+  
+  .layer-control-toggle{
+    height: 25px;
+  }
+
+  .layer-control-toggle a{
+    font-size: 13px;
+    line-height: 25px;
+  }
+
+  .layer-control-toggle img{
+    height: 17px;
+    padding: 4px 8px 4px 0px;
+  }
+
+  h2 {
+      font-size: 18px;
+  }
+
+  h3 {
+      font-size: 15px;
+  }
+
+  .side-panel-container {
+      width: 200px;
+  }
+
+  .side-panel-header{
+      width: 170px;
+  }
+
+  .header {
+    padding: 7.5px 15px;
+  }
+
+  .side-panel-content {
+      width: 190px;
+  }
+
+  #depth-level-label {
+      font-size: 17px;
+  }
+
+  #slr-icon {
+      height: 35px;
+  }
+
+  #gauge-label {
+      font-size: 13px;
+  }
+
+  .depth-axis-label, .time-axis-label, .noUi-pips-vertical, .noUi-pips-vertical-secondary, 
+  .ac-container article label, .menu-item-checkbox, #styledLayerControl-utilities, .legend-container {
+      font-size: 12px;
+  }
+
+  .scenario-select-label, .gauge-info, .projection-about {
+      font-size: 11px;
+  }
+  .scenario-button {
+      font-size: 11px;
+      width: 87.5px;
+  }
+
+  .slider-container {
+      padding: 15px 0 20px 75px;
+  }
+
+  .info-button { 
+      /* background-size: 24% auto; */
+      height: 12.5px;
+      width: 12.5px;
+  }
+
+  .side-panel-tab-container{
+      left: 200px;
+  }
+
+  .leaflet-left .leaflet-control {
+      margin-left: 210px;
+  }
+
+  #geocoder-control {
+      margin-left: 255px;
+  }
+
+  #layerControl {
+      width: 235px;
+  }
+
+  .label-icon { 
+      height: 19px;
+  }
+
+  .ac-container-accordion h3:after {
+      background-size: 13px 13px;
+      padding: 7.5px 0;
+  }
+
+  div[id^="leaflet-control-accordion-layers"] > button {
+      height: 30px;
+      line-height: 30px;
+  }
+
+  .super-label { 
+      font-size: 10px;
+  }
+
+  .legend-button {
+      width: 117.5px;
+      padding: 6px 0;
+  }
+
+  .colorbar{
+      width: 195px;
+      height: 15px;
+  }
+
 }
