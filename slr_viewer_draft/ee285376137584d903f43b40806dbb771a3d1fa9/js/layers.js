@@ -880,7 +880,7 @@ const oahuSetback = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_70yr_rate_plus_60ft
 // Initialize layer groups that change with depth
 const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],{
   legendKey:'passive',
-  legendEntry: '<img src="images/blue_colorbar.svg" style="width:220px; height: 17px">',
+  legendEntry: '<img src="images/blue_colorbar.svg" class="colorbar">',
   legendSubheader: 'Passive Flooding',
   displayName: 'Passive Flooding',
   infoButtonId: 'passive-flooding-info',
@@ -888,19 +888,19 @@ const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],
 })
 const gwi = L.layerGroup(gwiLayers[0],{
   legendKey:'gwi',
-  legendEntry: '<img src="images/green_colorbar.svg" style="width:220px; height: 17px">',
+  legendEntry: '<img src="images/green_colorbar.svg" class="colorbar">',
   legendSubheader: 'Groundwater Inundation',
   displayName: 'Groundwater Inundation',
 })
 const drainage = L.layerGroup(drainageLayers[0],{
   legendKey:'drainage',
-  legendEntry: '<img src="images/teal_colorbar.svg" style="width:220px; height: 17px">',
+  legendEntry: '<img src="images/teal_colorbar.svg" class="colorbar">',
   legendSubheader: 'Drainage Backflow',
   displayName: 'Drainage Backflow'
 })
 const wave = L.layerGroup(waveLayers[0],{
   legendKey:'wave',
-  legendEntry: '<img src="images/purple_colorbar.svg" style="width:220px; height:17px;">',
+  legendEntry: '<img src="images/purple_colorbar.svg" class="colorbar">',
   legendSubheader: 'Annual High Wave-Driven Flooding',
   displayName: 'Annual High Wave-Driven Flooding',
   superLabel: 'EPISODIC FLOODING'
@@ -918,7 +918,7 @@ const stormwater = L.layerGroup(stormwaterLayers[0],{
 });
 const compFlood = L.layerGroup(compFloodLayers[0],{
   legendKey:'comp-flood',
-  legendEntry:'Floodwater Depth<br><img src="images/gist_ncar_colorbar.svg" style="width:225px; height: 17px;margin-bottom:5px;">',
+  legendEntry:'Floodwater Depth<br><img src="images/gist_ncar_colorbar.svg" class="colorbar" style="margin-bottom:5px;">',
   displayName: 'Compound Flooding Scenario &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(December 2021 Kona storm)',
   legendSubheader: 'December 2021 Kona storm'
 });
