@@ -26,7 +26,6 @@ L.Map.include({
 });
 
 // Set up map
-const sliderStart = 0;
 
 // Statewide zoom
 // const zoomLevel = 8;
@@ -160,6 +159,13 @@ map.on('overlayadd', function addOverlay(e){
         }
       }
     }
+
+    // Change cursor to pointer if clickable tile layers are present
+    queryableWMSLayers.forEach(layer => {
+    if (map.hasLayer(layer)) {
+        L.DomUtil.addClass(map._container,'pointer-cursor');
+      }
+    })
 });
 
 map.on('overlayremove', function(e){
@@ -172,6 +178,17 @@ map.on('overlayremove', function(e){
   // For layers with sublayers, remove hidden class on sublayer elements so all entries will appear in legend if layer is reselected. 
   // (All sublayers are reset to checked when main layer is removed.)
   Array.from(entryDiv.children).forEach((child) => child.classList.remove('legend-entry-hidden'));
+
+  // Change cursor to default if no clickable tile layers are present
+  let clickablePresent = false;
+  queryableWMSLayers.forEach(layer => {
+    if (map.hasLayer(layer)) {
+      clickablePresent = true;
+    }
+  })
+  if (!clickablePresent) {
+    L.DomUtil.removeClass(map._container,'pointer-cursor');
+  }
 })
 
 

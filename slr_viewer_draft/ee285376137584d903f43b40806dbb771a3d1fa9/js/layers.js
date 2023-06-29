@@ -23,67 +23,15 @@ const mapboxSatelliteStreets = L.tileLayer(mapboxURL, mapboxOptions('mapbox/sate
 //    minZoom: 0
 //  });
 
-// const mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',{
-//   attribution:  '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-//   id: 'mapbox/streets-v11',
-//   maxZoom: 20,
-//   tileSize: 512,
-//   zoomOffset: -1,
-//   accessToken:ak
-// });
-
-
-// var Google_Grayscale_Simple = L.gridLayer.googleMutant(
-//   {
-//     type: 'roadmap',
-//     maxZoom: 20,
-//     styles: [{"featureType":"administrative","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"landscape","elementType":"labels.text","stylers":[{"lightness":-65},{"weight":3}]},{"featureType":"landscape","elementType":"labels.text.stroke","stylers":[{"lightness":100}]},{"featureType":"poi","stylers":[{"saturation":-100},{"lightness":25},{"visibility":"off"}]},{"featureType":"road.highway","stylers":[{"saturation":-100},{"visibility":"off"}]},{"featureType":"road.arterial","stylers":[{"saturation":-100},{"lightness":30},{"visibility":"on"}]},{"featureType":"road.local","stylers":[{"saturation":-100},{"lightness":40},{"visibility":"on"}]},{"featureType":"transit","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"administrative.province","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#ffff00"},{"lightness":25},{"saturation":-97}]}],
-//     basemap: true,
-//     basemapName: 'Google_Grayscale_Simple'
-//   }
-// );
-
-
-// var Google_Satellite = L.gridLayer.googleMutant( { type: 'satellite', maxZoom: 20, basemap: true, basemapName: 'Google_Satellite' } );
-
-// Esri basemaps
-
-// map.createPane('base');
-// map.getPane('base').style.zIndex = 0;
-// // var tiles = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery", {apikey: ak, pane:'base'}).addTo(map);
-// // var tiles = L.esri.Vector.vectorBasemapLayer("ArcGIS:LightGray:Base", {apikey: ak, pane:'base'}).addTo(map);
-// var tiles = L.esri.Vector.vectorBasemapLayer("OSM:LightGray:Base", {apikey: ak, pane:'base'}).addTo(map);
-
-// map.createPane('labels');
-// map.getPane('labels').style.zIndex = 650;
-// map.getPane('labels').style.pointerEvents = 'none';
-
-// var mapLabels = L.esri.Vector.vectorBasemapLayer("ArcGIS:Imagery:Labels", {apikey: ak, pane: 'labels'}).addTo(map);
-// var mapLabels = L.esri.Vector.vectorBasemapLayer("OSM:LightGray:Labels", {apikey: ak, pane: 'labels'}).addTo(map);
-
-
-// const ESRI_WorldGrayCanvas = L.tileLayer(
-//     'http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-//     {
-//       attribution: 'Map &copy; ESRI',
-//       // 'Map &copy; ESRI, DeLorme, NAVTEQ',
-//       minZoom: 0,
-//       maxZoom: 19,
-//       basemap: true,
-//       basemapName: 'ESRI_WorldGrayCanvas'
-//     }
-//   );
-
 //////// OVERLAYS ////////
 
 // Base URLs for CRC Geoserver
 const crcgeoWMS = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/wms';
 const crcgeoWFS = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
+// For Mapbox vector tiles
+const crcgeoMVT = (layerName) => `https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/${layerName}@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf`
 
 //////// EXPOSURE LAYERS ////////
-
-// Threshold for clicking on flood layers to show pop-ups
-const floodZoomThreshold = 12;
 
 const passiveWmsOptions = (ft, type) => (
   {
@@ -97,7 +45,7 @@ const passiveWmsOptions = (ft, type) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
-    queryProperty: 'GRAY_INDEX',
+    queryFields: ['GRAY_INDEX'],
     queryDisplay: type === "SCI"? ((data) => 
                 data == 11? ('Water depth at average highest tide of the day: <div class="popup-data"> 10+ ft</div>'):
                 ('Water depth at average highest tide of the day: <div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')):
@@ -105,7 +53,6 @@ const passiveWmsOptions = (ft, type) => (
                 data == 11? ('Depth below sea level:<div class="popup-data"> 10+ ft</div>'): 
                 ('Depth below sea level:<div class="popup-data">' + (data-1) + '-' + data + ' ft</div>')),
     nullValue: type === "SCI"? 127:15,
-    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:HI_State_80prob_0${ft}ft_${type}_v3` : `CRC:HI_State_80prob_${ft}ft_${type}_v3`, 
     name: (ft < 10) ? `Passive ${type} 0${ft}ft` : `Passive ${type} ${ft}ft`,
   }
@@ -135,10 +82,9 @@ const gwiWmsOptions = (ft) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
-    queryProperty: 'GRAY_INDEX',
+    queryFields: ['GRAY_INDEX'],
     queryDisplay: (data) => 'Groundwater inundation: <div class="popup-data">' + (data-1) + '-' + data + ' ft</div>',
     nullValue: 0,
-    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:puc_gwi_0${ft}ft` : `CRC:puc_gwi_${ft}ft`, 
     name: (ft < 10) ? `Groundwater inundation  0${ft}ft` : `Groundwater inundation ${ft}ft`,
   }
@@ -162,9 +108,9 @@ const drainageWmsOptions = (ft) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
-    queryProperty: 'GRAY_INDEX',
+    queryFields: ['GRAY_INDEX'],
+    queryDisplay: (data) => 'Drainage backflow: <div class="popup-data">' + (data-1) + '-' + data + ' ft</div>',
     nullValue: 0,
-    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:puc_drn_0${ft}ft` : `CRC:puc_drn_${ft}ft`, 
     name: (ft < 10) ? `Drainage backflow 0${ft}ft` : `Drainage backflow ${ft}ft`,
   }
@@ -186,9 +132,9 @@ const waveWmsOptions = (ft) => (
     bounds: L.latLngBounds( L.latLng( 18.860, -159.820 ), L.latLng( 22.260, -154.750 ) ),
     maxZoom: 19,
     queryable: true,
-    queryProperty: 'GRAY_INDEX',
+    queryFields: ['GRAY_INDEX'],
+    queryDisplay: (data) => 'Annual High Wave-Driven Flooding: <div class="popup-data">' + (data-1) + '-' + data + ' ft</div>',
     nullValue: -999,
-    popupMinZoom: floodZoomThreshold,
     layers: (ft < 10) ? `CRC:Waikiki_annual_wave_OsWkh1_0${ft}ft` : `CRC:Waikiki_annual_wave_OsWkh1_${ft}ft`, 
     name: (ft < 10) ? `Annual wave 0${ft}ft` : `Annual wave ${ft}ft`,
   }
@@ -213,7 +159,6 @@ for (let i = 0; i < 11; i++) {
       maxZoom: 19,
       queryable: true,
       nullValue: -999,
-      popupMinZoom: floodZoomThreshold,
       layers: (ft < 10) ? `CRC:compound_flooding_prelim_0${ft}ft` : `CRC:compound_flooding_prelim_${ft}ft`, 
       name: (ft < 10) ? `Kona storm scenario 0${ft}ft` : `Kona storm scenario ${ft}ft`,
     }
@@ -258,7 +203,7 @@ for (let i = 0; i < 11; i++) {
   for (let layer in roadLayers) {
       const fullLayerName = (i < 10)? `CRC%3Ahi_state_80prob_0${i}ftslr_${layer}ft_strt_v3` :  `CRC%3Ahi_state_80prob_${i}ftslr_${layer}ft_strt_v3`;
       const layerName = (i < 10)? `hi_state_80prob_0${i}ftslr_${layer}ft_strt_v3` :  `hi_state_80prob_${i}ftslr_${layer}ft_strt_v3`;
-      const roadURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/' + fullLayerName + '@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+      const roadURL = crcgeoMVT(fullLayerName);
       const styleFunction = (layer == '1')? style1ft: style2ft;
 
       const roadTileOptions = {
@@ -279,44 +224,6 @@ for (let i = 0; i < 11; i++) {
         })
   }
 }
-
-// WFS version - was too laggy for complicated shapes
-
-// Initial styles for zoomed out map
-// const roadStyle1ft = {
-//   color: '#f45a9b',
-//   weight: 1,
-//   opacity: 1
-// };
-
-// const roadStyle2ft = {
-//   color: '#9f0c4a',
-//   weight: 1,
-//   opacity: 1
-// };
-
-// const roadOptions = (ft, floodDepth) => (
-//   {style: floodDepth == '1ft'? roadStyle1ft: roadStyle2ft,
-//     // onEachFeature: function ( feature, layer ) {
-//     //   var street_name = feature.properties.name;
-//     //   var tooltip = '<center><b>0.5 ft scenario';
-//     //   if ( street_name ) {
-//     //     tooltip += ':<br/>' + street_name;
-//     //   }
-//     //   tooltip += '</b></center>';
-//     //   layer.bindTooltip( tooltip, { sticky: true } );
-//     // },
-//     attribution: 'Data &copy; <a href="https://www.soest.hawaii.edu/crc/" target="_blank" title="Climate Resilience Collaborative at University of Hawaii (UH) School of Ocean and Earth Science and Technology (SOEST)">UH/SOEST/CRC</a>',
-//     name: (ft < 10) ? `Flooded roads 0${ft}ft_${floodDepth}` : `Flooded roads ${ft}ft_${floodDepth}`,
-//   });
-// for (let i = 0; i < 11; i++) {
-//   for (let layer in roadLayers) {
-//     const layerName = (i < 10)? `CRC%3AHI_roads_flood${layer}_prelim_0${i}ft` :  `CRC%3AHI_roads_flood${layer}_prelim_${i}ft`;
-//     // const layerName = (i < 10)? `CRC%3AHI_Oahu_80prob_0${i}ftSLR_${layer}_strt_v2` :  `CRC%3AHI_Oahu_80prob_${i}ftSLR_${layer}_strt_v2`;
-//     const roadWFS = `https://crcgeo.soest.hawaii.edu/geoserver/CRC/ows?service=WFS&version=2.0.0&request=GetFeature&typeName=${layerName}&outputFormat=application%2Fjson&srsName=EPSG:4326`;
-//     roadLayers[layer][i] = new L.GeoJSON.AJAX(roadWFS, roadOptions(i, layer));
-//   }
-// }
 
 // Stormwater structures
 
@@ -418,7 +325,7 @@ const treatmentPlants = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3ASewer_-_Treatment_Pl
 });
 
 // WFS method was too laggy for the large number of features so loading cesspool points as vector tiles
-const cesspoolURL = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/CRC%3AOSDS_dots_w_Tracts_Clean_atts_Oahu@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
+const cesspoolURL = crcgeoMVT('CRC%3Aosds_dots_w_tracts_clean_atts_kp');
 
 function cesspoolStyle(properties, zoom) {
   const iconSize = (zoom < 13) ? [6,6]:
@@ -556,10 +463,10 @@ const land_use_districts = L.tileLayer.wms(
     }
   );
   
-// FEMA Flood Hazard Zones: 
+// FEMA Flood Hazard Zones
 
-// ***** NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. No idea why.*****
-const femaFlood = L.tileLayer.wms(
+//  NOTE: SLD file only seems to work if address of xml file is provided as http instead of https. Not sure why.
+const femaFlood = L.tileLayer.betterWms(
   'https://geodata.hawaii.gov/arcgis/services/Hazards/MapServer/WMSServer',
   {
     layers: '2',
@@ -574,67 +481,38 @@ const femaFlood = L.tileLayer.wms(
     attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
     //bounds: L.latLngBounds( L.latLng( 20.5001, -159.79 ), L.latLng( 22.2353, -155.979 ) ),
     bounds: L.latLngBounds( L.latLng( 18.891141, -160.250512 ), L.latLng( 22.235775, -154.730304 ) ),
-    maxZoom: 20,
+    maxZoom: 19,
     // My custom attributes:
-    name: 'Flood Hazard Zones',
-    pane: 'underlay',
-    legendKey: 'test1',
+    queryFields: ['fld_zone','zone_subty'],
+    queryDisplay: (data) => (data[1] != ' ') ? 'Flood Zone: ' + data[0] + ' (' + toTitleCase(data[1]) + ')': 'Flood Zone: ' + data[0],
     queryable: true 
   }
 );
 
+// Esri WMS doesn't allow hatching so use leaflet-polygon.fillPattern plugin to apply hatching to specific zones queried as GeoJSONs
 const leveeURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27%LEVEE%%27&outFields=*&outSR=4326&f=geojson'
 const floodwayURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Hazards/MapServer/6/query?where=zone_subty%20LIKE%20%27FLOODWAY%27&outFields=*&outSR=4326&f=geojson'
 
 const leveeHatch = new L.GeoJSON.AJAX(leveeURL, 
   {style:{fill:false, weight: 0.000001, opacity: 0.4}, 
   imgId:'hatch-gray',
-  legendKey: 'test1',
-  legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
-  legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
 });
 
 const floodwayHatch = new L.GeoJSON.AJAX(floodwayURL, 
   {style:{fill:false, weight: 0.000001, opacity: 0.67},
   imgId:'hatch-red',
-  legendKey: 'test2',
-  legendEntry: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
-  legendSymbol: '<svg class="legend-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
 });
 
-
-function femaStyle(properties, zoom) {
-  const zone = properties.fld_zone;
-  const subtype = properties.zone_subty;
-
-  if (zone === 'D' || (zone === 'X' && subtype.includes('MINIMAL'))){
-    return {
-      weight: 0,
-      fill: false
-    }
-  }
-
-  else{
-    const fillColor = (['A','AE','AH','AO','VE'].includes(zone)) ? '#5cffff':'#ff9648';
-    return {
-      weight: 1,
-      color: '#ffffff',
-      fillColor: fillColor,
-      fillOpacity: 0.5,
-      fill: true
-    }
-  }
-
-};
-
-const femaMVT = 'https://crcgeo.soest.hawaii.edu/geoserver/gwc/service/tms/1.0.0/CRC%3AFlood_Hazard_Areas_(DFIRM)_-_Statewide@EPSG%3A900913@pbf/{z}/{x}/{-y}.pbf';
-
-const femaTest = L.vectorGrid.protobuf(femaMVT, {
-  vectorTileLayerStyles: {'Flood_Hazard_Areas_(DFIRM)_-_Statewide':femaStyle},
-  interactive: true,
-  attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data/" target="_blank" title="U.S. Federal Emergency Management Agency">FEMA</a>',
+// Group the main layer and hatch pieces together.
+const femaZones = L.layerGroup([femaFlood, leveeHatch, floodwayHatch],{
   pane: 'underlay',
-  legendKey: 'femaflood'
+  legendKey:'fema',
+  legendEntry:'<div class="long-legend-wrapper"><div class="legend-box" style="background:#5cffff; opacity:0.67;"></div><div style="font-size:12px">1% Annual Chance Flood Hazard</div></div>'+
+              '<img class="legend-box" src="images/hatch_red_zoom.png" style="opacity:0.67;"><div style="font-size:12px">Floodway</div>'+
+              '<div class="long-legend-wrapper"><div class="legend-box" style="background:#ff9648; opacity:0.67;"></div><div style="font-size:12px">0.2% Annual Chance Flood Hazard</div></div>'+
+              '<div class="long-legend-wrapper"><div><img class="legend-box" src="images/hatch_darkgray_zoom.png" style="opacity:0.67;"></div><div style="font-size:12px">Area with Reduced Risk Due to Levee</div></div>',
+  displayName: 'FEMA Flood Hazard Areas',
+  legendSubheader: 'FEMA Flood Hazard Areas'
 })
 
 
@@ -886,7 +764,7 @@ const boards = new L.GeoJSON.AJAX(boardURL,
     },
     name: 'Neighborhood Boards',
     pane: 'admin-boundaries',
-    displayName: 'Neighborhood Board Boundaries',
+    displayName: 'Neighborhood Board Areas',
     legendKey: 'boards',
     legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Neighborhood Board Boundaries',
     legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
@@ -941,7 +819,7 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
     // My custom attributes:
     name: 'DHHL Lands',
     pane: 'admin-boundaries',
-    displayName: 'Hawaiian Home Land Boundaries',
+    displayName: 'Hawaiian Home Lands',
     legendKey: 'dhhl',
     legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Hawaiian Home Land Boundaries',
     legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
@@ -951,7 +829,7 @@ const dhhl = new L.GeoJSON.AJAX(dhhlURL,
 
 // TMK boundaries (Oʻahu parcels: layer id 7, statewide: layer id 1)
 
-const tmk_bounds = L.tileLayer.wms(
+const tmk_bounds = L.tileLayer.betterWms(
   'https://geodata.hawaii.gov/arcgis/services/ParcelsZoning/MapServer/WMSServer',
   {
     async: true,
@@ -965,9 +843,11 @@ const tmk_bounds = L.tileLayer.wms(
     bounds: L.latLngBounds( L.latLng( 18.9106432386012, -160.247059539488 ), L.latLng( 22.2353669223379, -154.806693600261 ) ),
     maxZoom: 20,
     // My custom attributes:
-    name: 'TMK Parcels',
     displayName: 'TMK Parcels',
+    name: 'TMK Parcels',
     queryable: true,
+    queryFields: ['tmk9num'],
+    queryDisplay: (data) => 'TMK: ' + data,
     legendKey:'tmk',
   }
 );
@@ -975,11 +855,6 @@ const tmk_bounds = L.tileLayer.wms(
 // Add legend options separately since they were interfering with ArcGIS WMS call
 tmk_bounds.options.legendEntry ='<svg class="legend-line tmk-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3"/></g></svg>TMK Parcels';
 tmk_bounds.options.legendSymbol ='<svg class="legend-line tmk-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="3"/></g></svg>';
-
-// TMK parcel boundaries
-
-// GeoJSON call for KP parcels only - exceeds record limit (1000)
-// const tmkUrlKP = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/25/query?where=county+LIKE+%27Honolulu%27+and+zone+LIKE+%274%27&outFields=*&f=geojson';
 
 
 // Oʻahu shoreline setback (2023)
@@ -1007,14 +882,15 @@ const passive = L.layerGroup([passiveLayers['SCI'][0], passiveLayers['GWI'][0]],
   legendKey:'passive',
   legendEntry: '<img src="images/blue_colorbar.svg" style="width:220px; height: 17px">',
   legendSubheader: 'Passive Flooding',
-  displayName: 'Passive Flooding'
+  displayName: 'Passive Flooding',
+  infoButtonId: 'passive-flooding-info',
+  superLabel: 'CHRONIC FLOODING'
 })
 const gwi = L.layerGroup(gwiLayers[0],{
   legendKey:'gwi',
   legendEntry: '<img src="images/green_colorbar.svg" style="width:220px; height: 17px">',
   legendSubheader: 'Groundwater Inundation',
   displayName: 'Groundwater Inundation',
-
 })
 const drainage = L.layerGroup(drainageLayers[0],{
   legendKey:'drainage',
@@ -1026,7 +902,8 @@ const wave = L.layerGroup(waveLayers[0],{
   legendKey:'wave',
   legendEntry: '<img src="images/purple_colorbar.svg" style="width:220px; height:17px;">',
   legendSubheader: 'Annual High Wave-Driven Flooding',
-  displayName: 'Annual High Wave-Driven Flooding'
+  displayName: 'Annual High Wave-Driven Flooding',
+  superLabel: 'EPISODIC FLOODING'
 });
 const roads = L.layerGroup(roadLayers[0],{
   legendKey:'roads',
@@ -1104,17 +981,6 @@ const electrical = L.layerGroup([substations, transmission],
     legendSubheader: 'Electrical Infrastructure',
 });
 
-// Array of queryable WMS tile layers/layer groups
-const queryableWMSLayers = [passive, wave, gwi, drainage, femaFlood, geology];
-
-// Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
-const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl];
-const wmsSingleLayers = [femaFlood, slrxa32, tmk_bounds];
-const unconnectedLayers = [land_use_districts, geology, soils];
-
-// Add event listener to GeoJSON AJAX layers to catch data:loaded event.
-//(Data starts loading before layer is added to map so this can happen before layer is added.)
-ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.loadStatus = 'loaded'));
 
 ///////// LAYER CONTROL OBJECTS //////////
 
@@ -1140,7 +1006,11 @@ const basemaps = [
 // layerGroupName: {'layer': layerGroup, 'sublayers': {sublayerName1: sublayer1, sublayerName2: sublayer2}}
 // (...And yes this could be constructed more efficiently)
 
-const labelFormat = (layer, inline) => inline? '<div class="legend-panel-inline">'+ layer.options.legendSymbol + '</div><span class="layer-label">'+layer.options.displayName +'</span>':'<span class="layer-label">'+ layer.options.displayName + '</span><div class="legend-panel">'+ layer.options.legendEntry + '</div>';
+// Functions to simplify formatting
+const infoButton = (buttonId) => buttonId != undefined? '<button class="info-button" type="button" id="' + buttonId + '" aria-label="more info"></button>':'';
+const labelFormat = (layer, inline) => inline?
+'<div class="legend-panel-inline">'+ layer.options.legendSymbol + '</div><span class="layer-label">'+layer.options.displayName +'</span>'+ infoButton(layer.options.infoButtonId):
+'<span class="layer-label">'+ layer.options.displayName + '</span>'+ infoButton(layer.options.infoButtonId) + '<div class="legend-panel">'+ layer.options.legendEntry + '</div>';
 
 const overlayMaps = [
   { groupName: '<h3><img src="images/wave.svg" class="label-icon">EXPOSURE</h3>', 
@@ -1188,10 +1058,20 @@ const overlayMaps = [
       [labelFormat(dhhl, true)]: dhhl,
       [labelFormat(oahuSetback, true)]: oahuSetback,
       [labelFormat(slrxa32)]: slrxa32,
+      [labelFormat(femaZones)]: femaZones,
       [labelFormat(tmk_bounds, true)]: tmk_bounds
     }
   }
 ];
 
-// <span class="okina">&#699;</span>
-// <button class="info-button" type="button" id="passive-flooding-info" aria-label="more info"></button>
+
+// Array of queryable WMS tile layers/layer groups
+const queryableWMSLayers = [passive, wave, gwi, drainage, femaFlood, tmk_bounds];
+
+// Arrays of all single layers (GeoJSON AJAX or WMS) for later use with loading icon
+const ajaxSingleLayers = [devplan, moku, ahupuaa, boards, dhhl, oahuSetback];
+const wmsSingleLayers = [femaFlood, slrxa32, tmk_bounds];
+
+// Add event listener to GeoJSON AJAX layers to catch data:loaded event.
+//(Data starts loading before layer is added to map so this can happen before layer is added.)
+ajaxSingleLayers.forEach(layer => layer.on('data:loaded', () => layer.options.loadStatus = 'loaded'));

@@ -19,10 +19,11 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
   },
   
   getFeatureInfo: function (evt) {
-    // Only make the request if map zoom is at minimum zoom level. This is an attempt to manage multiple clickable layers at once - KF
-    const popupMinZoom = this.wmsParams.popupMinZoom? this.wmsParams.popupMinZoom: 0;
-    // const nullValue = this.wmsParams.nullValue;
-    if (this._map.getZoom() >= popupMinZoom){
+    // Only make the request if map zoom is at minimum zoom level. This was an attempt to manage multiple clickable layers at once but I abandoned it- KF
+    // const popupMinZoom = this.wmsParams.popupMinZoom? this.wmsParams.popupMinZoom: 0;
+    
+    const fields = this.wmsParams.queryFields;
+
     // Make an AJAX request to the server and hope for the best
     var url = this.getFeatureInfoUrl(evt.latlng),
         showResults = L.Util.bind(this.showGetFeatureInfo, this);
@@ -32,22 +33,68 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
 
       const isJsonRequest = url.includes('json');
 
-      fetch(url)
-      .then((response) => {
+      if (isJsonRequest){
+        fetch(url)
+        .then((response) => {
+            if (!response.ok){
+              throw new Error('Connection error');
+            }
+            return response.json(); 
+          })
+          .then((data) => {
+            const err = (data.features.length > 0) ? null : data;
+            // for single field queries
+            if (fields.length == 1){
+              if (data.features[0].properties[fields[0]] != this.wmsParams.nullValue){
+                showResults(err, evt.latlng, data.features[0].properties[fields[0]]);
+              }
+            }
+            // for multiple field queries
+            // Note that currently only first field is checked for null value
+            else{
+              if (data.features[0].properties[fields[0]] != this.wmsParams.nullValue){
+                let results = [];
+                for (let i=0; i < fields.length; i++){
+                  results.push(data.features[0].properties[fields[i]])
+                }
+                showResults(err, evt.latlng, results);
+              }
+            }
+
+          })
+          .catch((error) => {showResults(error)});
+      }
+      // xml requests
+      else{
+        fetch(url)
+        .then((response) => {
           if (!response.ok){
             throw new Error('Connection error');
           }
-          return response.json(); // <--- SWITCH TO TEXT HERE FOR XML (AND THEN PARSE) https://stackoverflow.com/questions/37693982/how-to-fetch-xml-with-fetch-api
+          return response.text(); // https://stackoverflow.com/questions/37693982/how-to-fetch-xml-with-fetch-api
         })
+        .then((str) => new window.DOMParser().parseFromString(str, "text/xml"))
         .then((data) => {
-          var err = (isJsonRequest && data.features.length > 0) ? null : data;
-          const prop = this.wmsParams.queryProperty;
-          if (data.features[0].properties[prop] != this.wmsParams.nullValue){
-            showResults(err, evt.latlng, data.features[0].properties[prop]);
+          const err = (data.getElementsByTagName('FIELDS')) ? null : data;
+          // for single field queries
+          if (fields.length == 1){
+            if (data.getElementsByTagName('FIELDS')[0].getAttribute(fields[0]) != this.wmsParams.nullValue){
+              showResults(err, evt.latlng, data.getElementsByTagName('FIELDS')[0].getAttribute(fields[0]));
+            }
+          }
+          // for multiple field queries
+          else {
+            if (data.getElementsByTagName('FIELDS')[0].getAttribute(fields[0]) != this.wmsParams.nullValue){
+              let results = [];
+              for (let i=0; i < fields.length; i++){
+                results.push(data.getElementsByTagName('FIELDS')[0].getAttribute(fields[i]));
+              }
+              showResults(err, evt.latlng, results);
+            }
           }
         })
         .catch((error) => {showResults(error)});
-      }
+      }      
   },
   
   getFeatureInfoUrl: function (latlng) {
@@ -69,8 +116,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
           width: size.x,
           layers: this.wmsParams.layers,
           query_layers: this.wmsParams.layers,
-          info_format: 'application/json',
-          // this._url.match('geodata.hawaii.gov')? 'application/vnd.ogc.gml':'application/json' // <-- ACCOUNT FOR DIFFERENT DATA TYPES HERE
+          info_format: this._url.match('geodata.hawaii.gov')? 'text/xml':'application/json' // Account for different data formats here. HI State ArcGIS WMS returns xml, not JSON.
         };
     
     params[params.version === '1.3.0' ? 'i' : 'x'] = Math.round(point.x);
@@ -86,7 +132,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
     const latlngIcon = '<svg viewBox="0 0 42.95 62.04"><g><path d="m21.48,0C11.56,0,0,6.15,0,21.8c0,10.62,16.52,34.09,21.48,40.24,4.41-6.15,21.48-29.06,21.48-40.24C42.95,6.15,31.39,0,21.48,0Zm0,34.35c-6.14,0-11.11-4.97-11.11-11.11s4.97-11.11,11.11-11.11,11.11,4.97,11.11,11.11-4.97,11.11-11.11,11.11Z"/></g></svg>';
     L.popup({ maxWidth: 200})
       .setLatLng(latlng)
-      .setContent(this.wmsParams.queryDisplay(String(content)) + '<hr><div class="latlng">'+latlngIcon + latlngString + '</div>')
+      .setContent(this.wmsParams.queryDisplay(content) + '<hr><div class="latlng">'+latlngIcon + latlngString + '</div>')
       .openOn(this._map);
   }
 });

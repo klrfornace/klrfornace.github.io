@@ -33,7 +33,7 @@ const ariaFormat = {
 
 
 noUiSlider.create(depthSlider, {
-    start: sliderStart, // Initial value is set by global variable defined in slr_map.
+    start: 0,
     range: { min: 0, max: 10 },
     step: 1,
     orientation: 'vertical',

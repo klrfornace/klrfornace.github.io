@@ -554,8 +554,12 @@ L.Control.StyledLayerControl = L.Control.Layers.extend({
             name.innerHTML = '<label id="' + id +'-label" for="' + id + '">' + obj.name + '</label>';
         }
 
-        // name.innerHTML = '<label for="' + id + '">' + obj.name + '</label>';
-
+        // Add a super label above the input/label if defined in layer object
+        if (obj.layer.options.superLabel){
+            const superLabel = L.DomUtil.create('div', 'super-label', label);
+            label.innerHTML = '<div class="super-label">' + obj.layer.options.superLabel + '</div>';
+        }
+        
         label.appendChild(input);
         label.appendChild(name);
 
