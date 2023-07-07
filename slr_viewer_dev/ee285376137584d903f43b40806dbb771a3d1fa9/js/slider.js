@@ -145,7 +145,6 @@ for (let button of scenarioBtnGroup){
                 }
             });
             newLayers.forEach(layer => {
-                // check if layer is already here
                 group.addLayer(layer);
             });
         }

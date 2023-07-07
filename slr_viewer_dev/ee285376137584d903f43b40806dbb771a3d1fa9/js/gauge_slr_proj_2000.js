@@ -1,3 +1,6 @@
+// 2022 Sea Level Technical Report projections for Hawaiian Island tide gauges
+// Reset to 2000 baseline
+
 var slr_proj = [
     {
         "stationId":"1617760",
