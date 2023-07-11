@@ -35,7 +35,7 @@ L.Map.include({
 const zoomLevel = 11;
 const centerCoord = [21.483, -157.980];
 
-const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19}).setView(centerCoord, zoomLevel);
+const map = L.map('map',{preferCanvas:true, minZoom: 7, maxZoom:19, dragging: !L.Browser.mobile}).setView(centerCoord, zoomLevel);
 
 // Restrict bounds to Hawaiʻi
 const southWest = L.latLng( 15.2763, -166.7944 );
@@ -47,8 +47,8 @@ map.options.maxBounds = bounds;
 map.createPane('base'); // ensure basemaps are always the lowest layer
 map.getPane('base').style.zIndex = 150;
 
-map.createPane('mvt-line'); // for vector tiles that should be moved up
-map.getPane('mvt-line').style.zIndex = 390; // right behind line layers at 400
+map.createPane('mvt-line'); // for vector tiles that should be moved up to polygon/line level
+map.getPane('mvt-line').style.zIndex = 390; // right behind polygon/line layers at 400
 
 map.createPane('underlay'); // for tile layers that need to above basemap but below all other layers
 map.getPane('underlay').style.zIndex = 175;
@@ -61,8 +61,7 @@ mapboxLight.addTo(map); // initial basemap
 //////// LAYER CONTROL AND LEGEND ////////
 
 // Add styled layer control to map
-// Based on Leaflet.StyledLayerControl: https://github.com/davicustodio/Leaflet.StyledLayerControl
-
+// basemaps and overlayMaps objects are created in layers.js
 const layerControl = L.Control.styledLayerControl(basemaps, overlayMaps, {collapsed: false, position:'topright'});
 
 layerControl.addTo( map );
@@ -77,14 +76,14 @@ function openCloseLayerControl(){
     layerControlToggle.classList.remove('control-closed');
     this.setAttribute('title','Close the layer menu');
     this.setAttribute('aria-label','Close the layer menu');
-    this.setAttribute('href','#layerControl') // This directs keyboard navigators to layer control container when it is toggled open
+    // this.setAttribute('href','#layerControl') // This directs keyboard navigators to layer control container when it is toggled open - commented out because it causes jumping on smaller screens
   }
   else{
     layerControlContainer.style.display = 'none';
     layerControlToggle.classList.add('control-closed');
     this.setAttribute('title', 'Open the layer menu');
     this.setAttribute('aria-label', 'Open the layer menu');
-    this.setAttribute('href','#'); // Set link back when menu is closed since there is nowhere to navigate to
+    // this.setAttribute('href','#'); // Set link back when menu is closed since there is nowhere to navigate to
   }
 }
 
@@ -94,14 +93,12 @@ layerControlToggle.onclick = openCloseLayerControl;
 
 // Insert simple legend with active map layers into styled layer control which can be toggled on/off by user (initially off).
 
-const legendOuterDiv = document.querySelector('.legend-container'); //this div is created in styledLayerControl
+const legendOuterDiv = document.querySelector('.legend-container'); // this div is created in styledLayerControl
 const legendDiv = L.DomUtil.create('div','legend-container-inner', legendOuterDiv);
 const legendHeader = L.DomUtil.create('div','legend-header', legendDiv);
 legendHeader.innerHTML = 'Sea level: <span id="legend-depth-label">Present level</span>';
 
-// Set up entries for all layers/layer groups. All entries will initially be hidden.
-
-// Loop through all groups/layers/sublayers in overlay object (input for styledLayerControl) to create simple legend entries
+// Loop through all groups/layers/sublayers in overlayMaps object (same input as for styledLayerControl) to create simple legend entries
 for (i = 0; i < overlayMaps.length; i++){
   for (let overlay of Object.values(overlayMaps[i].layers)){
     // For layers with sublayers, add subheader and iterate over sublayer entries
@@ -145,10 +142,9 @@ map.on('overlayadd', function addOverlay(e){
     entryDiv.classList.remove('legend-entry-hidden');
   
     // Remove any other layers in administrative boundary pane if another is added. (Other exclusive groups to be added)
-
     // Arrays of excluisve groups (e.g., layers that cannot be on map concurrently)
     const adminGroup = [devplan, moku, ahupuaa, boards, dhhl];
-    const exposureGroup = [passive, wave, compFlood]; 
+    const exposureGroup = [passive, wave, compFlood]; // (flood layers not managed as exclusive layers for now)
 
     for(let group of [adminGroup]){
       if (group.includes(e.layer)){
@@ -160,8 +156,8 @@ map.on('overlayadd', function addOverlay(e){
       }
     }
 
-    // Change cursor to pointer if clickable tile layers are present
-    queryableWMSLayers.forEach(layer => {
+  // Change cursor to pointer if clickable tile layers are present
+  queryableWMSLayers.forEach(layer => {
     if (map.hasLayer(layer)) {
         L.DomUtil.addClass(map._container,'pointer-cursor');
       }
@@ -189,16 +185,17 @@ map.on('overlayremove', function(e){
   if (!clickablePresent) {
     L.DomUtil.removeClass(map._container,'pointer-cursor');
   }
+
 })
 
 
 // Layer style adjustments by zoom/basemap
 
-
  // Change layer styles based on light/dark (satellite) basemaps
 map.on( 'baselayerchange',
   function() {
     if ( map.hasLayer( mapboxLight )) {
+      // These styles are initially created in layers.js
       boundary_style.color = '#6e6e6e';
       boundary_style2.color = '#6e6e6e'; // Thicker line style
       boundary_highlight_style.color = '#3c3c3c';
@@ -207,7 +204,7 @@ map.on( 'baselayerchange',
       devplan.setStyle( boundary_style );
       moku.setStyle( boundary_style );
       boards.setStyle( boundary_style );
-      dhhl.setStyle(boundary_style2)
+      dhhl.setStyle(boundary_style2);
 
       // Also make sure legend styles are correct
       const entries = document.querySelectorAll('.admin-line');
@@ -276,24 +273,24 @@ map.on('zoomend', function(){
   }
 })
 
-map.on('zoomend', function() {
+// map.on('zoomend', function() {
   // Close tooltips for admin boundary layers at high zooms 
   // const tooltips = document.querySelectorAll('.leaflet-tooltip');
   // const tooltipStyle = map.getZoom() < adminZoomThreshold ? "block":"none";
   // tooltips.forEach((tooltip) => tooltip.style.display = tooltipStyle);
 
   // Adjust cursor based on if clickable tile layers are present
-  if (map.getZoom() < floodZoomThreshold){
-    L.DomUtil.removeClass(map._container,'pointer-cursor');
-  }
-  else{
-    queryableWMSLayers.forEach(layer => {
-      if (map.hasLayer(layer)) {
-        L.DomUtil.addClass(map._container,'pointer-cursor');
-      }
-    })
-  }
-})
+//   if (map.getZoom() < floodZoomThreshold){
+//     L.DomUtil.removeClass(map._container,'pointer-cursor');
+//   }
+//   else{
+//     queryableWMSLayers.forEach(layer => {
+//       if (map.hasLayer(layer)) {
+//         L.DomUtil.addClass(map._container,'pointer-cursor');
+//       }
+//     })
+//   }
+// })
 
 //////// OTHER CONTROLS ////////
 
@@ -319,9 +316,8 @@ homeControl.onAdd = function(){
 }
 homeControl.addTo(map);
 
-// Add easy print button to export map.
-// leaflet-easyPrint: https://github.com/rowanwins/leaflet-easyPrint
-// Bundle updated per this issue: https://github.com/rowanwins/leaflet-easyPrint/issues/109
+// Add easy print button to export map as png
+// This will create a png with only the simple legend in top right corner and simplified data attribution info in lower right corner.
 L.easyPrint({
 	title: 'Export this map',
 	position: 'topleft',
@@ -357,7 +353,7 @@ const geocoderControl = new L.Control.Geocoder({
   position:'topleft',
   placeholder:'Search by address or TMK', 
   collapsed: false, 
-  suggestMinLength: 7, 
+  suggestMinLength: 7, // number of characters entered before Mapbox provides address suggestions. Higher number will limit number of geocoding requests. 
   defaultMarkGeocode: false 
 })
   .on('startgeocode', function(e){
@@ -409,7 +405,7 @@ const geocoderControl = new L.Control.Geocoder({
     
   });
 
-// Set up geocoder restricted to bounding box around Hawaiʻi
+// Set up Mapbox geocoder restricted to bounding box around Hawaiʻi
 const geocoder = L.Control.Geocoder.mapbox({apiKey: ak, geocodingQueryParams:{'bbox':'-162,18,-154,23'}});
 geocoderControl.options.geocoder = geocoder;
 geocoderControl.addTo(map);
@@ -423,7 +419,6 @@ const geocoderErrorDiv = document.querySelector('.leaflet-control-geocoder-form-
 geocoderErrorDiv.setAttribute('id','geocoder-error-default');
 
 function queryTMK(tmk){
-
   // Define the ArcGIS REST API URL; return result in GeoJSON format; include
   // parcel acres in addition to the geometry of the search result:
 
@@ -468,7 +463,7 @@ function queryTMK(tmk){
         return;
       }
 
-      //Set color based on light or dark basemap
+      // Set TMK shape color based on light or dark basemap
       tmkColor = map.hasLayer(mapboxLight) ? "black":"#dbdbdb";
 
       const tmkPolygon = L.geoJSON(data, {
@@ -577,7 +572,6 @@ layerGroups.forEach(grp => {
 })
 
 // Error control for printing errors
-
 map.on('easyPrint-error', () => console.log('printing error'));
 
 const errorControl = L.control({position: 'middlecenter'});
@@ -596,7 +590,7 @@ function removeErrorControl(){
 }
 map.on('easyPrint-error', () => map.addControl(errorControl));
 
-// Map attribution control for print images
+// Simplified attribution control for print images
 const printAttribution = L.control({position:'bottomright'});
 printAttribution.onAdd = function(){
   const attr = L.DomUtil.create('div','print-attribution');
@@ -614,7 +608,6 @@ map.on('easyPrint-start', () => {
 });
 
 // Initialize map with passive flooding layers
-
 layerControl.selectLayer(passive); 
 const passiveLegendEntry = document.querySelector('.legend-' + passive.options.legendKey);
 passiveLegendEntry.classList.remove('legend-entry-hidden');
@@ -622,7 +615,7 @@ passiveLegendEntry.classList.remove('legend-entry-hidden');
 
 // Configure info tooltips using Tippy library
 // For some reason, this needs to be after the map is initialized with first set of layers. 
-// StyledLayerControl is interfering somehow, but I can't figure out how. -KF
+// StyledLayerControl is interfering somehow (probably because it is creating layer control multiple times), but I just left it alone. -KF
 const infoTooltips = {
   '#scenario-select-info':'More info about sea level rise scenarios. <br><a href="#">Click here for full details.</a>',
   '#mhhw-info':'<span style="font-weight:600">Mean Higher High Water (MHHW):</span> The water level at the average highest tide of the day.',
@@ -648,8 +641,8 @@ function openClosePanel(){
 
   // Open the side panel
   if (this.classList.contains('panel-closed')){
-    panel.style.width = '225px';
-    tabContainer.style.left = '225px';
+    panel.style.width = '';
+    tabContainer.style.left = '';
 
     this.classList.remove('panel-closed');
     this.style.backgroundImage = "url(images/arrow_left.svg)";
@@ -680,5 +673,3 @@ function openClosePanel(){
 
 const closeButton = document.querySelector('.side-panel-tab');
 closeButton.onclick = openClosePanel;
-
-

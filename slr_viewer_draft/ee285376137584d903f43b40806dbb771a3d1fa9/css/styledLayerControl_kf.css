@@ -126,6 +126,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	max-height: 0px;
 	height: 0px;
     /* padding: 8px 0; */
+	padding-right: 5px;
     line-height: 0px;
 	position: relative;
 	z-index: 10;
@@ -148,6 +149,9 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	padding: 4px 0 8px 0;
 }
 
+.wrapper.basemap-group{
+	padding: 8px 0 8px 0;
+}
 .ac-container article label {
     display: inline;
     cursor: pointer;
@@ -155,7 +159,7 @@ div[id^="leaflet-control-accordion-layers"] > button {
 }
 
 .ac-container .group-toggle-container {
-	padding: 0 10px 2px 10px;
+	padding: 0 10px;
     /* display: none; */
 }
 
@@ -177,18 +181,17 @@ div[id^="leaflet-control-accordion-layers"] > button {
 	background: rgba(20,65,111,0.12);
 }
 
-/* .ac-container input.menu:checked ~ .group-toggle-container {
-    display: block;
-	line-height: 1em;
-} */
-
 .super-label{
 	font-size: 11px;
 	font-weight: 600;
 	letter-spacing: 1px;
-	padding-top: 3px;
+	padding-top: 5px;
 	padding-left: 4px;
 }
+/* .ac-container input.menu:checked ~ .group-toggle-container {
+    display: block;
+	line-height: 1em;
+} */
 
 .menu-item-radio{
 	font-family: 'Roboto Flex', Arial, sans-serif;
@@ -369,11 +372,5 @@ div[id^="leaflet-control-accordion-layers"] > button {
 
 .layer-label{
 	padding-right: 3px;
-}
-
-#wave-options{
-	font-weight: 400;
-	font-size: 13px;
-	padding-left: 20px;
 }
 
