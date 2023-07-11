@@ -333,78 +333,247 @@ const transmission = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Atransmission_lines_hi_h
 
 //////////  OTHER OVERLAYS  //////////
 
-// Geology Layer - not currently connected
+// General boundary styles and functions for admin boundary layers
 
-const geology = L.tileLayer.wms(
-    'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/hi_usgs_all_geology/wms',
-    {
-      layers: 'hi_usgs_all_geology',
-      styles: 'hi_usgs_all_geology2',
-      version: '1.1.1',
-      format: 'image/png',
-      transparent: true,
-      opacity: 1.00,
-      // errorTileUrl: '/images/map_tile_error.png',
-      attribution: 'Data &copy; <a href="http://pubs.usgs.gov/of/2007/1089/" target="_blank" title="United States Geological Survey (USGS)">USGS</a>',
-      bounds: L.latLngBounds( L.latLng( 18.9106432386012, -160.247059539488 ), L.latLng( 22.2353669223379, -154.806693600261 ) ),
-      maxZoom: 20,
-      // My custom attributes:
-      name: 'Geology',
-      pane: 'underlay',
-      legendKey: 'geology',
-      queryable: true 
+const boundary_style = {
+  weight: 1.5,
+  color: '#6e6e6e',
+  opacity: 1.0,
+  fill: 0.000001,
+  fillOpacity: 0
+};
+
+const boundary_highlight_style = {
+  weight: 2,
+  color: '#3c3c3c',
+  opacity: 1.0,
+  fill: 0.000001,
+  fillOpacity: 0.0
+};
+
+
+function highlightBoundaries ( e ) {
+  const layer = e.target;
+  layer.setStyle( boundary_highlight_style );
+  if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
+}
+
+// For converting names returned in all caps
+function toTitleCase(str) {
+  return str.replace(
+    // /\w\S*/g, // white space only
+    /\b[\w']+\b/g, // all word boundaries (including hyphens)
+    function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     }
   );
+}
 
-// Soils survey - not currently connected
+// Development / Community Plan Areas (Districts):
 
-const soils = L.tileLayer.wms(
-    'https://geodata.hawaii.gov/arcgis/services/Terrestrial/MapServer/WMSServer',
-    {
-      layers: '4',
-      styles: 'soils',
-      sld: 'http://www.pacioos.hawaii.edu/ssi/sld/soils_survey.xml?v=2',
-      version: '1.1.1',
-      format: 'image/png',
-      transparent: true,
-      opacity: 1.00,
-      // errorTileUrl: 'images/map_tile_error.png',
-      attribution: 'Data &copy; <a href="http://pubs.usgs.gov/of/2007/1089/" target="_blank" title="United States Geological Survey (USGS)">USGS</a>',
-      bounds: L.latLngBounds( L.latLng( 18.9106432386012, -160.247059539488 ), L.latLng( 22.2353669223379, -154.806693600261 ) ),
-      maxZoom: 20,
-      // My custom attributes:
-      name: 'Soils',
-      pane: 'underlay',
-      legendKey: 'soils',
-      queryable: true 
+const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&outFields=*&returnGeometry=true&outSR=4326&f=geojson';
+
+const devplan = new L.GeoJSON.AJAX(devplanURL, 
+{style: boundary_style,
+    onEachFeature: function ( feature, layer ) {
+      layer.bindTooltip( '<strong>' + toTitleCase(feature.properties.district) + '</strong>', { direction: 'left', sticky: true, permanent: false } );
+      layer.on(
+        {
+          mouseover: highlightBoundaries,
+          mouseout: function(){devplan.resetStyle(this)},
+          click: function(e){
+            const tooltip = layer.getTooltip();
+            map.closeTooltip(tooltip)
+          }
+
+          // Zoom to clicked polygon if no other clickable overlays are
+          // expecting a pop-up window:
+
+          // click: function () {
+          //   if ( !hasClickableLayer() ) {
+          //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
+          //   }
+          // }
+        }
+      );
+    },
+    name: 'Community Plan Areas',
+    pane: 'admin-boundaries',
+    displayName: 'Community Plan Areas',
+    legendKey: 'devplan',
+    legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
+    legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
+    loadStatus: 'loading'
+  });
+
+// Ahupuaʻa boundaries:
+
+const ahupuaaURL = 'https://geodata.hawaii.gov/arcgis/rest/services/HistoricCultural/MapServer/1/query?geometry=-166.7944,15.2763,-148.3484,25.3142&      geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=ahupuaa&returnGeometry=true&returnTrueCurves=false&outSR=4326&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson';
+
+const ahupuaa = new L.GeoJSON.AJAX(ahupuaaURL,
+{
+  style: boundary_style,
+  onEachFeature: function ( feature, layer ) {
+    var ahupuaa_name = feature.properties.ahupuaa;
+    ahupuaa_name = ahupuaa_name.replace( /�/g, '&#299;' );
+    layer.bindTooltip( '<strong>' + ahupuaa_name + '</strong>',{ direction: 'left', sticky: true });
+    layer.on(
+      {
+        mouseover: highlightBoundaries,
+        mouseout: function(){ahupuaa.resetStyle(this)},
+        click: function(e){
+          const tooltip = layer.getTooltip();
+          map.closeTooltip(tooltip)
+        }
+        // Zoom to clicked polygon if no other clickable overlays are
+        // expecting a pop-up window:
+
+        // click: function () {
+        //   if ( !hasClickableLayer() ) {
+        //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
+        //   }
+        // }
+      }
+    );
+  },
+  // My custom attributes:
+  name: 'Ahupuaa',
+  pane: 'admin-boundaries',
+  displayName: 'Ahupua<span class="okina">&#699;</>a Boundaries',
+  legendKey: 'ahupuaa',
+  legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Ahupua<span class="okina">&#699;</>a Boundaries',
+  legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
+  loadStatus: 'loading'
+});
+
+// Moku boundaries:
+
+const mokuURL = 'https://geodata.hawaii.gov/arcgis/rest/services/HistoricCultural/MapServer/3/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=moku&returnGeometry=true&returnTrueCurves=false&outSR=4326&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson';
+
+const moku = new L.GeoJSON.AJAX(mokuURL,
+{
+  style: boundary_style,
+  onEachFeature: function ( feature, layer ) {
+
+    var moku_name = feature.properties.moku;
+
+    // Lanai has no moku, so fall back to Mokupuni (island):
+
+    if ( !moku_name ) {
+      moku_name = feature.properties.mokupuni;
     }
-  );
- 
-// State Land Use Districts (Agricultural, Conservation, Rural, Urban) - not currently connected
-// Was layer '15' then it switched to '16' (2019-09) then it switched to
-// '17' (2021-12); does not match REST which shows '20':
 
-const land_use_districts = L.tileLayer.wms(
-    'https://geodata.hawaii.gov/arcgis/services/ParcelsZoning/MapServer/WMSServer',
-    {
-      layers: '22', // was '17' (2022-08-30)
-      styles: 'lud',
-      sld: 'http://www.pacioos.hawaii.edu/ssi/sld/land_use_districts.xml',
-      version: '1.1.1',
-      format: 'image/png',
-      transparent: true,
-      opacity: 1.00,
-      // errorTileUrl: 'images/map_tile_error.png',
-      attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data-expanded/" target="_blank" title="State of Hawaii Office of Planning Statewide GIS Program">State of Hawai&#699;i</a>',
-      bounds: L.latLngBounds( L.latLng( 18.893356, -160.250511 ), L.latLng( 22.235643, -154.732045 ) ),
-      maxZoom: 20,
-      // My custom attributes:
-      name: 'Land Use Districts',
-      pane: 'underlay',
-      legendKey: 'landuse',
-      queryable: false 
-    }
-  );
+    layer.bindTooltip( '<strong>' + moku_name + '</strong>',{ direction: 'left', sticky: true });
+    layer.on(
+      {
+        mouseover: highlightBoundaries,
+        mouseout: function(){moku.resetStyle(this)},
+        click: function(e){
+          const tooltip = layer.getTooltip();
+          map.closeTooltip(tooltip)
+        }
+
+        // Zoom to clicked polygon if no other clickable overlays are
+        // expecting a pop-up window:
+
+        // click: function () {
+        //   if ( !hasClickableLayer() ) {
+        //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
+        //   }
+        // }
+      }
+    );
+  },
+  // My custom attributes:
+  name: 'Moku',
+  pane: 'admin-boundaries',
+  displayName: 'Moku Boundaries',
+  legendKey: 'moku',
+  legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Moku Boundaries',
+  legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
+  loadStatus: 'loading'
+});
+
+// Oʻahu Neighborhood Boards
+
+const boardURL = 'https://services.arcgis.com/tNJpAOha4mODLkXz/ArcGIS/rest/services/AdministrativePolitical/FeatureServer/5/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&spatialRel=esriSpatialRelIntersects&outFields=BOARD_NUM&returnGeometry=true&returnTrueCurves=false&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson'
+
+// Board names not included in feature service for some reason  ¯\_(ツ)_/¯
+const boardNames = {1:'Hawaii Kai', 2:'Kuliouou-Kalani Iki', 3:'Waialae-Kahala',4:'Kaimuki',5:'Diamond Head/Kapahulu/St. Louis Heights',6:'Palolo',7:'Manoa',8:'McCully-Moiliili',9:'Waikiki',10:'Makiki/Lower Punchbowl/Tantalus',11:'Ala Moana/Kakaako',12:'Nuuanu/Punchbowl',13:'Downtown-Chinatown',14:'Liliha/Puunui/Alewa/Kamehameha Heights',15:	'Kalihi-Palama',
+16:'Kalihi Valley',17:'Moanalua (Board not formed)',18:'Aliamanu/Salt Lake/Foster Village/Airport',
+20:'Aiea',21:'Pearl City',22:'Waipahu',23:'Ewa',24:'Waianae Coast',25:'Mililani/Waipio/Melemanu',26:'Wahiawa-Whitmore Village',27:'North Shore',28: 'Koolauloa',29:'Kahalu&#299;u',30: 'Kaneohe',31:'Kailua',32:'Waimanalo',33:'Mokapu (Board not formed)',34:'Makakilo/Kapolei/Honokai Hale',35:'Mililani Mauka/Launani Valley',36:'Nanakuli-Maili'};
+
+const boards = new L.GeoJSON.AJAX(boardURL,
+{style: boundary_style,
+  onEachFeature: function ( feature, layer ) {
+    const boardNumber = feature.properties.BOARD_NUM;
+    layer.bindTooltip( '<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>',{ direction: 'left', sticky: true });
+    layer.on(
+      {
+        mouseover: highlightBoundaries,
+        mouseout: function(){boards.resetStyle(this)},
+        click: function(e){
+          const tooltip = layer.getTooltip();
+          map.closeTooltip(tooltip)
+        }
+      }
+    );
+  },
+  name: 'Neighborhood Boards',
+  pane: 'admin-boundaries',
+  displayName: 'Neighborhood Board Areas',
+  legendKey: 'boards',
+  legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Neighborhood Board Boundaries',
+  legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
+  loadStatus: 'loading'
+});
+
+// DHHL lands
+
+const dhhlURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Census/MapServer/30/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=name20,pop20&returnGeometry=true&returnTrueCurves=false&outSR=4326&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson';
+
+const boundary_style2 = {
+weight: 1.5,
+color: '#6e6e6e',
+opacity: 1.0,
+fill: 0.000001,
+fillOpacity: 0.0
+};
+
+const dhhl = new L.GeoJSON.AJAX(dhhlURL,
+{style: boundary_style2,
+  onEachFeature: function ( feature, layer ) {
+    layer.bindTooltip( '<strong>' + feature.properties.name20 + '</strong>',{ direction: 'left', sticky: true });
+    layer.on(
+      {
+        mouseover: highlightBoundaries,
+        mouseout: function(){dhhl.resetStyle(this)},
+        click: function(e){
+          const tooltip = layer.getTooltip();
+          map.closeTooltip(tooltip)
+        }
+
+        // Zoom to clicked polygon if no other clickable overlays are
+        // expecting a pop-up window:
+
+        // click: function () {
+        //   if ( !hasClickableLayer() ) {
+        //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
+        //   }
+        // }
+      }
+    );
+  },
+  // My custom attributes:
+  name: 'DHHL Lands',
+  pane: 'admin-boundaries',
+  displayName: 'Hawaiian Home Lands',
+  legendKey: 'dhhl',
+  legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Hawaiian Home Land Boundaries',
+  legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
+  loadStatus: 'loading'
+}
+);
   
 // FEMA Flood Hazard Zones
 
@@ -481,248 +650,6 @@ const slrxa32 = L.tileLayer.wms(
   }
 );
 
-// General boundary styles and functions for admin boundary layers
-
-const boundary_style = {
-    weight: 1.5,
-    color: '#6e6e6e',
-    opacity: 1.0,
-    fill: 0.000001,
-    fillOpacity: 0
-  };
-
-const boundary_highlight_style = {
-    weight: 2,
-    color: '#3c3c3c',
-    opacity: 1.0,
-    fill: 0.000001,
-    fillOpacity: 0.0
-  };
-
-
-function highlightBoundaries ( e ) {
-    const layer = e.target;
-    layer.setStyle( boundary_highlight_style );
-    if ( !L.Browser.ie && !L.Browser.opera ) layer.bringToFront();
-  }
-
-// For converting names returned in all caps
-function toTitleCase(str) {
-    return str.replace(
-      // /\w\S*/g, // white space only
-      /\b[\w']+\b/g, // all word boundaries (including hyphens)
-      function(txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      }
-    );
-}
-
-// Development / Community Plan Areas (Districts):
-
-const devplanURL = 'https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/24/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&outFields=*&returnGeometry=true&outSR=4326&f=geojson';
-
-const devplan = new L.GeoJSON.AJAX(devplanURL, 
-  {style: boundary_style,
-      onEachFeature: function ( feature, layer ) {
-        layer.bindTooltip( '<strong>' + toTitleCase(feature.properties.district) + '</strong>', { direction: 'left', sticky: true, permanent: false } );
-        layer.on(
-          {
-            mouseover: highlightBoundaries,
-            mouseout: function(){devplan.resetStyle(this)},
-            click: function(e){
-              const tooltip = layer.getTooltip();
-              map.closeTooltip(tooltip)
-            }
-
-            // Zoom to clicked polygon if no other clickable overlays are
-            // expecting a pop-up window:
-
-            // click: function () {
-            //   if ( !hasClickableLayer() ) {
-            //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
-            //   }
-            // }
-          }
-        );
-      },
-      name: 'Community Plan Areas',
-      pane: 'admin-boundaries',
-      displayName: 'Community Plan Areas',
-      legendKey: 'devplan',
-      legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Community Plan Area Boundaries',
-      legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-      loadStatus: 'loading'
-    });
-
-// Ahupuaʻa boundaries:
-
-const ahupuaaURL = 'https://geodata.hawaii.gov/arcgis/rest/services/HistoricCultural/MapServer/1/query?geometry=-166.7944,15.2763,-148.3484,25.3142&      geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=ahupuaa&returnGeometry=true&returnTrueCurves=false&outSR=4326&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson';
-
-const ahupuaa = new L.GeoJSON.AJAX(ahupuaaURL,
-  {
-    style: boundary_style,
-    onEachFeature: function ( feature, layer ) {
-      var ahupuaa_name = feature.properties.ahupuaa;
-      ahupuaa_name = ahupuaa_name.replace( /�/g, '&#299;' );
-      layer.bindTooltip( '<strong>' + ahupuaa_name + '</strong>',{ direction: 'left', sticky: true });
-      layer.on(
-        {
-          mouseover: highlightBoundaries,
-          mouseout: function(){ahupuaa.resetStyle(this)},
-          click: function(e){
-            const tooltip = layer.getTooltip();
-            map.closeTooltip(tooltip)
-          }
-          // Zoom to clicked polygon if no other clickable overlays are
-          // expecting a pop-up window:
-
-          // click: function () {
-          //   if ( !hasClickableLayer() ) {
-          //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
-          //   }
-          // }
-        }
-      );
-    },
-    // My custom attributes:
-    name: 'Ahupuaa',
-    pane: 'admin-boundaries',
-    displayName: 'Ahupua<span class="okina">&#699;</>a Boundaries',
-    legendKey: 'ahupuaa',
-    legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Ahupua<span class="okina">&#699;</>a Boundaries',
-    legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-    loadStatus: 'loading'
-  });
-
-// Moku boundaries:
-
-const mokuURL = 'https://geodata.hawaii.gov/arcgis/rest/services/HistoricCultural/MapServer/3/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=moku&returnGeometry=true&returnTrueCurves=false&outSR=4326&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson';
-
-const moku = new L.GeoJSON.AJAX(mokuURL,
-  {
-    style: boundary_style,
-    onEachFeature: function ( feature, layer ) {
-
-      var moku_name = feature.properties.moku;
-
-      // Lanai has no moku, so fall back to Mokupuni (island):
-
-      if ( !moku_name ) {
-        moku_name = feature.properties.mokupuni;
-      }
-
-      layer.bindTooltip( '<strong>' + moku_name + '</strong>',{ direction: 'left', sticky: true });
-      layer.on(
-        {
-          mouseover: highlightBoundaries,
-          mouseout: function(){moku.resetStyle(this)},
-          click: function(e){
-            const tooltip = layer.getTooltip();
-            map.closeTooltip(tooltip)
-          }
-
-          // Zoom to clicked polygon if no other clickable overlays are
-          // expecting a pop-up window:
-
-          // click: function () {
-          //   if ( !hasClickableLayer() ) {
-          //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
-          //   }
-          // }
-        }
-      );
-    },
-    // My custom attributes:
-    name: 'Moku',
-    pane: 'admin-boundaries',
-    displayName: 'Moku Boundaries',
-    legendKey: 'moku',
-    legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Moku Boundaries',
-    legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-    loadStatus: 'loading'
-  });
-
-// Oʻahu Neighborhood Boards
-
-const boardURL = 'https://services.arcgis.com/tNJpAOha4mODLkXz/ArcGIS/rest/services/AdministrativePolitical/FeatureServer/5/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&spatialRel=esriSpatialRelIntersects&outFields=BOARD_NUM&returnGeometry=true&returnTrueCurves=false&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson'
-
-// Board names not included in feature service for some reason  ¯\_(ツ)_/¯
-const boardNames = {1:'Hawaii Kai', 2:'Kuliouou-Kalani Iki', 3:'Waialae-Kahala',4:'Kaimuki',5:'Diamond Head/Kapahulu/St. Louis Heights',6:'Palolo',7:'Manoa',8:'McCully-Moiliili',9:'Waikiki',10:'Makiki/Lower Punchbowl/Tantalus',11:'Ala Moana/Kakaako',12:'Nuuanu/Punchbowl',13:'Downtown-Chinatown',14:'Liliha/Puunui/Alewa/Kamehameha Heights',15:	'Kalihi-Palama',
-16:'Kalihi Valley',17:'Moanalua (Board not formed)',18:'Aliamanu/Salt Lake/Foster Village/Airport',
-20:'Aiea',21:'Pearl City',22:'Waipahu',23:'Ewa',24:'Waianae Coast',25:'Mililani/Waipio/Melemanu',26:'Wahiawa-Whitmore Village',27:'North Shore',28: 'Koolauloa',29:'Kahalu&#299;u',30: 'Kaneohe',31:'Kailua',32:'Waimanalo',33:'Mokapu (Board not formed)',34:'Makakilo/Kapolei/Honokai Hale',35:'Mililani Mauka/Launani Valley',36:'Nanakuli-Maili'};
-
-const boards = new L.GeoJSON.AJAX(boardURL,
-  {style: boundary_style,
-    onEachFeature: function ( feature, layer ) {
-      const boardNumber = feature.properties.BOARD_NUM;
-      layer.bindTooltip( '<strong>' + boardNames[boardNumber]+ ' ('+ boardNumber + ')</strong>',{ direction: 'left', sticky: true });
-      layer.on(
-        {
-          mouseover: highlightBoundaries,
-          mouseout: function(){boards.resetStyle(this)},
-          click: function(e){
-            const tooltip = layer.getTooltip();
-            map.closeTooltip(tooltip)
-          }
-        }
-      );
-    },
-    name: 'Neighborhood Boards',
-    pane: 'admin-boundaries',
-    displayName: 'Neighborhood Board Areas',
-    legendKey: 'boards',
-    legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Neighborhood Board Boundaries',
-    legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-    loadStatus: 'loading'
-  });
-
-// DHHL lands
-
-const dhhlURL = 'https://geodata.hawaii.gov/arcgis/rest/services/Census/MapServer/30/query?geometry=-166.7944,15.2763,-148.3484,25.3142&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=name20,pop20&returnGeometry=true&returnTrueCurves=false&outSR=4326&returnIdsOnly=false&returnCountOnly=false&returnZ=false&returnM=false&returnDistinctValues=false&f=geojson';
-
-const boundary_style2 = {
-  weight: 1.5,
-  color: '#6e6e6e',
-  opacity: 1.0,
-  fill: 0.000001,
-  fillOpacity: 0.0
-};
-
-const dhhl = new L.GeoJSON.AJAX(dhhlURL,
-  {style: boundary_style2,
-    onEachFeature: function ( feature, layer ) {
-      layer.bindTooltip( '<strong>' + feature.properties.name20 + '</strong>',{ direction: 'left', sticky: true });
-      layer.on(
-        {
-          mouseover: highlightBoundaries,
-          mouseout: function(){dhhl.resetStyle(this)},
-          click: function(e){
-            const tooltip = layer.getTooltip();
-            map.closeTooltip(tooltip)
-          }
-
-          // Zoom to clicked polygon if no other clickable overlays are
-          // expecting a pop-up window:
-
-          // click: function () {
-          //   if ( !hasClickableLayer() ) {
-          //     fitBounds( layer.getBounds().getSouth(), layer.getBounds().getWest(), layer.getBounds().getNorth(), layer.getBounds().getEast() );
-          //   }
-          // }
-        }
-      );
-    },
-    // My custom attributes:
-    name: 'DHHL Lands',
-    pane: 'admin-boundaries',
-    displayName: 'Hawaiian Home Lands',
-    legendKey: 'dhhl',
-    legendEntry: '<svg class="legend-line admin-line" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>Hawaiian Home Land Boundaries',
-    legendSymbol: '<svg class="legend-line admin-line tight-layout" viewBox="0 0 31.74 5.74"><g><rect x=".5" y=".5" width="30.74" height="4.74"/></g></svg>',
-    loadStatus: 'loading'
-  }
-);
-
 // TMK boundaries (Oʻahu parcels: layer id 7, statewide: layer id 1)
 
 const tmk_bounds = L.tileLayer.betterWms(
@@ -769,6 +696,79 @@ const oahuSetback = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3Aoahu_70yr_rate_plus_60ft
   legendSymbol: '<svg class="legend-line setback-line tight-layout" viewBox="0 0 31.74 5.74"><g><path d="m31.74,5.74h-4.74V0h4.74v5.74Zm-8.74,0h-5V0h5v5.74Zm-9,0h-5V0h5v5.74Zm-9,0H0V0h5v5.74Z"/></g></svg>',
   legendEntry: '<svg class="legend-line setback-line" viewBox="0 0 31.74 5.74"><g><path d="m31.74,5.74h-4.74V0h4.74v5.74Zm-8.74,0h-5V0h5v5.74Zm-9,0h-5V0h5v5.74Zm-9,0H0V0h5v5.74Z"/></g></svg>O<span class="okina">&#699;</span>ahu Shoreline Setback'
 });
+
+// Geology Layer - not currently connected
+
+const geology = L.tileLayer.wms(
+  'http://geo.pacioos.hawaii.edu/geoserver/PACIOOS/hi_usgs_all_geology/wms',
+  {
+    layers: 'hi_usgs_all_geology',
+    styles: 'hi_usgs_all_geology2',
+    version: '1.1.1',
+    format: 'image/png',
+    transparent: true,
+    opacity: 1.00,
+    // errorTileUrl: '/images/map_tile_error.png',
+    attribution: 'Data &copy; <a href="http://pubs.usgs.gov/of/2007/1089/" target="_blank" title="United States Geological Survey (USGS)">USGS</a>',
+    bounds: L.latLngBounds( L.latLng( 18.9106432386012, -160.247059539488 ), L.latLng( 22.2353669223379, -154.806693600261 ) ),
+    maxZoom: 20,
+    // My custom attributes:
+    name: 'Geology',
+    pane: 'underlay',
+    legendKey: 'geology',
+    queryable: true 
+  }
+);
+
+// Soils survey - not currently connected
+
+const soils = L.tileLayer.wms(
+  'https://geodata.hawaii.gov/arcgis/services/Terrestrial/MapServer/WMSServer',
+  {
+    layers: '4',
+    styles: 'soils',
+    sld: 'http://www.pacioos.hawaii.edu/ssi/sld/soils_survey.xml?v=2',
+    version: '1.1.1',
+    format: 'image/png',
+    transparent: true,
+    opacity: 1.00,
+    // errorTileUrl: 'images/map_tile_error.png',
+    attribution: 'Data &copy; <a href="http://pubs.usgs.gov/of/2007/1089/" target="_blank" title="United States Geological Survey (USGS)">USGS</a>',
+    bounds: L.latLngBounds( L.latLng( 18.9106432386012, -160.247059539488 ), L.latLng( 22.2353669223379, -154.806693600261 ) ),
+    maxZoom: 20,
+    // My custom attributes:
+    name: 'Soils',
+    pane: 'underlay',
+    legendKey: 'soils',
+    queryable: true 
+  }
+);
+
+// State Land Use Districts (Agricultural, Conservation, Rural, Urban) - not currently connected
+// Was layer '15' then it switched to '16' (2019-09) then it switched to
+// '17' (2021-12); does not match REST which shows '20':
+
+const land_use_districts = L.tileLayer.wms(
+  'https://geodata.hawaii.gov/arcgis/services/ParcelsZoning/MapServer/WMSServer',
+  {
+    layers: '22', // was '17' (2022-08-30)
+    styles: 'lud',
+    sld: 'http://www.pacioos.hawaii.edu/ssi/sld/land_use_districts.xml',
+    version: '1.1.1',
+    format: 'image/png',
+    transparent: true,
+    opacity: 1.00,
+    // errorTileUrl: 'images/map_tile_error.png',
+    attribution: 'Data &copy; <a href="http://planning.hawaii.gov/gis/download-gis-data-expanded/" target="_blank" title="State of Hawaii Office of Planning Statewide GIS Program">State of Hawai&#699;i</a>',
+    bounds: L.latLngBounds( L.latLng( 18.893356, -160.250511 ), L.latLng( 22.235643, -154.732045 ) ),
+    maxZoom: 20,
+    // My custom attributes:
+    name: 'Land Use Districts',
+    pane: 'underlay',
+    legendKey: 'landuse',
+    queryable: false 
+  }
+);
 
 //////////  LAYER GROUPS  //////////
 
