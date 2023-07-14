@@ -158,6 +158,7 @@ a {
   overflow-y: auto;
   position: absolute;
   transition: width 0.3s linear;
+  will-change: width; /* attempt to make smoother transition on mobile Safari */
 }
 
 .header {

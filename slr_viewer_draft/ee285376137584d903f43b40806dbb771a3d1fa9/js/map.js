@@ -642,6 +642,7 @@ function openClosePanel(){
   // Open the side panel
   if (this.classList.contains('panel-closed')){
     panel.style.width = '';
+    panel.style.visibility = '';
     tabContainer.style.left = '';
 
     this.classList.remove('panel-closed');
@@ -656,6 +657,7 @@ function openClosePanel(){
   // Close the side panel
   else{
     panel.style.width = 0;
+    setTimeout(() => panel.style.visibility = 'hidden',300); // Set visibility to hidden after width transition to hide from screen readers/keyboard users
     tabContainer.style.left = '0px';
 
     this.classList.add('panel-closed');
