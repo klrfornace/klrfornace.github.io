@@ -324,6 +324,7 @@ L.easyPrint({
   filename: 'slr_viewer_map',
   hideControlContainer: false,
   exportOnly: true,
+  tileWait: 1000,
   hideClasses: ['leaflet-control-zoom','leaflet-control-home','leaflet-control-easyPrint','ac-container','styledLayerControl-utilities',
     'leaflet-control-attribution','logo-control'], 
   showClasses: ['legend-container','print-attribution'],
