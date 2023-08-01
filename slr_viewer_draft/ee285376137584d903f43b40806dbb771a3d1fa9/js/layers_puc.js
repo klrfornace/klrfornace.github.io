@@ -336,6 +336,7 @@ function cesspoolStyle(properties, zoom) {
 };
 
 const cesspoolTileOptions = {
+  rendererFactory: L.canvas.tile,
   vectorTileLayerStyles: {'OSDS_dots_w_Tracts_Clean_atts_Oahu': cesspoolStyle},
   interactive: false,	//set to false now since there are no pop-ups
   displayName: 'Cesspools',
