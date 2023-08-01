@@ -325,7 +325,7 @@ const treatmentPlants = new L.GeoJSON.AJAX(crcgeoWFS('CRC%3ASewer_-_Treatment_Pl
 });
 
 // WFS method was too laggy for the large number of features so loading cesspool points as vector tiles
-const cesspoolURL = crcgeoMVT('CRC%3Aosds_dots_w_tracts_clean_atts_kp');
+const cesspoolURL = crcgeoMVT('CRC%3AOSDS_dots_w_Tracts_Clean_atts_Oahu');
 
 function cesspoolStyle(properties, zoom) {
   const iconSize = (zoom < 13) ? [6,6]:
